@@ -1,5 +1,6 @@
 /*! 
- * \file ctrl_main_gr14.h
+ * \author Group 14
+ * \file controller_main_gr14.h
  * \brief main header of the controller
  */
 
