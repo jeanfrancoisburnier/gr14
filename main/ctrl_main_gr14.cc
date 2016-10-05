@@ -84,13 +84,14 @@ void controller_loop(CtrlStruct *cvs)
 	opponents_tower(cvs);
 
 	// tower control
-	outputs->tower_command = 0.0;
+	outputs->tower_command = 15.0;
 
 	switch (cvs->main_state)
 	{
 		// calibration
 		case CALIB_STATE:
 			calibration(cvs);
+			printf("%d \t %d\n", cvs->inputs->u_switch[0], cvs->inputs->u_switch[1]);
 			break;
 
 		// wait before match beginning
