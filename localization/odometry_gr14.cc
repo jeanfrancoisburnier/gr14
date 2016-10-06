@@ -14,8 +14,8 @@ void update_odometry(CtrlStruct *cvs)
 	// variables declaration
 	double r_sp, l_sp;
 	double dt;
-    double wheel_sep = 0.225; //distance entre les deux roues
-    double wheel_rad = 0.030; //rayon d'une roue
+    double wheel_sep = 0.225; //distance between both wheels
+    double wheel_rad = 0.030; //radiius of a wheel
     double dS=0; //distance traveled by robot
     double dSl=0;//distance traveled by right and left wheel
     double dSr;
