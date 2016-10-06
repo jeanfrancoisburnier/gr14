@@ -14,6 +14,14 @@ void update_odometry(CtrlStruct *cvs)
 	// variables declaration
 	double r_sp, l_sp;
 	double dt;
+    double wheel_sep = 0.225; //distance entre les deux roues
+    double wheel_rad = 0.030; //rayon d'une roue
+    double dS=0; //distance traveled by robot
+    double dSl=0;//distance traveled by right and left wheel
+    double dSr;
+    double d_theta;
+    double dx;
+    double dy;
 
 	RobotPosition *rob_pos;
 	CtrlIn *inputs;
@@ -22,8 +30,8 @@ void update_odometry(CtrlStruct *cvs)
 	inputs  = cvs->inputs;
 	rob_pos = cvs->rob_pos;
 
-	r_sp = inputs->r_wheel_speed; // right wheel speed
-	l_sp = inputs->l_wheel_speed; // left wheel speed
+    r_sp = wheel_speed_meter(inputs->r_wheel_speed,wheel_rad); // right wheel speed
+	l_sp = wheel_speed_meter(inputs->l_wheel_speed,wheel_rad); // left wheel speed
 
 	// time
 	dt = inputs->t - rob_pos->last_t; // time increment since last call
@@ -36,11 +44,31 @@ void update_odometry(CtrlStruct *cvs)
 
 	// ----- odometry computation start ----- //
 
+    dSl = dt * l_sp ;
+    dSr = dt * r_sp ;
+    
+    dS = (dSr + dSl) / 2;
+    d_theta = (dSr - dSl) / wheel_sep; // change in the robots orientation
+    
+    dx = dS * cos(rob_pos->theta + d_theta/2);
+    dy = dS * sin(rob_pos->theta + d_theta/2);
 
 	// ----- odometry computation end ----- //
 
 	// last update time
 	rob_pos->last_t = inputs->t;
+    rob_pos->x = rob_pos->x + dx;
+    rob_pos->y = rob_pos->y + dy;
+    rob_pos->theta = rob_pos->theta + d_theta;
+    
+    printf ( "%f \t %f \t %f\n",rob_pos->x,rob_pos->y,rob_pos->theta);
+    //printf ( "%f \t %f \t %f\n",r_sp,inputs->r_wheel_speed,inputs->r_wheel_speed*wheel_rad);
+}
+
+double wheel_speed_meter(double wheel_speed_rad,double wheel_radius) //speed form radians per second to meter per second
+{
+    double wheel_speed_m = wheel_speed_rad*wheel_radius;
+    return wheel_speed_m;
 }
 
 NAMESPACE_CLOSE();
