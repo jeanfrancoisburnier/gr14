@@ -2,6 +2,7 @@
 #include "useful_gr14.h"
 #include "init_pos_gr14.h"
 #include <math.h>
+#define declage_tower 0.083
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -119,9 +120,9 @@ void triangulation(CtrlStruct *cvs)
 	alpha_c = 0.0;
 
 	// beacons angles predicted thanks to odometry measurements (to compute)
-	alpha_1_predicted = 0.0;
-	alpha_2_predicted = 0.0;
-	alpha_3_predicted = 0.0;
+	alpha_1_predicted = predicted_angle(rob_pos->x,rob_pos->y,x_beac_1,y_beac_1,rob_pos->theta,declage_tower);
+	alpha_2_predicted = predicted_angle(rob_pos->x,rob_pos->y,x_beac_2,y_beac_2,rob_pos->theta,declage_tower);
+	alpha_3_predicted = predicted_angle(rob_pos->x,rob_pos->y,x_beac_3,y_beac_3,rob_pos->theta,declage_tower);
 
 	// indexes of each beacon
 	alpha_1_index = index_predicted(alpha_1_predicted, alpha_a, alpha_b, alpha_c);
@@ -181,6 +182,12 @@ void triangulation(CtrlStruct *cvs)
 	pos_tri->theta = 0.0;
 
 	// ----- triangulation computation end ----- //
+}
+
+double predicted_angle(double x_r,double y_r,double x_b,double y_b,double alpha,double d){
+	double theta;
+	theta = atan((x_b-(x_r+cos(alpha)*d))/(y_b-(y_r+sin(alpha)*d)))-alpha
+return theta;
 }
 
 NAMESPACE_CLOSE();
