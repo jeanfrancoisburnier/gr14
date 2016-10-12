@@ -4,6 +4,8 @@
 #include <math.h>
 #define declage_tower 0.083
 
+#define PI 3,1416
+
 NAMESPACE_INIT(ctrlGr14);
 
 /*! \brief set the fixed beacons positions, depending on the team
@@ -90,6 +92,12 @@ void triangulation(CtrlStruct *cvs)
 	double alpha_1, alpha_2, alpha_3;
 	double alpha_1_predicted, alpha_2_predicted, alpha_3_predicted;
 	double x_beac_1, y_beac_1, x_beac_2, y_beac_2, x_beac_3, y_beac_3;
+	
+	//variables needed for the ToTal algorithm
+	double xm_beac_1, ym_beac_1, xm_beac_3, ym_beac_3;
+	double T12, T23, T31;
+	double x12_p, x23_p, x31_p, y12_p, y23_p, y31_p, k31_p;
+	double D;
 
 	// variables initialization
 	pos_tri = cvs->triang_pos;
@@ -172,13 +180,46 @@ void triangulation(CtrlStruct *cvs)
 	
 
 	// ----- triangulation computation start ----- //
+	//ToTal algorithm : http://www.telecom.ulg.ac.be/triangulation/
+	//*************************************************************\\
+	//Modified beacon coordinates
+	xm_beac_1=x_beac_1 - x_beac_2;
+	ym_beac_1=y_beac_1 - y_beac_2;
+	xm_beac_3=x_beac_3 - x_beac_2;
+	ym_beac_3=y_beac_3 - y_beac_2;
 
+	//Compute te three cot(.)
+	T12 = cot(alpha_2 - alpha_1);
+	T23 = cot(alpha_3 - alpha_2);
+	T12 = (1-T12*T23) / (T12+T23);
+
+	//Compute the modified circle center coordinates
+	x12_p = xm_beac_1 + T12 * ym_beac_1;
+	y12_p = ym_beac_1 - T12 * xm_beac_1;
+	x23_p = xm_beac_3 - T23 * ym_beac_3;
+	y23_p = ym_beac_3 + T23 * xm_beac_3;
+	x31_p = (xm_beac_3 + xm_beac_1) + T31 * (ym_beac_3 - ym_beac_1);
+	y31_p = (ym_beac_3 + ym_beac_1) - T31 * (xm_beac_3 - xm_beac_1;
+
+	//Compute k31_p
+	k31_p = xm_beac_1*xm_beac_3 + ym_beac_1*ym_beac_3 + T31*(xm_beac_1*ym_beac_3 - xm_beac_3*ym_beac_1);
+
+	//Compute D
+	D = (x12_p-x23_p)*(y23_p-y31_p) - (y12_p-y23_p)*(x23_p-x31_p);
+	
 	// robot position
-	pos_tri->x = rob_pos->x;
-	pos_tri->y = 0.0;
+	pos_tri->x = x_beac_2 + (k31_p*(y12_p-y23_p)) / D;
+	pos_tri->y = y_beac_2 + (k31_p*(x23_p-x12_p)) / D;
+	//************************************************************\\
 
 	// robot orientation
-	pos_tri->theta = 0.0;
+	switch (cvs->team_id)
+	{
+		case TEAM_A : pos_tri->theta = -PI/2 - alpha_3; break;
+
+		case TEAM_B : pos_tri->theta = PI/2 - alpha_3; break;
+	}
+
 
 	// ----- triangulation computation end ----- //
 }
