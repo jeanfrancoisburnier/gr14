@@ -37,10 +37,10 @@ void fixed_beacon_positions(int team_id, double *x_beac_1, double *y_beac_1,
 			*x_beac_1 = 1.062;
 			*y_beac_1 = -1.562;
 
-			*x_beac_2 = 0.0;
-			*y_beac_2 = 1.562;
+			*x_beac_2 = -1.062;
+			*y_beac_2 = -1.562;
 
-			*x_beac_3 = -1.062;
+			*x_beac_3 = 0.0;
 			*y_beac_3 = -1.562;
 			break;
 	
