@@ -23,26 +23,26 @@ void fixed_beacon_positions(int team_id, double *x_beac_1, double *y_beac_1,
 {
 	switch (team_id)
 	{
-		case TEAM_A:
-			*x_beac_1 = 0.0;
-			*y_beac_1 = 0.0;
+		case TEAM_A: //blue team
+			*x_beac_1 = 1.062;
+			*y_beac_1 = 1.562;
 
-			*x_beac_2 = 0.0;
-			*y_beac_2 = 0.0;
+			*x_beac_2 = -1.062;
+			*y_beac_2 = 1.562;
 
 			*x_beac_3 = 0.0;
-			*y_beac_3 = 0.0;
+			*y_beac_3 = -1.562;
 			break;
 
 		case TEAM_B:
-			*x_beac_1 = 0.0;
-			*y_beac_1 = 0.0;
+			*x_beac_1 = 1.062;
+			*y_beac_1 = -1.562;
 
-			*x_beac_2 = 0.0;
-			*y_beac_2 = 0.0;
+			*x_beac_2 = -1.062;
+			*y_beac_2 = -1.562;
 
 			*x_beac_3 = 0.0;
-			*y_beac_3 = 0.0;
+			*y_beac_3 = -1.562;
 			break;
 	
 		default:
@@ -95,7 +95,6 @@ void triangulation(CtrlStruct *cvs)
 	pos_tri = cvs->triang_pos;
 	rob_pos = cvs->rob_pos;
 	inputs  = cvs->inputs;
-
 	// safety
 	if ((inputs->rising_index_fixed < 0) || (inputs->falling_index_fixed < 0))
 	{
@@ -175,7 +174,7 @@ void triangulation(CtrlStruct *cvs)
 	// ----- triangulation computation start ----- //
 
 	// robot position
-	pos_tri->x = 0.0;
+	pos_tri->x = rob_pos->x;
 	pos_tri->y = 0.0;
 
 	// robot orientation
