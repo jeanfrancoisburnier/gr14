@@ -199,7 +199,7 @@ void triangulation(CtrlStruct *cvs)
 	x23_p = xm_beac_3 - T23 * ym_beac_3;
 	y23_p = ym_beac_3 + T23 * xm_beac_3;
 	x31_p = (xm_beac_3 + xm_beac_1) + T31 * (ym_beac_3 - ym_beac_1);
-	y31_p = (ym_beac_3 + ym_beac_1) - T31 * (xm_beac_3 - xm_beac_1;
+	y31_p = (ym_beac_3 + ym_beac_1) - T31 * (xm_beac_3 - xm_beac_1);
 
 	//Compute k31_p
 	k31_p = xm_beac_1*xm_beac_3 + ym_beac_1*ym_beac_3 + T31*(xm_beac_1*ym_beac_3 - xm_beac_3*ym_beac_1);
@@ -212,7 +212,7 @@ void triangulation(CtrlStruct *cvs)
 	pos_tri->y = y_beac_2 + (k31_p*(x23_p-x12_p)) / D;
 	//************************************************************\\
 
-	// robot orientation
+	// robot orientation  //à modifier, erreur de compréhension, l'ancien code ne fonctionnait que si le robot était à l'origine************************\
 	switch (cvs->team_id)
 	{
 		case TEAM_A : pos_tri->theta = -PI/2 - alpha_3; break;
@@ -226,7 +226,7 @@ void triangulation(CtrlStruct *cvs)
 
 double predicted_angle(double x_r,double y_r,double x_b,double y_b,double alpha,double d){
 	double theta;
-	theta = atan((x_b-(x_r+cos(alpha)*d))/(y_b-(y_r+sin(alpha)*d)))-alpha
+	theta = atan((x_b-(x_r+cos(alpha)*d))/(y_b-(y_r+sin(alpha)*d)))-alpha;
 return theta;
 }
 
