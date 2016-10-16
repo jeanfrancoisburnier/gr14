@@ -94,10 +94,10 @@ void triangulation(CtrlStruct *cvs)
 	double x_beac_1, y_beac_1, x_beac_2, y_beac_2, x_beac_3, y_beac_3;
 	
 	//variables needed for the ToTal algorithm
-	double xm_beac_1, ym_beac_1, xm_beac_3, ym_beac_3;
+	/*double xm_beac_1, ym_beac_1, xm_beac_3, ym_beac_3;
 	double T12, T23, T31;
 	double x12_p, x23_p, x31_p, y12_p, y23_p, y31_p, k31_p;
-	double D;
+	double D;*/
 
 	// variables initialization
 	pos_tri = cvs->triang_pos;
@@ -206,19 +206,50 @@ void triangulation(CtrlStruct *cvs)
   	float invD = 1.0 / D ;
   	float K = k31 / invD ;
   
+  	//Position of the Robot
 	pos_tri->x = K * (c12y - c23y) + x2 ;
 	pos_tri->y = K * (c23x - c12x) + y2 ;
 	
-//	return invD ; /* return 1/D */
+
+	//Orientation of the Robot //**********************Fait au cas par cas, il faudrait vérifier si pas déjà un algo existant*****
+	float x_abs = abs(pos_tri->x);
+	float xr2 = abs(x_beac_2 - pos_tri->x); // distance robot -> beacoin 2 en x
+	float xr1 = abs(x_beac_1 - pos_tri->x);// distance robot -> beacoin 1 en x
+	float yr1 = abs(y_beac_1 - pos_tri->y);// distance robot -> beatcoin 1 en y
+	float yr3 = abs(y_beac_3 - pos_tri->y);// distance robot -> beatcoin 3 en y
 
 
-
-	// robot orientation  //à modifier, erreur de compréhension, l'ancien code ne fonctionnait que si le robot était à l'origine************************\
-	switch (cvs->team_id)
+	if((alpha_1 < 0) && (alpha_2 >= 0) && (alpha_3 < 0)
 	{
-		case TEAM_A : pos_tri->theta = -PI/2 - alpha_3; break;
-
-		case TEAM_B : pos_tri->theta = PI/2 - alpha_3; break;
+		pos_tri->theta = arctan(yr1 / xr1) - alpha_1;
+	}
+	else if((alpha_1 < 0) && (alpha_2 < 0) && (alpha_3 >= 0)
+	{
+		pos_tri->theta = arctan(xr2/yr1) - alpha_2 + PI/2;
+	}
+	else if((alpha_1 < 0) && (alpha_2 >= 0) && (alpha_3 >= 0)
+	{
+		pos_tri->theta = arctan(yr1/xr1) - alpha_1;
+	}
+	else if((alpha_1 >= 0) && (alpha_2 < 0) && (alpha_3 < 0)
+	{
+		pos_tri->theta = - arctan(x_abs / yr3) - alpha_3 - PI/2;
+	}
+	else if((alpha_1 >= 0) && (alpha_2 >= 0) && (alpha_3 >= 0)
+	{
+		pos_tri->theta = arctan(yr1 / xr3) - alpha_1;
+	}
+	else if((alpha_1 < 0) && (alpha_2 < 0) && (alpha_3 < 0)
+	{
+		pos_tri->theta = - arctan(x_abs / yr3) - alpha_3 - PI/2;
+	}
+	else if((alpha_1 >= 0) && (alpha_2 >= 0) && (alpha_3 < 0)
+	{
+		pos_tri->theta = - arctan(yr3 / x_abs) - alpha_3;
+	}
+	else//else if((alpha_1 >= 0) && (alpha_2 < 0) && (alpha_3 >= 0)
+	{
+		pos_tri->theta = arctan(x_abs / yr3) - alpha_3 - PI/2;
 	}
 
 
