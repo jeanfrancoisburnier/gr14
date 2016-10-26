@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include "triangulation_gr14.h"
 #include "useful_gr14.h"
 #include "init_pos_gr14.h"
@@ -218,14 +219,14 @@ void triangulation(CtrlStruct *cvs)
 	* ToTal algorithm : http://www.telecom.ulg.ac.be/triangulation/
  	* Version with mathematical approximation of the limit for the pseudosingularities
 	*/
-	float cot_12 = 1/tan( alpha2 - alpha1 ) ;
-	float cot_23 = 1/tan( alpha3 - alpha2 ) ;
+	float cot_12 = 1/tan( alpha_2 - alpha_1 ) ;
+	float cot_23 = 1/tan( alpha_3 - alpha_2 ) ;
 	cot_12 = adjust_value_to_bounds( cot_12 , COT_MAX ) ;
 	cot_23 = adjust_value_to_bounds( cot_23 , COT_MAX ) ;
 	float cot_31 = ( 1.0 - cot_12 * cot_23 ) / ( cot_12 + cot_23 ) ;
 	cot_31 = adjust_value_to_bounds( cot_31 , COT_MAX ) ;
 	
-	float x1_ = x1 - x2 , y1_ = y1 - y2 , x3_ = x3 - x2 , y3_ = y3 - y2 ;
+	float x1_ = x_beac_1 - x_beac_2 , y1_ = y_beac_1 - y_beac_2 , x3_ = x_beac_3 - x_beac_2 , y3_ = y_beac_3 - y_beac_2 ;
 
 	float c12x = x1_ + cot_12 * y1_ ;
 	float c12y = y1_ - cot_12 * x1_ ;
@@ -291,6 +292,7 @@ void triangulation(CtrlStruct *cvs)
 
 	// ----- triangulation computation end ----- //
 }
+	
 
 double predicted_angle(double x_r,double y_r,double x_b,double y_b,double alpha,double d){
 	double theta; // valeur que l'on va transmettre comme angle prédit
@@ -316,3 +318,6 @@ double normalize_angle(double alpha){
 }
 
 NAMESPACE_CLOSE();
+
+
+
