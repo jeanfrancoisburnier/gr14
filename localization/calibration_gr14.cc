@@ -47,7 +47,7 @@ void calibration(CtrlStruct *cvs)
 			calib->t_flag = t;
 			break;
 
-		case CALIB_STATE_A: // state A
+		case CALIB_STATE_A: // move backward until contact with wall
 			speed_regulation(cvs, -4.0, -4.0);
 
 			// go to state B after 5 seconds
@@ -59,24 +59,25 @@ void calibration(CtrlStruct *cvs)
 			}
 			break;
 
-		case CALIB_STATE_B: // state B - bien collé au mur
-			// speed_regulation(cvs, 5.0, 5.0);
+		case CALIB_STATE_B: // move backward until pressed against wall -> initializes y coordinate and (theta)
 
-			// go to state C after 0.5 seconds
+			// go to state C after 1 second
 			if (t - calib->t_flag > 1.0)
 			{
 				calib->flag = CALIB_STATE_C;
 
 				calib->t_flag = t;
 
-				// should send something (position x or y)/////////////////////////
+				// Do not forget to take into that the robot could start on yellow side
+				rob_pos->y = 1.502;
+
 			}
 			break;
 
-		case CALIB_STATE_C: // state C
+		case CALIB_STATE_C: // move forward
 			speed_regulation(cvs, 5.0, 5.0);
 
-			// go to final state after 2 seconds
+			// go to state D after 1 second
 			if (t - calib->t_flag > 1.0)
 			{
 				calib->flag = CALIB_STATE_D;
@@ -85,10 +86,10 @@ void calibration(CtrlStruct *cvs)
 			}
 			break;
 
-		case CALIB_STATE_D: // state D
+		case CALIB_STATE_D: // rotation of -90°
 			speed_regulation(cvs, -2.356, +2.356);
 
-			// go to final state after 5 seconds
+			// go to state E after 2.5 seconds
 			if (t - calib->t_flag > 2.5)
 			{
 				calib->flag = CALIB_STATE_E;
@@ -97,10 +98,10 @@ void calibration(CtrlStruct *cvs)
 			}
 			break;
 
-		case CALIB_STATE_E: // state E
+		case CALIB_STATE_E: // move backward until contact with wall
 			speed_regulation(cvs, -4.0, -4.0);
 
-			// go to final state after 2 seconds
+			 // go to state F after 5 seconds
 			if (t - calib->t_flag > 5.0 || (cvs->inputs->u_switch[0] && cvs->inputs->u_switch[1]))
 			{
 				calib->flag = CALIB_STATE_F;
@@ -109,24 +110,25 @@ void calibration(CtrlStruct *cvs)
 			}
 			break;
 
-		case CALIB_STATE_F: // state F - bien collé au mur
-			// speed_regulation(cvs, 5.0, 5.0);
+		case CALIB_STATE_F: // move backward until pressed against wall -> initializes x coordinate and theta
 
-			// go to state C after 0.5 seconds
+			// go to state G after 1 second
 			if (t - calib->t_flag > 1.0)
 			{
 				calib->flag = CALIB_STATE_G;
 
 				calib->t_flag = t;
 
-				// should send something (position x or y)/////////////////////////
+				// Do not forget to take into that the robot could start on yellow side
+				rob_pos->x = 1.002;
+				rob_pos->theta = M_PI;
 			}
 			break;
 
-		case CALIB_STATE_G: // state G
+		case CALIB_STATE_G: // move forward
 			speed_regulation(cvs, 4.0, 4.0);
 
-			// go to final state after 2 seconds
+			// go to state H after 2 seconds
 			if (t - calib->t_flag > 2.0)
 			{
 				calib->flag = CALIB_STATE_H;
@@ -135,10 +137,10 @@ void calibration(CtrlStruct *cvs)
 			}
 			break;
 
-		case CALIB_STATE_H: // state H
+		case CALIB_STATE_H: // rotation of 90°
 			speed_regulation(cvs, +2.356, -2.356);
 
-			// go to final state after 2 seconds
+			// go to final state after 2.5 seconds
 			if (t - calib->t_flag > 2.5)
 			{
 				calib->flag = CALIB_FINISH;
@@ -148,7 +150,7 @@ void calibration(CtrlStruct *cvs)
 			break;
 
 		case CALIB_FINISH: // wait before the match is starting
-			speed_regulation(cvs, 50.0, 50.0);
+			speed_regulation(cvs, 0.0, 0.0);
 			break;
 	
 		default:
