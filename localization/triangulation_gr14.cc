@@ -213,7 +213,7 @@ void triangulation(CtrlStruct *cvs)
 	alpha_2 = alpha_2 + PI;
 	alpha_3 = alpha_3 + PI;
 
-<<<<<<< HEAD
+
 	/* ----- triangulation computation start ----- //
 	* ToTal algorithm : http://www.telecom.ulg.ac.be/triangulation/
  	* Version with mathematical approximation of the limit for the pseudosingularities
