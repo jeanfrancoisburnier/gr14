@@ -2,6 +2,9 @@
 #include "useful_gr14.h"
 #include "init_pos_gr14.h"
 #include <math.h>
+#define declage_tower 0.083
+
+#define PI 3,1416
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -22,26 +25,26 @@ void fixed_beacon_positions(int team_id, double *x_beac_1, double *y_beac_1,
 {
 	switch (team_id)
 	{
-		case TEAM_A:
-			*x_beac_1 = 0.0;
-			*y_beac_1 = 0.0;
+		case TEAM_A: //blue team
+			*x_beac_1 = 1.062;
+			*y_beac_1 = 1.562;
 
-			*x_beac_2 = 0.0;
-			*y_beac_2 = 0.0;
+			*x_beac_2 = -1.062;
+			*y_beac_2 = 1.562;
 
 			*x_beac_3 = 0.0;
-			*y_beac_3 = 0.0;
+			*y_beac_3 = -1.562;
 			break;
 
 		case TEAM_B:
-			*x_beac_1 = 0.0;
-			*y_beac_1 = 0.0;
+			*x_beac_1 = 1.062;
+			*y_beac_1 = -1.562;
 
-			*x_beac_2 = 0.0;
-			*y_beac_2 = 0.0;
+			*x_beac_2 = -1.062;
+			*y_beac_2 = -1.562;
 
 			*x_beac_3 = 0.0;
-			*y_beac_3 = 0.0;
+			*y_beac_3 = -1.562;
 			break;
 	
 		default:
@@ -89,12 +92,17 @@ void triangulation(CtrlStruct *cvs)
 	double alpha_1, alpha_2, alpha_3;
 	double alpha_1_predicted, alpha_2_predicted, alpha_3_predicted;
 	double x_beac_1, y_beac_1, x_beac_2, y_beac_2, x_beac_3, y_beac_3;
+	
+	//variables needed for the ToTal algorithm
+	/*double xm_beac_1, ym_beac_1, xm_beac_3, ym_beac_3;
+	double T12, T23, T31;
+	double x12_p, x23_p, x31_p, y12_p, y23_p, y31_p, k31_p;
+	double D;*/
 
 	// variables initialization
 	pos_tri = cvs->triang_pos;
 	rob_pos = cvs->rob_pos;
 	inputs  = cvs->inputs;
-
 	// safety
 	if ((inputs->rising_index_fixed < 0) || (inputs->falling_index_fixed < 0))
 	{
@@ -119,9 +127,9 @@ void triangulation(CtrlStruct *cvs)
 	alpha_c = 0.0;
 
 	// beacons angles predicted thanks to odometry measurements (to compute)
-	alpha_1_predicted = 0.0;
-	alpha_2_predicted = 0.0;
-	alpha_3_predicted = 0.0;
+	alpha_1_predicted = predicted_angle(rob_pos->x,rob_pos->y,x_beac_1,y_beac_1,rob_pos->theta,declage_tower);
+	alpha_2_predicted = predicted_angle(rob_pos->x,rob_pos->y,x_beac_2,y_beac_2,rob_pos->theta,declage_tower);
+	alpha_3_predicted = predicted_angle(rob_pos->x,rob_pos->y,x_beac_3,y_beac_3,rob_pos->theta,declage_tower);
 
 	// indexes of each beacon
 	alpha_1_index = index_predicted(alpha_1_predicted, alpha_a, alpha_b, alpha_c);
@@ -171,16 +179,87 @@ void triangulation(CtrlStruct *cvs)
 	}
 	
 
-	// ----- triangulation computation start ----- //
+	/* ----- triangulation computation start ----- //
+	* ToTal algorithm : http://www.telecom.ulg.ac.be/triangulation/
+ 	* Version with mathematical approximation of the limit for the pseudosingularities
+	*/
+	float cot_12 = 1/tan( alpha_2 - alpha_1 ) ;
+	float cot_23 = 1/tan( alpha_3 - alpha_2 ) ;
+	cot_12 = adjust_value_to_bounds( cot_12 , COT_MAX ) ;
+	cot_23 = adjust_value_to_bounds( cot_23 , COT_MAX ) ;
+	float cot_31 = ( 1.0 - cot_12 * cot_23 ) / ( cot_12 + cot_23 ) ;
+	cot_31 = adjust_value_to_bounds( cot_31 , COT_MAX ) ;
+	
+	float x1_ = x_beac_1 - x_beac_2 , y1_ = y_beac_1 - y_beac_2 , x3_ = x_beac_3 - x_beac_2 , y3_ = y_beac_3 - y_beac_2 ;
 
-	// robot position
-	pos_tri->x = 0.0;
-	pos_tri->y = 0.0;
+	float c12x = x1_ + cot_12 * y1_ ;
+	float c12y = y1_ - cot_12 * x1_ ;
 
-	// robot orientation
-	pos_tri->theta = 0.0;
+	float c23x = x3_ - cot_23 * y3_ ;
+	float c23y = y3_ + cot_23 * x3_ ;
+
+	float c31x = (x3_ + x1_) + cot_31 * (y3_ - y1_) ;
+	float c31y = (y3_ + y1_) - cot_31 * (x3_ - x1_) ;
+	float k31 = (x3_ * x1_) + (y3_ * y1_) + cot_31 * ( (y3_ * x1_) - (x3_ * y1_) ) ;
+  
+  	float D = (c12x - c23x) * (c23y - c31y) - (c23x - c31x) * (c12y - c23y) ;
+  	float invD = 1.0 / D ;
+  	float K = k31 / invD ;
+  
+  	//Position of the Robot
+	pos_tri->x = K * (c12y - c23y) + x2 ;
+	pos_tri->y = K * (c23x - c12x) + y2 ;
+	
+
+	//Orientation of the Robot //**********************Fait au cas par cas, il faudrait vérifier si pas déjà un algo existant*****
+	float x_abs = abs(pos_tri->x);
+	float xr2 = abs(x_beac_2 - pos_tri->x); // distance robot -> beacoin 2 en x
+	float xr1 = abs(x_beac_1 - pos_tri->x);// distance robot -> beacoin 1 en x
+	float yr1 = abs(y_beac_1 - pos_tri->y);// distance robot -> beatcoin 1 en y
+	float yr3 = abs(y_beac_3 - pos_tri->y);// distance robot -> beatcoin 3 en y
+
+
+	if((alpha_1 < 0) && (alpha_2 >= 0) && (alpha_3 < 0)
+	{
+		pos_tri->theta = arctan(yr1 / xr1) - alpha_1;
+	}
+	else if((alpha_1 < 0) && (alpha_2 < 0) && (alpha_3 >= 0)
+	{
+		pos_tri->theta = arctan(xr2/yr1) - alpha_2 + PI/2;
+	}
+	else if((alpha_1 < 0) && (alpha_2 >= 0) && (alpha_3 >= 0)
+	{
+		pos_tri->theta = arctan(yr1/xr1) - alpha_1;
+	}
+	else if((alpha_1 >= 0) && (alpha_2 < 0) && (alpha_3 < 0)
+	{
+		pos_tri->theta = - arctan(x_abs / yr3) - alpha_3 - PI/2;
+	}
+	else if((alpha_1 >= 0) && (alpha_2 >= 0) && (alpha_3 >= 0)
+	{
+		pos_tri->theta = arctan(yr1 / xr3) - alpha_1;
+	}
+	else if((alpha_1 < 0) && (alpha_2 < 0) && (alpha_3 < 0)
+	{
+		pos_tri->theta = - arctan(x_abs / yr3) - alpha_3 - PI/2;
+	}
+	else if((alpha_1 >= 0) && (alpha_2 >= 0) && (alpha_3 < 0)
+	{
+		pos_tri->theta = - arctan(yr3 / x_abs) - alpha_3;
+	}
+	else//else if((alpha_1 >= 0) && (alpha_2 < 0) && (alpha_3 >= 0)
+	{
+		pos_tri->theta = arctan(x_abs / yr3) - alpha_3 - PI/2;
+	}
+
 
 	// ----- triangulation computation end ----- //
+}
+
+double predicted_angle(double x_r,double y_r,double x_b,double y_b,double alpha,double d){
+	double theta;
+	theta = atan((x_b-(x_r+cos(alpha)*d))/(y_b-(y_r+sin(alpha)*d)))-alpha;
+return theta;
 }
 
 NAMESPACE_CLOSE();
