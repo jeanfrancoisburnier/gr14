@@ -207,7 +207,7 @@ void triangulation(CtrlStruct *cvs)
 			exit(EXIT_FAILURE);
 	}
 
-	//We add Pi to the angées alpha so they go from 0 to 2*PI add we can do more easily the algorithm found online
+	//We add Pi to the angles alpha so they go from 0 to 2*PI add we can do more easily the algorithm found online
 	
 	alpha_1 = alpha_1 + PI;
 	alpha_2 = alpha_2 + PI;
