@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include "triangulation_gr14.h"
 #include "useful_gr14.h"
 #include "init_pos_gr14.h"
@@ -6,7 +5,9 @@
 #include <cmath>
 #define decalage_tower 0.083
 
-#define PI 3,1416
+#define PI 3.1416
+#define COT_MAX 100000000
+#define adjust_value_to_bounds(value, max) ( ( value > max ) ? max : ( ( value < -max ) ? -max : value ) )
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -96,12 +97,6 @@ void triangulation(CtrlStruct *cvs)
 	double alpha_1, alpha_2, alpha_3;
 	double alpha_1_predicted, alpha_2_predicted, alpha_3_predicted;
 	double x_beac_1, y_beac_1, x_beac_2, y_beac_2, x_beac_3, y_beac_3;
-	
-	//variables needed for the ToTal algorithm
-	/*double xm_beac_1, ym_beac_1, xm_beac_3, ym_beac_3;
-	double T12, T23, T31;
-	double x12_p, x23_p, x31_p, y12_p, y23_p, y31_p, k31_p;
-	double D;*/
 
 	// variables initialization
 	pos_tri = cvs->triang_pos;
@@ -131,15 +126,19 @@ void triangulation(CtrlStruct *cvs)
 	rise_angle_2 = inputs->last_rising_fixed[rise_index_2];
 	rise_angle_3 = inputs->last_rising_fixed[rise_index_3];
 
+	printf ( "rise angle :%f \t %f \t %f\n",rise_angle_1,rise_angle_2,rise_angle_3);
+
 	fall_angle_1 = inputs->last_falling_fixed[fall_index_1];
 	fall_angle_2 = inputs->last_falling_fixed[fall_index_2];
 	fall_angle_3 = inputs->last_falling_fixed[fall_index_3];
 
+	printf ( "fall angle :%f \t %f \t %f\n",fall_angle_1,fall_angle_2,fall_angle_3);
 
 	//check if one beacons is on the -PI,PI intersection and adjust 
-	fall_angle_1 = (std::abs(rise_angle_1 - fall_angle_1) > PI) ? PI-fall_angle_1 : fall_angle_1;
-	fall_angle_2 = (std::abs(rise_angle_2 - fall_angle_2) > PI) ? PI-fall_angle_2 : fall_angle_2;
-	fall_angle_3 = (std::abs(rise_angle_3 - fall_angle_3) > PI) ? PI-fall_angle_3 : fall_angle_3;
+	fall_angle_1 = (std::abs(rise_angle_1 - fall_angle_1) > PI) ? 2*PI+fall_angle_1 : fall_angle_1;
+	fall_angle_2 = (std::abs(rise_angle_2 - fall_angle_2) > PI) ? 2*PI+fall_angle_2 : fall_angle_2;
+	fall_angle_3 = (std::abs(rise_angle_3 - fall_angle_3) > PI) ? 2*PI+fall_angle_3 : fall_angle_3;
+
 
 	// beacons angles measured with the laser (to compute)
 	alpha_a = (fall_angle_1 + rise_angle_1)/2;
@@ -151,6 +150,8 @@ void triangulation(CtrlStruct *cvs)
 	alpha_b = normalize_angle(alpha_b);
 	alpha_c = normalize_angle(alpha_c);
 
+	printf ( "normalised angles :%f \t %f \t %f\n",alpha_a,alpha_b,alpha_c);
+
 	// beacons angles predicted thanks to odometry measurements (to compute)
 	alpha_1_predicted = predicted_angle(rob_pos->x,rob_pos->y,x_beac_1,y_beac_1,rob_pos->theta,decalage_tower);
 	alpha_2_predicted = predicted_angle(rob_pos->x,rob_pos->y,x_beac_2,y_beac_2,rob_pos->theta,decalage_tower);
@@ -161,10 +162,14 @@ void triangulation(CtrlStruct *cvs)
 	alpha_2_predicted = normalize_angle(alpha_2_predicted);
 	alpha_3_predicted = normalize_angle(alpha_3_predicted);	
 
+	printf ( "predicted angles modified :%f \t %f \t %f\n",alpha_1_predicted,alpha_2_predicted,alpha_3_predicted);
+
 	// indexes of each beacon
 	alpha_1_index = index_predicted(alpha_1_predicted, alpha_a, alpha_b, alpha_c);
 	alpha_2_index = index_predicted(alpha_2_predicted, alpha_a, alpha_b, alpha_c);
 	alpha_3_index = index_predicted(alpha_3_predicted, alpha_a, alpha_b, alpha_c);
+
+	printf ( "predicted index :%d \t %d \t %d\n",alpha_1_index,alpha_2_index,alpha_3_index);
 
 	// safety
 	if ((alpha_1_index == alpha_2_index) || (alpha_1_index == alpha_3_index) || (alpha_2_index == alpha_3_index))
@@ -243,8 +248,8 @@ void triangulation(CtrlStruct *cvs)
   	float K = k31 / invD ;
   
   	//Position of the Robot
-	pos_tri->x = K * (c12y - c23y) + x2 ;
-	pos_tri->y = K * (c23x - c12x) + y2 ;
+	pos_tri->x = K * (c12y - c23y) + x_beac_2 ;
+	pos_tri->y = K * (c23x - c12x) + y_beac_2 ;
 
 	
 
@@ -256,47 +261,50 @@ void triangulation(CtrlStruct *cvs)
 	float yr3 = abs(y_beac_3 - pos_tri->y);// distance robot -> beatcoin 3 en y
 
 
-	if((alpha_1 < 0) && (alpha_2 >= 0) && (alpha_3 < 0)
+	if((alpha_1 < 0) && (alpha_2 >= 0) && (alpha_3 < 0))
 	{
-		pos_tri->theta = arctan(yr1 / xr1) - alpha_1;
+		pos_tri->theta = atan(yr1 / xr1) - alpha_1;
 	}
-	else if((alpha_1 < 0) && (alpha_2 < 0) && (alpha_3 >= 0)
+	else if((alpha_1 < 0) && (alpha_2 < 0) && (alpha_3 >= 0))
 	{
-		pos_tri->theta = arctan(xr2/yr1) - alpha_2 + PI/2;
+		pos_tri->theta = atan(xr2/yr1) - alpha_2 + PI/2;
 	}
-	else if((alpha_1 < 0) && (alpha_2 >= 0) && (alpha_3 >= 0)
+	else if((alpha_1 < 0) && (alpha_2 >= 0) && (alpha_3 >= 0))
 	{
-		pos_tri->theta = arctan(yr1/xr1) - alpha_1;
+		pos_tri->theta = atan(yr1/xr1) - alpha_1;
 	}
-	else if((alpha_1 >= 0) && (alpha_2 < 0) && (alpha_3 < 0)
+	else if((alpha_1 >= 0) && (alpha_2 < 0) && (alpha_3 < 0))
 	{
-		pos_tri->theta = - arctan(x_abs / yr3) - alpha_3 - PI/2;
+		pos_tri->theta = - atan(x_abs / yr3) - alpha_3 - PI/2;
 	}
-	else if((alpha_1 >= 0) && (alpha_2 >= 0) && (alpha_3 >= 0)
+	else if((alpha_1 >= 0) && (alpha_2 >= 0) && (alpha_3 >= 0))
 	{
-		pos_tri->theta = arctan(yr1 / xr3) - alpha_1;
+		pos_tri->theta = atan(yr1 / xr1) - alpha_1;
 	}
-	else if((alpha_1 < 0) && (alpha_2 < 0) && (alpha_3 < 0)
+	else if((alpha_1 < 0) && (alpha_2 < 0) && (alpha_3 < 0))
 	{
-		pos_tri->theta = - arctan(x_abs / yr3) - alpha_3 - PI/2;
+		pos_tri->theta = - atan(x_abs / yr3) - alpha_3 - PI/2;
 	}
-	else if((alpha_1 >= 0) && (alpha_2 >= 0) && (alpha_3 < 0)
+	else if((alpha_1 >= 0) && (alpha_2 >= 0) && (alpha_3 < 0))
 	{
-		pos_tri->theta = - arctan(yr3 / x_abs) - alpha_3;
+		pos_tri->theta = - atan(yr3 / x_abs) - alpha_3;
 	}
 	else//else if((alpha_1 >= 0) && (alpha_2 < 0) && (alpha_3 >= 0)
 	{
-		pos_tri->theta = arctan(x_abs / yr3) - alpha_3 - PI/2;
+		pos_tri->theta = atan(x_abs / yr3) - alpha_3 - PI/2;
 	}
 
-
+	printf ( "triang :%f \t %f \t %f\n",pos_tri->x,pos_tri->y,pos_tri->theta);
 	// ----- triangulation computation end ----- //
 }
 	
 
 double predicted_angle(double x_r,double y_r,double x_b,double y_b,double alpha,double d){
 	double theta; // valeur que l'on va transmettre comme angle prédit
-	theta = atan((x_b-(x_r+cos(alpha)*d))/(y_b-(y_r+sin(alpha)*d)))-alpha;
+
+	//printf ( "ta maman :%f \t %f \t %f \t %f\n",x_r,x_b,alpha,d);
+
+	theta = atan((y_b-y_r)/(x_b-x_r)) + alpha;
 	/* la fonction calcul l'angle en fonction de la position du robot. l'arctan prend la position du beacon(x_b,y_b) moins la 
 	position du robot(x_r,y_r) moins le decalage (d) de la tour radar qui n'est pas centrée que l'on vient multiplier
 	par le cos ou sin de l'orientation du robot. On déduit ensuite l'angle alpha 
