@@ -83,8 +83,22 @@ void controller_loop(CtrlStruct *cvs)
 	// opponents position
 	opponents_tower(cvs);
 
+	// check opp front
+	check_opp_front(cvs);
+
 	// tower control
-	outputs->tower_command = 0.0;
+	outputs->tower_command = 15.0;
+
+	// if (t < -10.0)
+	// {
+	// 	speed_regulation(cvs, -2.0*1.728, 2.0*1.728);
+	// }
+	// else
+	// {
+	// 	speed_regulation(cvs, 0.0, 0.0);
+	// }
+
+	return;
 
 	switch (cvs->main_state)
 	{
@@ -110,7 +124,8 @@ void controller_loop(CtrlStruct *cvs)
 
 			if (t > 89.0) // 1 second safety
 			{
-				cvs->main_state = STOP_END_STATE;
+				// cvs->main_state = STOP_END_STATE;
+				cvs->main_state = RUN_STATE;
 			}
 			break;
 

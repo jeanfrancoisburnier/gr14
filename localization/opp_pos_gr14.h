@@ -19,6 +19,7 @@ typedef struct OpponentsPosition
 	double y[2]; ///< y position of opponents [m]
 
 	double last_t; ///< last time the filters were updated [s]
+	double last_distance[2]; ///< last distance to opponents
 
 	int nb_opp; ///< number of opponents
 
@@ -28,6 +29,7 @@ typedef struct OpponentsPosition
 int check_opp_front(CtrlStruct *cvs);
 void opponents_tower(CtrlStruct *cvs);
 int single_opp_tower(double last_rise, double last_fall, double rob_x, double rob_y, double rob_theta, double *new_x_opp, double *new_y_opp);
+double compute_distance_to_opp();
 
 NAMESPACE_CLOSE();
 
