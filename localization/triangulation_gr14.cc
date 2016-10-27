@@ -192,12 +192,6 @@ void triangulation(CtrlStruct *cvs)
 			exit(EXIT_FAILURE);
 	}
 	
-	/*
-	alpha_1 = alpha_1 + PI;
-	alpha_2 = alpha_2 + PI;
-	alpha_3 = alpha_3 + PI; 
-	*/
-
 	/* ----- triangulation computation start ----- //
 	* ToTal algorithm : http://www.telecom.ulg.ac.be/triangulation/
  	* Version with mathematical approximation of the limit for the pseudosingularities
@@ -229,16 +223,12 @@ void triangulation(CtrlStruct *cvs)
 	pos_tri->x = K * (c12y - c23y) + x_beac_2 ;
 	pos_tri->y = K * (c23x - c12x) + y_beac_2 ;
 
-	
-
 	//Orientation of the Robot //**********************Fait au cas par cas, il faudrait vérifier si pas déjà un algo existant*****
 	float theta_temp = 0.0;
 	theta_temp = - alpha_1 + atan2((y_beac_1 - pos_tri->y),(x_beac_1 - pos_tri->x));
 	pos_tri->theta =  limit_angle(theta_temp);
 	
-	
-
-	printf ( "triang :%f \t %f \t %f\n",pos_tri->x,pos_tri->y,pos_tri->theta);
+	//printf ( "triang :%f \t %f \t %f\n",pos_tri->x,pos_tri->y,pos_tri->theta);
 	// ----- triangulation computation end ----- //
 }
 	
