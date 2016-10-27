@@ -19,7 +19,6 @@ void triangulation(CtrlStruct *cvs);
 
 double predicted_angle(double x_r,double y_r,double x_b,double y_b,double alpha,double d);
 
-double normalize_angle(double alpha);
 
 NAMESPACE_CLOSE();
 
