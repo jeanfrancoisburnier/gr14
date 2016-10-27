@@ -241,45 +241,21 @@ void triangulation(CtrlStruct *cvs)
 	
 
 	//Orientation of the Robot //**********************Fait au cas par cas, il faudrait vérifier si pas déjà un algo existant*****
-	float x_abs = abs(pos_tri->x);
-	float xr2 = abs(x_beac_2 - pos_tri->x); // distance robot -> beacoin 2 en x
-	float xr1 = abs(x_beac_1 - pos_tri->x);// distance robot -> beacoin 1 en x
-	float yr1 = abs(y_beac_1 - pos_tri->y);// distance robot -> beatcoin 1 en y
-	float yr3 = abs(y_beac_3 - pos_tri->y);// distance robot -> beatcoin 3 en y
-
-
-	if((alpha_1 < 0) && (alpha_2 >= 0) && (alpha_3 < 0))
+	float theta_temp = 0.0;
+	theta_temp = - alpha_1 + atan2((y_beac_1 - pos_tri->y) / (x_beac_1 - pos_tri->x));
+	if(theta_temp > PI)
 	{
-		pos_tri->theta = atan(yr1 / xr1) - alpha_1;
+		pos_tri->theta =  theta_temp - 2*PI;
 	}
-	else if((alpha_1 < 0) && (alpha_2 < 0) && (alpha_3 >= 0))
+	else if(theta_temp <= -PI)
 	{
-		pos_tri->theta = atan(xr2/yr1) - alpha_2 + PI/2;
+		pos_tri->theta = theta_temp + 2*PI;
 	}
-	else if((alpha_1 < 0) && (alpha_2 >= 0) && (alpha_3 >= 0))
+	else
 	{
-		pos_tri->theta = atan(yr1/xr1) - alpha_1;
+		pos_tri->theta = theta_temp;
 	}
-	else if((alpha_1 >= 0) && (alpha_2 < 0) && (alpha_3 < 0))
-	{
-		pos_tri->theta = - atan(x_abs / yr3) - alpha_3 - PI/2;
-	}
-	else if((alpha_1 >= 0) && (alpha_2 >= 0) && (alpha_3 >= 0))
-	{
-		pos_tri->theta = atan(yr1 / xr1) - alpha_1;
-	}
-	else if((alpha_1 < 0) && (alpha_2 < 0) && (alpha_3 < 0))
-	{
-		pos_tri->theta = - atan(x_abs / yr3) - alpha_3 - PI/2;
-	}
-	else if((alpha_1 >= 0) && (alpha_2 >= 0) && (alpha_3 < 0))
-	{
-		pos_tri->theta = - atan(yr3 / x_abs) - alpha_3;
-	}
-	else//else if((alpha_1 >= 0) && (alpha_2 < 0) && (alpha_3 >= 0)
-	{
-		pos_tri->theta = atan(x_abs / yr3) - alpha_3 - PI/2;
-	}
+	
 
 	printf ( "triang :%f \t %f \t %f\n",pos_tri->x,pos_tri->y,pos_tri->theta);
 	// ----- triangulation computation end ----- //
