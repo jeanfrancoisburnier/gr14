@@ -10,7 +10,7 @@ NAMESPACE_INIT(ctrlGr14);
 #define DEG_TO_RAD (M_PI/180.0) ///< convertion from degrees to radians
 
 // calibration states
-enum {CALIB_START, CALIB_STATE_A, CALIB_STATE_B, CALIB_STATE_C, CALIB_FINISH};
+enum {CALIB_START, CALIB_STATE_A, CALIB_STATE_B, CALIB_STATE_C, CALIB_STATE_D, CALIB_STATE_E, CALIB_FINISH};
 
 /*! \brief calibration of the robot to calibrate its position
  * 
@@ -48,10 +48,10 @@ void calibration(CtrlStruct *cvs)
 			break;
 
 		case CALIB_STATE_A: // state A
-			speed_regulation(cvs, 0.0, 0.0);
+			speed_regulation(cvs, -2.0, -2.0);
 
-			// go to state B after 2 seconds
-			if (t - calib->t_flag > 2.0)
+			// go to state B after 5 seconds
+			if (t - calib->t_flag > 5.0 || (cvs->inputs->u_switch[0] && cvs->inputs->u_switch[1]))
 			{
 				calib->flag = CALIB_STATE_B;
 
@@ -59,23 +59,49 @@ void calibration(CtrlStruct *cvs)
 			}
 			break;
 
-		case CALIB_STATE_B: // state B
-			speed_regulation(cvs, 0.0, 0.0);
+		case CALIB_STATE_B: // state B - bien collé au mur
+			// speed_regulation(cvs, 5.0, 5.0);
 
-			// go to state C after 2 seconds
-			if (t - calib->t_flag > 2.0)
+			// go to state C after 0.5 seconds
+			if (t - calib->t_flag > 1.0)
 			{
 				calib->flag = CALIB_STATE_C;
+
+				calib->t_flag = t;
+
+				// should send something (position x or y)
+			}
+			break;
+
+		case CALIB_STATE_C: // state C
+			speed_regulation(cvs, 3.0, 3.0);
+
+			// go to final state after 2 seconds
+			if (t - calib->t_flag > 2.0)
+			{
+				calib->flag = CALIB_STATE_D;
 
 				calib->t_flag = t;
 			}
 			break;
 
-		case CALIB_STATE_C: // state C
-			speed_regulation(cvs, 0.0, 0.0);
+		case CALIB_STATE_D: // state D
+			speed_regulation(cvs, -1.178, +1.178);
+
+			// go to final state after 5 seconds
+			if (t - calib->t_flag > 5.0)
+			{
+				calib->flag = CALIB_STATE_E;
+
+				calib->t_flag = t;
+			}
+			break;
+
+		case CALIB_STATE_E: // state E
+			speed_regulation(cvs, -2.0, -2.0);
 
 			// go to final state after 2 seconds
-			if (t - calib->t_flag > 2.0)
+			if (t - calib->t_flag > 5.0)
 			{
 				calib->flag = CALIB_FINISH;
 

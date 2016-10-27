@@ -89,22 +89,12 @@ void controller_loop(CtrlStruct *cvs)
 	// tower control
 	outputs->tower_command = 15.0;
 
-	// if (t < -10.0)
-	// {
-	// 	speed_regulation(cvs, -2.0*1.728, 2.0*1.728);
-	// }
-	// else
-	// {
-	// 	speed_regulation(cvs, 0.0, 0.0);
-	// }
-
-	return;
-
 	switch (cvs->main_state)
 	{
 		// calibration
 		case CALIB_STATE:
 			calibration(cvs);
+			//printf("%d \t %d\n", cvs->inputs->u_switch[0], cvs->inputs->u_switch[1]);
 			break;
 
 		// wait before match beginning
