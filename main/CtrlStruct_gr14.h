@@ -41,7 +41,7 @@ typedef struct CtrlStruct
 
 	RobotPosition *rob_pos;     ///< robot position coming from the robot odometry
 	RobotPosition *triang_pos;  ///< robot position coming from the triangulation
-	RobotPosition *kalman_pos;	///< robot position coming from the kalman filter
+	KalmanStruct *kalman_pos;	///< robot position coming from the kalman filter
 	OpponentsPosition *opp_pos; ///< opponents position
 	SpeedRegulation *sp_reg;    ///< speed regulation
 	RobotCalibration *calib;    ///< calibration

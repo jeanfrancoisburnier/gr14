@@ -9,6 +9,8 @@
 
 #include "CtrlStruct_gr14.h"
 #include "init_pos_gr14.h"
+#include "matrice.h"
+
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -20,11 +22,11 @@ typedef struct KalmanStruc
 	double theta; ///< robot orientation [rad]
 
 	double last_t; ///< last time position was updated 
-	
-
-} KalmanStrucs;
+	double P_k[3][3]; // The error covariance matrix
+} KalmanStruc;
 
 void kalman(CtrlStruct *cvs);
+
 
 NAMESPACE_CLOSE();
 
