@@ -13,10 +13,16 @@
 NAMESPACE_INIT(ctrlGr14);
 
 /// Kalman main structure
-struct KalmanStruc
+typedef struct KalmanStruc
 {
-	int dummy_variable; ///< put your own variable, this is just an example without purpose
-};
+	double x; ///< x position [m]
+	double y; ///< y position [m]
+	double theta; ///< robot orientation [rad]
+
+	double last_t; ///< last time position was updated 
+	
+
+} KalmanStrucs;
 
 void kalman(CtrlStruct *cvs);
 

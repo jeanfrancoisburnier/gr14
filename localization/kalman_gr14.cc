@@ -14,10 +14,12 @@ void kalman(CtrlStruct *cvs)
 	// variable declaration
 	RobotPosition *rob_pos;
 	RobotPosition *triang_pos;
+	RobotPosition *kalman_pos;
 
 	// variables initialization
 	rob_pos = cvs->rob_pos;
 	triang_pos = cvs->triang_pos;
+	kalman_pos = cvs->kalman_pos;
 }
 
 NAMESPACE_CLOSE();

@@ -3,6 +3,7 @@
 #include "init_pos_gr14.h"
 #include <math.h>
 #include <cmath>
+
 #define decalage_tower 0.083
 
 #define PI 3.1416
@@ -228,7 +229,11 @@ void triangulation(CtrlStruct *cvs)
 	theta_temp = - alpha_1 + atan2((y_beac_1 - pos_tri->y),(x_beac_1 - pos_tri->x));
 	pos_tri->theta =  limit_angle(theta_temp);
 	
-	//printf ( "triang :%f \t %f \t %f\n",pos_tri->x,pos_tri->y,pos_tri->theta);
+	//printf ( "%f %f %f;\n",pos_tri->x,pos_tri->y,pos_tri->theta);
+	set_plot(pos_tri->x,"triang x");
+	set_plot(pos_tri->y,"triang y");
+	set_plot(pos_tri->theta,"triang theta");
+
 	// ----- triangulation computation end ----- //
 }
 	
