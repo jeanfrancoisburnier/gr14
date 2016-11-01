@@ -44,4 +44,39 @@ void set_init_position(int robot_id, RobotPosition *rob_pos)
 	}		
 }
 
+
+void set_init_position_kalman(int robot_id, KalmanStruct *kalman_pos)
+{
+	switch (robot_id)
+	{
+		case ROBOT_B: // blue robot
+			kalman_pos->x = 0.67;
+			kalman_pos->y = 1.15;
+			kalman_pos->theta = - 3.14156/2;
+			break;
+
+		case ROBOT_R: // red robot
+			kalman_pos->x = 0.0;
+			kalman_pos->y = 0.0;
+			kalman_pos->theta = 0.0;
+			break;
+
+		case ROBOT_Y: // yellow robot
+			kalman_pos->x = 0.0;
+			kalman_pos->y = 0.0;
+			kalman_pos->theta = 0.0;
+			break;
+
+		case ROBOT_W: //  white robot
+			kalman_pos->x = 0.0;
+			kalman_pos->y = 0.0;
+			kalman_pos->theta = 0.0;
+			break;
+	
+		default:
+			printf("Error: unknown robot ID: %d !\n", robot_id);
+			exit(EXIT_FAILURE);
+	}		
+}
+
 NAMESPACE_CLOSE();

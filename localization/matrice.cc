@@ -17,7 +17,7 @@ NAMESPACE_INIT(ctrlGr14);
  */
 void mult_matrices_3x3(double a[][3], double b[][3], double result[][3])
 {
-    double i, j, k;
+    int i, j, k;
     for(i = 0; i < 3; i++)
     {
         for(j = 0; j < 3; j++)
@@ -37,16 +37,12 @@ void mult_matrices_3x3(double a[][3], double b[][3], double result[][3])
  * \param[in] size define the size of vector R_2 or R_3
  * \param[out] result matrix in which the result of a*b is stored
  */
-void mult_matrices_vect_3xsize(double a[3][], double b[], double result[],int size)
+void mult_matrices_vect_3x3(double a[3][3], double b[3], double result[3])
 {
-	if (size!=3 && size !=2)
-	{
-		return;
-	}
-    double i, k;
+    int i, k;
     for(i = 0; i < 3; i++)
     {
-    	for(k = 0; k < size; k++)
+    	for(k = 0; k < 3; k++)
         {
                 result[i] +=  a[i][k] *  b[k];
         }        
@@ -62,6 +58,7 @@ void mult_matrices_vect_3xsize(double a[3][], double b[], double result[],int si
 double inv_mat_3x3(double mat[3][3],double inv[3][3])
 {
 	double determinant = 0;
+    int i, j;
 	for(i=0;i<3;i++)
 	{
       determinant = determinant + (mat[0][i]*(mat[1][(i+1)%3]*mat[2][(i+2)%3] - mat[1][(i+2)%3]*mat[2][(i+1)%3]));
@@ -88,6 +85,7 @@ double inv_mat_3x3(double mat[3][3],double inv[3][3])
  */
 void mat_trans(double mat[3][3],double  trans_mat[3][3])
 {
+    int i, j;
 	for(i=0;i<3;i++)
 	{
 	    for(j=0;j<3;j++)
@@ -104,8 +102,9 @@ void mat_trans(double mat[3][3],double  trans_mat[3][3])
  * \param[in] add_or_sub define if we are adding or subbing the elements 0 subing(mat_1 - mat_2) 1 adding 
  * \param[out] result matrix in which the result of mat_1+-mat_2 is stored
  */
-void mat_add(double mat_1[3][3],double mat_2[3][3],result[3][3],bool add_or_sub)
+void mat_add(double mat_1[3][3],double mat_2[3][3],double result[3][3],bool add_or_sub)
 {
+    int i, j;
     if (add_or_sub) // add
     {
         for(i=0;i<3;i++)
@@ -135,8 +134,9 @@ void mat_add(double mat_1[3][3],double mat_2[3][3],result[3][3],bool add_or_sub)
  * \param[in] add_or_sub define if we are adding or subbing the elements 0 subing(vect_1 - vect_2) 1 adding 
  * \param[out] result vect in which the result of mat_1+-mat_2 is stored
  */
-void vect_add(double vect_1[3],double vect_2[3],result[3],bool add_or_sub)
+void vect_add(double vect_1[3],double vect_2[3],double result[3],bool add_or_sub)
 {
+    int i;
     if (add_or_sub) // add
     {
         for(i=0;i<3;i++)

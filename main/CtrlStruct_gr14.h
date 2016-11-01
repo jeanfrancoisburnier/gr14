@@ -29,6 +29,7 @@ enum {TEAM_A, TEAM_B, NB_TEAMS};
 typedef struct RobotPosition RobotPosition;
 typedef struct SpeedRegulation SpeedRegulation;
 typedef struct RobotCalibration RobotCalibration;
+typedef struct KalmanStruct KalmanStruct;
 typedef struct OpponentsPosition OpponentsPosition;
 typedef struct PathPlanning PathPlanning;
 typedef struct Strategy Strategy;

@@ -17,15 +17,18 @@ void kalman(CtrlStruct *cvs)
 {
 	// variable declaration
 	//RobotPosition *rob_pos;
-	//RobotPosition *triang_pos;
+	RobotPosition *triang_pos;
 	KalmanStruct *kalman_pos;
 
 	// variables initialization
 	//rob_pos = cvs->rob_pos;
-	//triang_pos = cvs->triang_pos;
+	triang_pos = cvs->triang_pos;
 	//kalman_pos = cvs->kalman_pos;
 
-	double x_hat , y_hat , theta_hat;
+	double x_triang = triang_pos->x;
+	double y_triang = triang_pos->y;
+	double theta_triang = triang_pos->theta;
+	//double x_hat[3] = {,,};
 	double P_hat[3][3] = { 0 };
 	double A_k[3][3] = { 0 };
 	double B_k[3][2] = { 0 };
