@@ -59,7 +59,7 @@ void update_odometry(CtrlStruct *cvs)
 	rob_pos->last_t = inputs->t;
     rob_pos->x = rob_pos->x + dx;
     rob_pos->y = rob_pos->y + dy;
-    rob_pos->theta = rob_pos->theta + d_theta;
+    rob_pos->theta = limit_angle(rob_pos->theta + d_theta);
     
     //printf ( "Odometry : %f \t %f \t %f\n",rob_pos->x,rob_pos->y,rob_pos->theta);
     //printf ( "%f \t %f \t %f\n",r_sp,inputs->r_wheel_speed,inputs->r_wheel_speed*wheel_rad);
