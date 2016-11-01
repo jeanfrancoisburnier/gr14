@@ -4,8 +4,6 @@
 #include <math.h>
 #include <cmath>
 
-#define decalage_tower 0.083
-
 #define PI 3.1416
 #define COT_MAX 100000000
 #define adjust_value_to_bounds(value, max) ( ( value > max ) ? max : ( ( value < -max ) ? -max : value ) )
@@ -141,9 +139,9 @@ void triangulation(CtrlStruct *cvs)
 	alpha_c = limit_angle((fall_angle_3 + rise_angle_3)/2);
 
 	// beacons angles predicted thanks to odometry measurements 
-	alpha_1_predicted = limit_angle(predicted_angle(rob_pos->x,rob_pos->y,x_beac_1,y_beac_1,rob_pos->theta,decalage_tower));
-	alpha_2_predicted = limit_angle(predicted_angle(rob_pos->x,rob_pos->y,x_beac_2,y_beac_2,rob_pos->theta,decalage_tower));
-	alpha_3_predicted = limit_angle(predicted_angle(rob_pos->x,rob_pos->y,x_beac_3,y_beac_3,rob_pos->theta,decalage_tower));
+	alpha_1_predicted = limit_angle(predicted_angle(rob_pos->x,rob_pos->y,x_beac_1,y_beac_1,rob_pos->theta));
+	alpha_2_predicted = limit_angle(predicted_angle(rob_pos->x,rob_pos->y,x_beac_2,y_beac_2,rob_pos->theta));
+	alpha_3_predicted = limit_angle(predicted_angle(rob_pos->x,rob_pos->y,x_beac_3,y_beac_3,rob_pos->theta));
 
 	// indexes of each beacon
 	alpha_1_index = index_predicted(alpha_1_predicted, alpha_a, alpha_b, alpha_c);
@@ -238,7 +236,7 @@ void triangulation(CtrlStruct *cvs)
 }
 	
 
-double predicted_angle(double x_r,double y_r,double x_b,double y_b,double alpha,double d){
+double predicted_angle(double x_r,double y_r,double x_b,double y_b,double alpha){
 	double theta; // valeur que l'on va transmettre comme angle prédit
 
 	theta = atan2((y_b-y_r),(x_b-x_r)) - alpha;

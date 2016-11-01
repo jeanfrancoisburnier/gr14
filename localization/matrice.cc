@@ -153,4 +153,35 @@ void vect_add(double vect_1[3],double vect_2[3],double result[3],bool add_or_sub
     }
 }
 
+/*! \copy of a 3x3 matrix
+ * 
+ * \param[in] mat matrix to be copied
+ * \param[out] copy matrix in which we copy the first one
+ */
+void copy_mat(double mat[3][3],double copy[3][3])
+{
+    int i,j;
+    for(i=0;i<3;i++)
+    {
+        for(j=0;j<3;j++)
+        {
+            copy[i][j]=mat[i][j];
+        }
+    }
+}
+
+/*! copy of R_3 vector
+ * 
+ * \param[in] vect vector to be copied
+ * \param[out] copy vector in which we copy the first one
+ */
+void copy_vect(double vect[3],double copy[3])
+{
+    int i;
+    for(i=0;i<3;i++)
+    {
+        copy[i]=vect[i];
+    }
+}
+
 NAMESPACE_CLOSE();

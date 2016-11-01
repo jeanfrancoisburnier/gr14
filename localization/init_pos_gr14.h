@@ -32,6 +32,7 @@ typedef struct KalmanStruct
 
 	double last_t; ///< last time position was updated 
 	double P_k[3][3]; // The error covariance matrix
+	
 } KalmanStruct;
 
 void set_init_position(int robot_id, RobotPosition *rob_pos);

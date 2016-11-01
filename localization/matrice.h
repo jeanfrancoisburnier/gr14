@@ -23,7 +23,8 @@ void inv_mat_3x3(double mat[3][3]);
 void mat_trans(double mat[3][3],double trans_mat[3][3]); 
 void mat_add(double mat_1[3][3],double mat_2[3][3],double result[3][3],bool add_or_sub);
 void vect_add(double vect_1[3][3],double vect_2[3][3],double result[3][3],bool add_or_sub);
-
+void copy_mat(double mat[3][3],double copy[3][3]);
+void copy_vect(double vect[3],double copy[3]);
 
 
 NAMESPACE_CLOSE();

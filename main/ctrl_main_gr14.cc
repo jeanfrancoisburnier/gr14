@@ -50,6 +50,7 @@ void controller_init(CtrlStruct *cvs)
 
 	// robot initial position
 	set_init_position(cvs->robot_id, cvs->rob_pos);
+	set_init_position_kalman(cvs->robot_id, cvs->kalman_pos);
 	cvs->rob_pos->last_t = t;
 
 	// speed regulation

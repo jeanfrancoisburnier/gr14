@@ -14,12 +14,7 @@
 
 NAMESPACE_INIT(ctrlGr14);
 
-/// Kalman main structure
-
-
-
 void kalman(CtrlStruct *cvs);
-
 
 NAMESPACE_CLOSE();
 
