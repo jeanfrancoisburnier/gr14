@@ -70,18 +70,19 @@ void opponents_tower(CtrlStruct *cvs)
 
 	// ----- opponents position computation start ----- //
 
-	// Opponent a position
+	// Opponent 'a' position
 	double opp_a_x;
 	double opp_a_y;
 
-	// Opponent b position
+	// Opponent 'b' position
 	double opp_b_x;
 	double opp_b_y;
 
+	// Difference between previous position and actual position
 	double delta_pos_1;
 	double delta_pos_2;
 
-	if (nb_opp == 1)
+	if (nb_opp == 1) // Only one opponent
 	{
 		opp_a_x = opp_pos->x[0];
 		opp_a_y = opp_pos->y[0];
@@ -89,23 +90,34 @@ void opponents_tower(CtrlStruct *cvs)
 		// Get new position of opponent a
 		single_opp_tower(rise_1, fall_1, rob_pos->x, rob_pos->y, rob_pos->theta, &opp_a_x, &opp_a_y);
 
-		// filter opponent position
+		// Filter opponent position
 		opp_pos->x[0] = first_order_filter(opp_pos->x[0], opp_a_x, TAU, delta_t);
 		opp_pos->y[0] = first_order_filter(opp_pos->y[0], opp_a_y, TAU, delta_t);
 
+		// Compute distance to opponent - TODO: remove this
+		double distance = sqrt(pow(rob_pos->x-opp_pos->x[0],2)+pow(rob_pos->y-opp_pos->y[0],2));
+		set_plot(distance*1000.0," distance [mm]");
+
+		// printf("X: %f \t Y: %f\n",rob_pos->x*1000.0,rob_pos->y*1000.0);
+		printf("X: %f \t Y: %f\n",opp_pos->x[0]*1000.0,opp_pos->y[0]*1000.0);
+
+
+		// set_plot(rob_pos->x*1000.0," x [mm]");
+		// set_plot(rob_pos->y*1000.0," y [mm]");
+
 	}
-	else
+	else // Two opponents
 	{
 
 		// Get new position of opponent a and b
 		single_opp_tower(rise_1, fall_1, rob_pos->x, rob_pos->y, rob_pos->theta, &opp_a_x, &opp_a_y);
 		single_opp_tower(rise_2, fall_2, rob_pos->x, rob_pos->y, rob_pos->theta, &opp_b_x, &opp_b_y);
 
-		// Compute...
+		// Compute difference of old position and new position
 		delta_pos_1 = pow(opp_a_x - opp_pos->x[0],2) + pow(opp_a_y - opp_pos->y[0],2);
 		delta_pos_2 = pow(opp_b_x - opp_pos->x[0],2) + pow(opp_b_y - opp_pos->y[0],2);
 
-		if(delta_pos_1 < delta_pos_2)
+		if(delta_pos_1 < delta_pos_2) // Opponent a is Opponent 1
 		{
 			// filter opponent position
 			opp_pos->x[0] = first_order_filter(opp_pos->x[0], opp_a_x, TAU, delta_t);
@@ -115,7 +127,7 @@ void opponents_tower(CtrlStruct *cvs)
 			opp_pos->y[1] = first_order_filter(opp_pos->y[1], opp_b_y, TAU, delta_t);
 
 		}
-		else
+		else // Opponent b is Opponent 1
 		{
 			// filter opponent position
 			opp_pos->x[0] = first_order_filter(opp_pos->x[0], opp_b_x, TAU, delta_t);
@@ -126,11 +138,18 @@ void opponents_tower(CtrlStruct *cvs)
 
 		}
 
-		// double distance1 = sqrt(pow(rob_pos->x-opp_pos->x[0],2)+pow(rob_pos->y-opp_pos->y[0],2));
-		// double distance2 = sqrt(pow(rob_pos->x-opp_pos->x[1],2)+pow(rob_pos->y-opp_pos->y[1],2));
+		// Compute distance to opponents - TODO: remove this
+		double distance1 = sqrt(pow(rob_pos->x-opp_pos->x[0],2)+pow(rob_pos->y-opp_pos->y[0],2));
+		double distance2 = sqrt(pow(rob_pos->x-opp_pos->x[1],2)+pow(rob_pos->y-opp_pos->y[1],2));
 
 		// set_plot(distance1*1000.0," distance1 [mm]");
 		// set_plot(distance2*1000.0," distance2 [mm]");
+
+		// printf("X: %f \t Y: %f\n",opp_pos->x[0]*1000.0,opp_pos->y[0]*1000.0);
+		set_plot(opp_pos->x[0]*1000.0," x1 [mm]");
+		set_plot(opp_pos->y[0]*1000.0," y1 [mm]");
+		set_plot(opp_pos->x[1]*1000.0," x2 [mm]");
+		set_plot(opp_pos->y[1]*1000.0," y2 [mm]");
 
 	}
 	// ----- opponents position computation end ----- //
@@ -152,12 +171,13 @@ void single_opp_tower(double last_rise, double last_fall, double rob_x, double r
 
 	double distance = 0.0; // distance between the robot and the opponent
 
-	// deal with special case: angles close to -PI/PI
+	// Deal with special case: angles close to -PI/PI
 	if (last_fall < last_rise)
 	{
 		last_fall += 2*M_PI;
 	}
 
+	// Compute distance to opponent
 	distance = TOWER_RADIUS/sin((last_fall - last_rise)/2.0);
 
 	if (distance == INFINITY)
@@ -165,6 +185,7 @@ void single_opp_tower(double last_rise, double last_fall, double rob_x, double r
 		return;
 	}
 
+	// Compute opponent new position
 	*new_x_opp = rob_x + distance*cos((last_fall+last_rise)/2.0 + rob_theta);
 	*new_y_opp = rob_y + distance*sin((last_fall+last_rise)/2.0 + rob_theta);
 	
@@ -202,17 +223,25 @@ int check_opp_front(CtrlStruct *cvs)
 		exit(EXIT_FAILURE);
 	}
 
+	int var_test = 0; // test a enlever
 	for(i=0; i<nb_opp; i++)
-	{
+	{	
 		if (pow((opp_pos->x[i] - rob_pos->x + TOWER2CENTER*cos(rob_pos->theta)),2) +
 			pow((opp_pos->y[i] - rob_pos->y + TOWER2CENTER*sin(rob_pos->theta)),2) < 0.3 )
 		{
-			// printf("Too close modafucuzz\n");
-			return 1;
+			printf("Opp %d is too close modafucuzz\n", i);
+			// return 1;
+			var_test = 1;
+		}
+		else
+		{
+			printf("Opponents %d is far\n", i);
+			var_test = 0;
 		}
 	}
 
-	return 0;
+	// return 0;
+	return var_test;
 }
 
 NAMESPACE_CLOSE();
