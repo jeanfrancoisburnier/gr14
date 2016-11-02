@@ -61,12 +61,10 @@ void set_init_position_kalman(int robot_id, KalmanStruct *kalman_pos)
 			kalman_pos->Q[i][j] = 0;
 		}
 	}
-
 	kalman_pos->Q[0][0] = SIGMA_Q;
 	kalman_pos->Q[1][1] = SIGMA_Q;
 	kalman_pos->Q[2][2] = SIGMA_Q;
-	
-	
+		
 	for(i = 0;i<3;i++)
 	{
 		for(j=0;j<3;j++)
@@ -74,12 +72,10 @@ void set_init_position_kalman(int robot_id, KalmanStruct *kalman_pos)
 			kalman_pos->R[i][j] = 0;
 		}
 	}
-	
 	kalman_pos->R[0][0] = SIGMA_X;
 	kalman_pos->R[1][1] = SIGMA_Y;
 	kalman_pos->R[2][2] = SIGMA_THETA;
-	
-	
+		
 	for(i = 0;i<3;i++)
 	{
 		for(j=0;j<3;j++)
@@ -88,7 +84,6 @@ void set_init_position_kalman(int robot_id, KalmanStruct *kalman_pos)
 		}
 	}
 	
-
 	switch (robot_id)
 	{
 		case ROBOT_B: // blue robot

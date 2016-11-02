@@ -11,7 +11,6 @@
 #include "CtrlStruct_gr14.h"
 #include "matrice_gr14.h"
 
-
 NAMESPACE_INIT(ctrlGr14);
 
 void kalman(CtrlStruct *cvs);

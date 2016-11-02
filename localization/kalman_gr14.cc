@@ -5,7 +5,6 @@
 #include <math.h>
 #include <cmath>
 
-
 #define WHEEL_SEP 0.225
 #define WHEEL_RAD 0.030
 #define PI 3.1416
@@ -19,13 +18,10 @@ NAMESPACE_INIT(ctrlGr14);
 void kalman(CtrlStruct *cvs)
 {
 	// variable declaration
-
-	//RobotPosition *rob_pos;
 	RobotPosition *triang_pos;
 	KalmanStruct *kalman_pos;
 	CtrlIn *inputs;
 
-	//rob_pos = cvs->rob_pos;
 	inputs  = cvs->inputs;
 	triang_pos = cvs->triang_pos;
 	kalman_pos = cvs->kalman_pos;
@@ -49,8 +45,6 @@ void kalman(CtrlStruct *cvs)
 	double result_matrix[3][3];//result vector and matrix used as intermediates in the algorithm
 
 	// variables initialization
-
-	//rob_pos = cvs->rob_pos;
 
 	//------compute dSl, dSr, d_theta and dS for the matrices A and B--------//
 	r_sp = wheel_speed_meter(inputs->r_wheel_speed,WHEEL_RAD); // right wheel speed
@@ -127,8 +121,6 @@ void kalman(CtrlStruct *cvs)
 
 	//-------------K_k = P_hat*S_k^-1---------//
 
-	//set_mat_0(result_matrix);
-
 	if (!inv_mat_3x3(S_k,result_matrix))
 		{
 			printf("singular\n");
@@ -147,10 +139,8 @@ void kalman(CtrlStruct *cvs)
  
  	//----kalman_pos->P_k = (I-K_k)P_hat----//
 
-
 	mat_add(I,K_k,result_matrix,0);
 	mult_matrices_3x3(result_matrix,P_hat,kalman_pos->P_k);
-
 
 	//printf ( "%f %f %f;\n",kalman_pos->x,kalman_pos->y,kalman_pos->theta);
 	
