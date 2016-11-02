@@ -167,7 +167,7 @@ void kalman(CtrlStruct *cvs)
 
 	if (!inv_mat_3x3(S_k,result_matrix))
 		{
-			printf("singular");
+			printf("singular\n");
 			return;
 		}
 
@@ -193,7 +193,7 @@ void kalman(CtrlStruct *cvs)
 	mult_matrices_3x3(result_matrix,P_hat,kalman_pos->P_k);
 
 
-	printf ( "%f %f %f;\n",kalman_pos->x,kalman_pos->y,kalman_pos->theta);
+	//printf ( "%f %f %f;\n",kalman_pos->x,kalman_pos->y,kalman_pos->theta);
 	
 	// update time stamp for next loop
 	kalman_pos->last_t = inputs->t;

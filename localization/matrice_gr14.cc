@@ -1,4 +1,4 @@
-#include "matrice.h"
+#include "matrice_gr14.h"
 #include "odometry_gr14.h"
 #include "triangulation_gr14.h"
 #include "useful_gr14.h"
@@ -190,6 +190,10 @@ void copy_vect(double vect[3],double copy[3])
     }
 }
 
+/*! copy of R_3 vector
+ * 
+ * \param[in] mat matrix that will be printed
+ */
 void print_mat(double mat[3][3])
 {
     int i,j;
@@ -203,6 +207,10 @@ void print_mat(double mat[3][3])
     printf("\n");    
 }
 
+/*! copy of R_3 vector
+ * 
+ * \param[in] vect vector that will be printed
+ */
 void print_vect(double vect[3])
 {
     int i;
@@ -213,6 +221,10 @@ void print_vect(double vect[3])
      printf("\n");    
 }
 
+/*! copy of R_3 vector
+ * 
+ * \param[in] mat matrix that will be set to 0
+ */
 void set_mat_0(double mat[3][3])
 {
     int i,j;
@@ -225,6 +237,10 @@ void set_mat_0(double mat[3][3])
     }
 }
 
+/*! copy of R_3 vector
+ * 
+ * \param[in] vect vector that will be set to 0
+ */
 void set_vect_0(double vect[3])
 {
     int i;
