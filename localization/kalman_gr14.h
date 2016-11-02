@@ -9,7 +9,7 @@
 
 #include "namespace_ctrl.h"
 #include "CtrlStruct_gr14.h"
-#include "matrice.h"
+#include "matrice_gr14.h"
 
 
 NAMESPACE_INIT(ctrlGr14);
