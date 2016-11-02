@@ -15,8 +15,10 @@ NAMESPACE_INIT(ctrlGr14);
  * \param[in] b matrix
  * \param[out] result matrix in which the result of a*b is stored
  */
-void mult_matrices_3x3(double a[][3], double b[][3], double result[][3])
+void mult_matrices_3x3(double a[3][3], double b[3][3], double result[3][3])
 {
+    double inter_mat[3][3];
+    set_mat_0(inter_mat); 
     int i, j, k;
     for(i = 0; i < 3; i++)
     {
@@ -24,10 +26,11 @@ void mult_matrices_3x3(double a[][3], double b[][3], double result[][3])
         {
             for(k = 0; k < 3; k++)
             {
-                result[i][j] +=  a[i][k] *  b[k][j];
+                inter_mat[i][j] +=  a[i][k] *  b[k][j];
             }
         }
     }
+    copy_mat(inter_mat,result);
 }
 
 /*! \ multiplication of a matrix and vector size R_2 or R_3
@@ -39,14 +42,17 @@ void mult_matrices_3x3(double a[][3], double b[][3], double result[][3])
  */
 void mult_matrices_vect_3x3(double a[3][3], double b[3], double result[3])
 {
+    double inter_vect[3];
+    set_vect_0(inter_vect);
     int i, k;
     for(i = 0; i < 3; i++)
     {
     	for(k = 0; k < 3; k++)
         {
-                result[i] +=  a[i][k] *  b[k];
+                inter_vect[i] +=  a[i][k] *  b[k];
         }        
     }
+    copy_vect(inter_vect,result);
 }
 
 /*! \inverse of a 3x3 matrix
@@ -181,6 +187,50 @@ void copy_vect(double vect[3],double copy[3])
     for(i=0;i<3;i++)
     {
         copy[i]=vect[i];
+    }
+}
+
+void print_mat(double mat[3][3])
+{
+    int i,j;
+    for(i=0;i<3;i++)
+    {
+        for(j=0;j<3;j++)
+        {
+            printf("%f ",mat[i][j]);
+        }
+    }
+    printf("\n");    
+}
+
+void print_vect(double vect[3])
+{
+    int i;
+    for(i=0;i<3;i++)
+        {
+            printf("%f ",vect[i]);
+        }
+     printf("\n");    
+}
+
+void set_mat_0(double mat[3][3])
+{
+    int i,j;
+    for(i=0;i<3;i++)
+    {
+        for(j=0;j<3;j++)
+        {
+            mat[i][j] = 0;
+        }
+    }
+}
+
+void set_vect_0(double vect[3])
+{
+    int i;
+    for(i=0;i<3;i++)
+    {
+        vect[i] = 0;;
     }
 }
 

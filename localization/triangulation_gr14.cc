@@ -227,7 +227,7 @@ void triangulation(CtrlStruct *cvs)
 	theta_temp = - alpha_1 + atan2((y_beac_1 - pos_tri->y),(x_beac_1 - pos_tri->x));
 	pos_tri->theta =  limit_angle(theta_temp);
 	
-	printf ( "triang:%f %f %f\n",pos_tri->x,pos_tri->y,pos_tri->theta);
+	printf ( "2: %f %f %f\n",pos_tri->x,pos_tri->y,pos_tri->theta);
 	//set_plot(pos_tri->x,"triang x");
 	//set_plot(pos_tri->y,"triang y");
 	//set_plot(pos_tri->theta,"triang theta");

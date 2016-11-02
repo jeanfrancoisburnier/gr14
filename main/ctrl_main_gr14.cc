@@ -83,7 +83,7 @@ void controller_loop(CtrlStruct *cvs)
 	// triangulation
 	triangulation(cvs);
 
-	//kalman(cvs);
+	kalman(cvs);
 
 	// opponents position
 	opponents_tower(cvs);
