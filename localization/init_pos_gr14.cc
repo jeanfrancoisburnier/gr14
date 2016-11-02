@@ -1,11 +1,11 @@
 #include "init_pos_gr14.h"
 #include <math.h>
 
-#define SIGMA_X 1
-#define SIGMA_Y 1
-#define SIGMA_THETA 1
+#define SIGMA_X 0.01
+#define SIGMA_Y 0.01
+#define SIGMA_THETA 0.01
 
-#define SIGMA_Q 1
+#define SIGMA_Q 0.01
 
 NAMESPACE_INIT(ctrlGr14);
 

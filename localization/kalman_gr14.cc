@@ -193,7 +193,7 @@ void kalman(CtrlStruct *cvs)
 	mult_matrices_3x3(result_matrix,P_hat,kalman_pos->P_k);
 
 
-	printf ( "3: %f %f %f;\n",kalman_pos->x,kalman_pos->y,kalman_pos->theta);
+	printf ( "%f %f %f;\n",kalman_pos->x,kalman_pos->y,kalman_pos->theta);
 	
 	// update time stamp for next loop
 	kalman_pos->last_t = inputs->t;

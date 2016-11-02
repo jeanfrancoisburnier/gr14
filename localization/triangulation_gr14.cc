@@ -4,6 +4,7 @@
 #include <math.h>
 #include <cmath>
 
+#define TOWER_OFFSET 0.083
 #define PI 3.1416
 #define COT_MAX 100000000
 #define adjust_value_to_bounds(value, max) ( ( value > max ) ? max : ( ( value < -max ) ? -max : value ) )
@@ -217,17 +218,21 @@ void triangulation(CtrlStruct *cvs)
   	double D = (c12x - c23x) * (c23y - c31y) - (c23x - c31x) * (c12y - c23y) ;
   	double invD = 1.0 / D ;
   	double K = k31 * invD ;
-  
+
   	//Position of the Robot
-	pos_tri->x = K * (c12y - c23y) + x_beac_2 ;
-	pos_tri->y = K * (c23x - c12x) + y_beac_2 ;
+  	pos_tri->x = K * (c12y - c23y) + x_beac_2;
+	pos_tri->y = K * (c23x - c12x) + y_beac_2;
 
 	//Orientation of the Robot //**********************Fait au cas par cas, il faudrait vérifier si pas déjà un algo existant*****
 	float theta_temp = 0.0;
 	theta_temp = - alpha_1 + atan2((y_beac_1 - pos_tri->y),(x_beac_1 - pos_tri->x));
 	pos_tri->theta =  limit_angle(theta_temp);
+
+	//Reajust the position of the robot with the tower offset
+	pos_tri->x = K * (c12y - c23y) + x_beac_2 - TOWER_OFFSET*cos(pos_tri->theta);
+	pos_tri->y = K * (c23x - c12x) + y_beac_2 - TOWER_OFFSET*sin(pos_tri->theta);
 	
-	printf ( "2: %f %f %f\n",pos_tri->x,pos_tri->y,pos_tri->theta);
+	//printf ( "2: %f %f %f\n",pos_tri->x,pos_tri->y,pos_tri->theta);
 	//set_plot(pos_tri->x,"triang x");
 	//set_plot(pos_tri->y,"triang y");
 	//set_plot(pos_tri->theta,"triang theta");
