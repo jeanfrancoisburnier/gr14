@@ -32,11 +32,7 @@ void kalman(CtrlStruct *cvs)
 
 	double z_k[3] = {(*triang_pos).x,(*triang_pos).y,(*triang_pos).theta};
 	double x_hat[3] = {(*kalman_pos).x,(*kalman_pos).y,(*kalman_pos).theta};
-	/*printf("x_hat;");
-	print_vect(x_hat);*/
 	double P_hat[3][3];
-	/*printf("P_hat:");
-	print_mat(P_hat);*/
 	copy_mat((*kalman_pos).P_k,P_hat);
 	double A_k[3][3];
 	double A_k_trans[3][3] = { 0 };
@@ -93,14 +89,7 @@ void kalman(CtrlStruct *cvs)
 	A_k[2][1] = 0;
 	A_k[2][2] = 1;    
 
-	/*printf("A_k:");
-	print_mat(A_k);*/
-
 	mat_trans(A_k,A_k_trans); 
-
-	/*printf("A_k_trans:");
-	print_mat(A_k_trans);*/
-
 
 	B_k[0][0] = 1/2 * cos(x_hat[2] + d_theta/2) + dS / (2 * WHEEL_SEP) * sin(x_hat[2] + d_theta/2);
 	B_k[0][1] = 1/2 * cos(x_hat[2] + d_theta/2) - dS / (2 * WHEEL_SEP) * sin(x_hat[2] + d_theta/2);
@@ -112,54 +101,29 @@ void kalman(CtrlStruct *cvs)
 	B_k[2][1] = 1/WHEEL_SEP;
 	B_k[2][2] = 0;
 
-	/*printf("B_k:");
-	print_mat(B_k);*/
-
 	//------------Kalman algorithm--------------//
 	//------------------------------------------//
 
 	//----x_hat=A_k*x_hat+B_k*u_k-------------//
-
-
 
 	mult_matrices_vect_3x3(A_k,x_hat,result_vect);
 	copy_vect(result_vect,x_hat);
 	mult_matrices_vect_3x3(B_k,u_k,result_vect);
 	vect_add(x_hat,result_vect,x_hat,1);
 
-	/*printf("4:");
-	print_vect(x_hat);*/
-
 	//-----P_k =A_k*P_k*A_K_trans+Q_k-----------//
-	/*printf("4.1:");
-	print_mat(P_hat);*/
 
 	mult_matrices_3x3(A_k,P_hat,result_matrix);
-
-	/*printf("4.2:");
-	print_mat(result_matrix);*/
-
 	mult_matrices_3x3(result_matrix,A_k_trans,P_hat);
-
-	/*printf("4.3:");
-	print_mat(P_hat);*/
-
-
 	mat_add(P_hat,kalman_pos->Q,P_hat,1);
-	/*printf("5:");
-	print_mat(P_hat);*/
 
 	//---------err_k = z_k-x_hat---------------//
+
 	vect_add(z_k,x_hat,err_k,0);
 
-	/*printf("6:");
-	print_vect(err_k);*/
-
 	//-------------S_k = P_hat + R_K----------//
-	mat_add(P_hat,kalman_pos->R,S_k,1);
 
-	/*printf("7:");
-	print_mat(S_k);*/
+	mat_add(P_hat,kalman_pos->R,S_k,1);
 
 	//-------------K_k = P_hat*S_k^-1---------//
 
@@ -173,12 +137,7 @@ void kalman(CtrlStruct *cvs)
 
 	mult_matrices_3x3(P_hat,result_matrix,K_k);
 
-	/*printf("K_k:");
-	print_mat(K_k);*/
-
 	//---kalman_pos->x,y,theta = x_hat + K_k * err_k---//
-
-
 
 	mult_matrices_vect_3x3(K_k,err_k,result_vect);
 	vect_add(x_hat,result_vect,result_vect,1);

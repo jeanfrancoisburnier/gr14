@@ -88,12 +88,7 @@ void controller_loop(CtrlStruct *cvs)
 	// opponents position
 	opponents_tower(cvs);
 
-	//set_plot(cvs->kalman_pos->x,"k x");
-	//set_plot(cvs->kalman_pos->y,"k y");
-	//set_plot(cvs->kalman_pos->theta,"k th");
-	//set_plot(cvs->triang_pos->x,"t x");
-	//set_plot(cvs->triang_pos->y,"t y");
-	//set_plot(cvs->triang_pos->theta,"t th");
+	//set_plot(cvs->kalman_pos->x,"k x");	
 
 	// tower control
 	outputs->tower_command = 15.0;
