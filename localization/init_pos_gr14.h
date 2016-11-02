@@ -32,6 +32,8 @@ typedef struct KalmanStruct
 
 	double last_t; ///< last time position was updated 
 	double P_k[3][3]; // The error covariance matrix
+	double Q[3][3]; //The process noise
+	double R[3][3]; // The error on the measurment 
 	
 } KalmanStruct;
 

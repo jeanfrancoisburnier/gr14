@@ -55,7 +55,7 @@ void mult_matrices_vect_3x3(double a[3][3], double b[3], double result[3])
  * \param[out] inv matrix in which is computed the inverse of mat
  * code found http://www.cquestions.com/2011/09/c-program-to-find-inverse-of-matrix.html
  */
-double inv_mat_3x3(double mat[3][3],double inv[3][3])
+int inv_mat_3x3(double mat[3][3],double inv[3][3])
 {
 	double determinant = 0;
     int i, j;

@@ -1,6 +1,12 @@
 #include "init_pos_gr14.h"
 #include <math.h>
 
+#define SIGMA_X 0.001
+#define SIGMA_Y 0.001
+#define SIGMA_THETA 0.001
+
+#define SIGMA_Q 0.001
+
 NAMESPACE_INIT(ctrlGr14);
 
 /*! \brief set the initial robot position
@@ -47,6 +53,39 @@ void set_init_position(int robot_id, RobotPosition *rob_pos)
 
 void set_init_position_kalman(int robot_id, KalmanStruct *kalman_pos)
 {
+	int i,j;
+	for(i = 0;i<3;i++)
+	{
+		for(j=0;j<3;i++)
+		{
+			kalman_pos->Q[i][j] = 0;
+		}
+	}
+	kalman_pos->Q[0][0] = SIGMA_Q;
+	kalman_pos->Q[1][1] = SIGMA_Q;
+	kalman_pos->Q[2][2] = SIGMA_Q;
+
+
+	for(i = 0;i<3;i++)
+	{
+		for(j=0;j<3;i++)
+		{
+			kalman_pos->R[i][j] = 0;
+		}
+	}
+	kalman_pos->R[0][0] = SIGMA_X;
+	kalman_pos->R[1][1] = SIGMA_Y;
+	kalman_pos->R[2][2] = SIGMA_THETA;
+
+	for(i = 0;i<3;i++)
+	{
+		for(j=0;j<3;i++)
+		{
+			kalman_pos->P_k[i][j] = kalman_pos->Q[i][j];
+		}
+	}
+	
+
 	switch (robot_id)
 	{
 		case ROBOT_B: // blue robot
