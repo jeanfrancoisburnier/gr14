@@ -14,6 +14,7 @@
 #include "triangulation_gr14.h"
 #include "strategy_gr14.h"
 #include "kalman_gr14.h"
+#include "set_output.h"
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -78,17 +79,20 @@ void controller_loop(CtrlStruct *cvs)
 	t = inputs->t;
 
 	// update the robot odometry
-	update_odometry(cvs);
+	//update_odometry(cvs);
 
 	// triangulation
 	triangulation(cvs);
 
+	//Kalman
 	kalman(cvs);
 
 	// opponents position
 	opponents_tower(cvs);
 
-	//set_plot(cvs->kalman_pos->x,"k x");	
+	set_plot(cvs->kalman_pos->x,"x");
+	set_plot(cvs->kalman_pos->y,"y");
+	set_plot(cvs->kalman_pos->theta,"t");
 
 	// tower control
 	outputs->tower_command = 15.0;

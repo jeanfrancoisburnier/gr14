@@ -1,11 +1,10 @@
 #include "init_pos_gr14.h"
 #include <math.h>
 
-#define SIGMA_X 0.01
-#define SIGMA_Y 0.01
-#define SIGMA_THETA 0.01
-
-#define SIGMA_Q 0.01
+#define SIGMA_X 0.02
+#define SIGMA_Y 0.02
+#define SIGMA_THETA 0.0000001
+#define SIGMA_Q 0.000001
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -50,9 +49,17 @@ void set_init_position(int robot_id, RobotPosition *rob_pos)
 	}		
 }
 
-
+/*! \brief set the initial robot position for the kalman filter
+ * 
+ * \param[in] robot_id robot ID
+ * \param[out] rob_pos robot position structure
+ * \parma[out] The values for the matrix Q,R and the initial value of P_k(which is Q)
+ *
+ * Adapt these initial positions, depending on the game map.
+ */
 void set_init_position_kalman(int robot_id, KalmanStruct *kalman_pos)
 {	
+	//initialise the matrix to 0 and then set the diagonal
 	int i,j;
 	for(int i=0;i<3;i++)
 	{

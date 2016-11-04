@@ -10,6 +10,7 @@
 #include "namespace_ctrl.h"
 #include "CtrlStruct_gr14.h"
 
+
 NAMESPACE_INIT(ctrlGr14);
 
 void fixed_beacon_positions(int team_id, double *x_beac_1, double *y_beac_1,

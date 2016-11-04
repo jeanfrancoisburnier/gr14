@@ -84,7 +84,8 @@ int index_predicted(double alpha_predicted, double alpha_a, double alpha_b, doub
 void triangulation(CtrlStruct *cvs)
 {
 	// variables declaration
-	RobotPosition *pos_tri, *rob_pos;
+	RobotPosition *pos_tri;
+	KalmanStruct *kalman_pos;
 	CtrlIn *inputs;
 
 	int alpha_1_index, alpha_2_index, alpha_3_index;
@@ -100,7 +101,7 @@ void triangulation(CtrlStruct *cvs)
 
 	// variables initialization
 	pos_tri = cvs->triang_pos;
-	rob_pos = cvs->rob_pos;
+	kalman_pos = cvs->kalman_pos;
 	inputs  = cvs->inputs;
 	// safety
 	if ((inputs->rising_index_fixed < 0) || (inputs->falling_index_fixed < 0))
@@ -140,9 +141,9 @@ void triangulation(CtrlStruct *cvs)
 	alpha_c = limit_angle((fall_angle_3 + rise_angle_3)/2);
 
 	// beacons angles predicted thanks to odometry measurements 
-	alpha_1_predicted = limit_angle(predicted_angle(rob_pos->x,rob_pos->y,x_beac_1,y_beac_1,rob_pos->theta));
-	alpha_2_predicted = limit_angle(predicted_angle(rob_pos->x,rob_pos->y,x_beac_2,y_beac_2,rob_pos->theta));
-	alpha_3_predicted = limit_angle(predicted_angle(rob_pos->x,rob_pos->y,x_beac_3,y_beac_3,rob_pos->theta));
+	alpha_1_predicted = limit_angle(predicted_angle(kalman_pos->x,kalman_pos->y,x_beac_1,y_beac_1,kalman_pos->theta));
+	alpha_2_predicted = limit_angle(predicted_angle(kalman_pos->x,kalman_pos->y,x_beac_2,y_beac_2,kalman_pos->theta));
+	alpha_3_predicted = limit_angle(predicted_angle(kalman_pos->x,kalman_pos->y,x_beac_3,y_beac_3,kalman_pos->theta));
 
 	// indexes of each beacon
 	alpha_1_index = index_predicted(alpha_1_predicted, alpha_a, alpha_b, alpha_c);
@@ -223,7 +224,7 @@ void triangulation(CtrlStruct *cvs)
   	pos_tri->x = K * (c12y - c23y) + x_beac_2;
 	pos_tri->y = K * (c23x - c12x) + y_beac_2;
 
-	//Orientation of the Robot //**********************Fait au cas par cas, il faudrait vérifier si pas déjà un algo existant*****
+	//Orientation of the Robot //
 	float theta_temp = 0.0;
 	theta_temp = - alpha_1 + atan2((y_beac_1 - pos_tri->y),(x_beac_1 - pos_tri->x));
 	pos_tri->theta =  limit_angle(theta_temp);
@@ -240,15 +241,15 @@ void triangulation(CtrlStruct *cvs)
 	// ----- triangulation computation end ----- //
 }
 	
-
+	/* 
+	* la fonction calcul l'angle en fonction de la position du robot. l'arctan prend la position du beacon(x_b,y_b) moins la 
+	* position du robot(x_r,y_r) . On déduit ensuite l'angle theta qui est l'orientation du robot
+	*/
 double predicted_angle(double x_r,double y_r,double x_b,double y_b,double alpha){
 	double theta; // valeur que l'on va transmettre comme angle prédit
 
 	theta = atan2((y_b-y_r),(x_b-x_r)) - alpha;
-	/* la fonction calcul l'angle en fonction de la position du robot. l'arctan prend la position du beacon(x_b,y_b) moins la 
-	position du robot(x_r,y_r) . On déduit ensuite l'angle theta qui est l'orientation du robot
-	*/
-return theta;
+	return theta;
 }
 
 
