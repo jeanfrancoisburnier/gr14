@@ -73,12 +73,12 @@ double first_order_filter(double last_val, double new_val, double tau, double de
 
 /*! \brief get the normal distance, given two vector components
  * 
- * \param[in] wheel_speed_rad wheele speed in radians
+ * \param[in] wheel_speed_rad wheel speed in radians per sec
  * \param[in] wheel radius
  * \param[out] wheel speed in m/s^-1
- * \return normal distance
+ *
  */
-double wheel_speed_meter(double wheel_speed_rad,double wheel_radius) //speed form radians per second to meter per second
+double wheel_speed_meter(double wheel_speed_rad,double wheel_radius)
 {
     double wheel_speed_m = wheel_speed_rad*wheel_radius;
     return wheel_speed_m;
