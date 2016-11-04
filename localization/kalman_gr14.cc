@@ -39,7 +39,6 @@ void kalman(CtrlStruct *cvs)
 	triang_pos = cvs->triang_pos;
 	kalman_pos = cvs->kalman_pos;
 
-
 	/* Description of the variables used
 	 *
 	 * z_k position computed with the triangulation method
