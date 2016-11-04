@@ -41,6 +41,7 @@ void kalman(CtrlStruct *cvs)
 
 
 	/* Description of the variables used
+	 *
 	 * z_k position computed with the triangulation method
 	 * x_hat Initialized with the previous kalman pos and it will be updated during the kalman call
 	 * P_hat The covariance matrix initialized with the previous matrix, will be updated during the algorithm
@@ -55,6 +56,7 @@ void kalman(CtrlStruct *cvs)
 	 * dt change in time since the last computation of Kalman
 	 * r_sp, l_sp r wheel and left wheel speed
 	 * result_matrix, result_vect result vector and matrix used as temporary in the algorithm
+	 *
 	*/	
 	double z_k[3] = {(*triang_pos).x,(*triang_pos).y,(*triang_pos).theta};
 	double x_hat[3] = {(*kalman_pos).x,(*kalman_pos).y,(*kalman_pos).theta};
@@ -119,9 +121,10 @@ void kalman(CtrlStruct *cvs)
 	mat_trans(A_k,A_k_trans); 
 
     /*
-    * The computation are done all in 3 by 3 matrix (less sub function and easier algebra)
-    * since u_k and B_k are supposed to be a R_2 vector and a 3 by 2 matrix I have simply added zeros
-    * to make the R_3 and 3 by 3
+     *
+     * The computation are done all in 3 by 3 matrix (less sub function and easier algebra)
+     * since u_k and B_k are supposed to be a R_2 vector and a 3 by 2 matrix I have simply added zeros
+     * to make the R_3 and 3 by 3
     */ 
     u_k[0] = dSl ;
     u_k[1] = dSr ;
