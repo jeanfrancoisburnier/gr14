@@ -91,7 +91,6 @@ void controller_loop(CtrlStruct *cvs)
 		// calibration
 		case CALIB_STATE:
 			calibration(cvs);
-			//printf("%d \t %d\n", cvs->inputs->u_switch[0], cvs->inputs->u_switch[1]);
 			break;
 
 		// wait before match beginning
