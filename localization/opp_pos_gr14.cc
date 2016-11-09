@@ -93,18 +93,6 @@ void opponents_tower(CtrlStruct *cvs)
 		// Filter opponent position
 		opp_pos->x[0] = first_order_filter(opp_pos->x[0], opp_a_x, TAU, delta_t);
 		opp_pos->y[0] = first_order_filter(opp_pos->y[0], opp_a_y, TAU, delta_t);
-
-		// Compute distance to opponent - TODO: remove this
-		double distance = sqrt(pow(rob_pos->x-opp_pos->x[0],2)+pow(rob_pos->y-opp_pos->y[0],2));
-		set_plot(distance*1000.0," distance [mm]");
-
-		// printf("X: %f \t Y: %f\n",rob_pos->x*1000.0,rob_pos->y*1000.0);
-		printf("X: %f \t Y: %f\n",opp_pos->x[0]*1000.0,opp_pos->y[0]*1000.0);
-
-
-		// set_plot(rob_pos->x*1000.0," x [mm]");
-		// set_plot(rob_pos->y*1000.0," y [mm]");
-
 	}
 	else // Two opponents
 	{
@@ -137,20 +125,6 @@ void opponents_tower(CtrlStruct *cvs)
 			opp_pos->y[1] = first_order_filter(opp_pos->y[1], opp_a_y, TAU, delta_t);
 
 		}
-
-		// Compute distance to opponents - TODO: remove this
-		double distance1 = sqrt(pow(rob_pos->x-opp_pos->x[0],2)+pow(rob_pos->y-opp_pos->y[0],2));
-		double distance2 = sqrt(pow(rob_pos->x-opp_pos->x[1],2)+pow(rob_pos->y-opp_pos->y[1],2));
-
-		// set_plot(distance1*1000.0," distance1 [mm]");
-		// set_plot(distance2*1000.0," distance2 [mm]");
-
-		// printf("X: %f \t Y: %f\n",opp_pos->x[0]*1000.0,opp_pos->y[0]*1000.0);
-		set_plot(opp_pos->x[0]*1000.0," x1 [mm]");
-		set_plot(opp_pos->y[0]*1000.0," y1 [mm]");
-		set_plot(opp_pos->x[1]*1000.0," x2 [mm]");
-		set_plot(opp_pos->y[1]*1000.0," y2 [mm]");
-
 	}
 	// ----- opponents position computation end ----- //
 }
@@ -223,25 +197,16 @@ int check_opp_front(CtrlStruct *cvs)
 		exit(EXIT_FAILURE);
 	}
 
-	int var_test = 0; // test a enlever
 	for(i=0; i<nb_opp; i++)
 	{	
 		if (pow((opp_pos->x[i] - rob_pos->x + TOWER2CENTER*cos(rob_pos->theta)),2) +
 			pow((opp_pos->y[i] - rob_pos->y + TOWER2CENTER*sin(rob_pos->theta)),2) < 0.3 )
 		{
-			printf("Opp %d is too close modafucuzz\n", i);
-			// return 1;
-			var_test = 1;
-		}
-		else
-		{
-			printf("Opponents %d is far\n", i);
-			var_test = 0;
+			return 1;
 		}
 	}
 
-	// return 0;
-	return var_test;
+	return 0;
 }
 
 NAMESPACE_CLOSE();
