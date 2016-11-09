@@ -7,16 +7,11 @@
 #ifndef _KALMAN_GR14_H_
 #define _KALMAN_GR14_H_
 
+#include "namespace_ctrl.h"
 #include "CtrlStruct_gr14.h"
-#include "init_pos_gr14.h"
-
+#include "matrice_gr14.h"
+#include "set_output.h"
 NAMESPACE_INIT(ctrlGr14);
-
-/// Kalman main structure
-struct KalmanStruc
-{
-	int dummy_variable; ///< put your own variable, this is just an example without purpose
-};
 
 void kalman(CtrlStruct *cvs);
 

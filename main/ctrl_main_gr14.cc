@@ -13,6 +13,8 @@
 #include "calibration_gr14.h"
 #include "triangulation_gr14.h"
 #include "strategy_gr14.h"
+#include "kalman_gr14.h"
+#include "set_output.h"
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -50,6 +52,8 @@ void controller_init(CtrlStruct *cvs)
 
 	// robot initial position
 	set_init_position(cvs->robot_id, cvs->rob_pos);
+	set_init_position_kalman(cvs->robot_id, cvs->kalman_pos);
+	cvs->kalman_pos->last_t = t;
 	cvs->rob_pos->last_t = t;
 
 	// speed regulation
@@ -75,13 +79,20 @@ void controller_loop(CtrlStruct *cvs)
 	t = inputs->t;
 
 	// update the robot odometry
-	update_odometry(cvs);
+	//update_odometry(cvs);
 
 	// triangulation
 	triangulation(cvs);
 
+	//Kalman
+	kalman(cvs);
+
 	// opponents position
 	opponents_tower(cvs);
+
+	set_plot(cvs->kalman_pos->x,"x");
+	set_plot(cvs->kalman_pos->y,"y");
+	set_plot(cvs->kalman_pos->theta,"t");
 
 	// tower control
 	outputs->tower_command = 15.0;

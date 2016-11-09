@@ -16,6 +16,7 @@ double norm_dist(double dx, double dy);
 double limit_range(double x, double min, double max);
 double limit_angle(double x);
 double first_order_filter(double last_val, double new_val, double tau, double delta_t);
+double wheel_speed_meter(double wheel_speed_rad,double wheel_radius);
 
 NAMESPACE_CLOSE();
 
