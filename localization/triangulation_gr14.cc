@@ -5,7 +5,9 @@
 #include <cmath>
 #define decalage_tower 0.083
 
-#define PI 3,1416
+#define PI 3.1416
+#define COT_MAX 100000000
+#define adjust_value_to_bounds(value, max) ( ( value > max ) ? max : ( ( value < -max ) ? -max : value ) )
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -95,12 +97,6 @@ void triangulation(CtrlStruct *cvs)
 	double alpha_1, alpha_2, alpha_3;
 	double alpha_1_predicted, alpha_2_predicted, alpha_3_predicted;
 	double x_beac_1, y_beac_1, x_beac_2, y_beac_2, x_beac_3, y_beac_3;
-	
-	//variables needed for the ToTal algorithm
-	double xm_beac_1, ym_beac_1, xm_beac_3, ym_beac_3;
-	double T12, T23, T31;
-	double x12_p, x23_p, x31_p, y12_p, y23_p, y31_p, k31_p;
-	double D;
 
 	// variables initialization
 	pos_tri = cvs->triang_pos;
@@ -120,7 +116,6 @@ void triangulation(CtrlStruct *cvs)
 	rise_index_2 = (rise_index_1 - 1 < 0) ? NB_STORE_EDGE-1 : rise_index_1 - 1;
 	rise_index_3 = (rise_index_2 - 1 < 0) ? NB_STORE_EDGE-1 : rise_index_2 - 1;
 
-
 	fall_index_1 = inputs->falling_index_fixed;
 	fall_index_2 = (fall_index_1 - 1 < 0) ? NB_STORE_EDGE-1 : fall_index_1 - 1;
 	fall_index_3 = (fall_index_2 - 1 < 0) ? NB_STORE_EDGE-1 : fall_index_2 - 1;
@@ -134,36 +129,26 @@ void triangulation(CtrlStruct *cvs)
 	fall_angle_2 = inputs->last_falling_fixed[fall_index_2];
 	fall_angle_3 = inputs->last_falling_fixed[fall_index_3];
 
-
 	//check if one beacons is on the -PI,PI intersection and adjust 
-	fall_angle_1 = (std::abs(rise_angle_1 - fall_angle_1) > PI) ? PI-fall_angle_1 : fall_angle_1;
-	fall_angle_2 = (std::abs(rise_angle_2 - fall_angle_2) > PI) ? PI-fall_angle_2 : fall_angle_2;
-	fall_angle_3 = (std::abs(rise_angle_3 - fall_angle_3) > PI) ? PI-fall_angle_3 : fall_angle_3;
+	fall_angle_1 = (std::abs(rise_angle_1 - fall_angle_1) > PI) ? 2*PI+fall_angle_1 : fall_angle_1;
+	fall_angle_2 = (std::abs(rise_angle_2 - fall_angle_2) > PI) ? 2*PI+fall_angle_2 : fall_angle_2;
+	fall_angle_3 = (std::abs(rise_angle_3 - fall_angle_3) > PI) ? 2*PI+fall_angle_3 : fall_angle_3;
 
-	// beacons angles measured with the laser (to compute)
-	alpha_a = (fall_angle_1 + rise_angle_1)/2;
-	alpha_b = (fall_angle_2 + rise_angle_2)/2;
-	alpha_c = (fall_angle_3 + rise_angle_3)/2;
+	// beacons angles measured with the laser
+	alpha_a = limit_angle((fall_angle_1 + rise_angle_1)/2);
+	alpha_b = limit_angle((fall_angle_2 + rise_angle_2)/2);
+	alpha_c = limit_angle((fall_angle_3 + rise_angle_3)/2);
 
-	//normailse the angles
-	alpha_a = normalize_angle(alpha_a);
-	alpha_b = normalize_angle(alpha_b);
-	alpha_c = normalize_angle(alpha_c);
-
-	// beacons angles predicted thanks to odometry measurements (to compute)
-	alpha_1_predicted = predicted_angle(rob_pos->x,rob_pos->y,x_beac_1,y_beac_1,rob_pos->theta,decalage_tower);
-	alpha_2_predicted = predicted_angle(rob_pos->x,rob_pos->y,x_beac_2,y_beac_2,rob_pos->theta,decalage_tower);
-	alpha_3_predicted = predicted_angle(rob_pos->x,rob_pos->y,x_beac_3,y_beac_3,rob_pos->theta,decalage_tower);
-
-	//normalise predicted angles
-	alpha_1_predicted = normalize_angle(alpha_1_predicted);
-	alpha_2_predicted = normalize_angle(alpha_2_predicted);
-	alpha_3_predicted = normalize_angle(alpha_3_predicted);	
+	// beacons angles predicted thanks to odometry measurements 
+	alpha_1_predicted = limit_angle(predicted_angle(rob_pos->x,rob_pos->y,x_beac_1,y_beac_1,rob_pos->theta,decalage_tower));
+	alpha_2_predicted = limit_angle(predicted_angle(rob_pos->x,rob_pos->y,x_beac_2,y_beac_2,rob_pos->theta,decalage_tower));
+	alpha_3_predicted = limit_angle(predicted_angle(rob_pos->x,rob_pos->y,x_beac_3,y_beac_3,rob_pos->theta,decalage_tower));
 
 	// indexes of each beacon
 	alpha_1_index = index_predicted(alpha_1_predicted, alpha_a, alpha_b, alpha_c);
 	alpha_2_index = index_predicted(alpha_2_predicted, alpha_a, alpha_b, alpha_c);
 	alpha_3_index = index_predicted(alpha_3_predicted, alpha_a, alpha_b, alpha_c);
+
 
 	// safety
 	if ((alpha_1_index == alpha_2_index) || (alpha_1_index == alpha_3_index) || (alpha_2_index == alpha_3_index))
@@ -206,79 +191,61 @@ void triangulation(CtrlStruct *cvs)
 			printf("Error: unknown index %d !\n", alpha_3_index);
 			exit(EXIT_FAILURE);
 	}
-
-	//We add Pi to the angées alpha so they go from 0 to 2*PI add we can do more easily the algorithm found online
 	
-	alpha_1 = alpha_1 + PI;
-	alpha_2 = alpha_2 + PI;
-	alpha_3 = alpha_3 + PI;
-
-	// ----- triangulation computation start ----- //
-	//ToTal algorithm : http://www.telecom.ulg.ac.be/triangulation/
-	//*************************************************************\\
-	//Modified beacon coordinates
-	xm_beac_1=x_beac_1 - x_beac_2;
-	ym_beac_1=y_beac_1 - y_beac_2;
-	xm_beac_3=x_beac_3 - x_beac_2;
-	ym_beac_3=y_beac_3 - y_beac_2;
-
-	//Compute te three cot(.)
-	T12 = 1/tan(alpha_2 - alpha_1);
-	T23 = 1/tan(alpha_3 - alpha_2);
-	T12 = (1-T12*T23) / (T12+T23);
-
-	//Compute the modified circle center coordinates
-	x12_p = xm_beac_1 + T12 * ym_beac_1;
-	y12_p = ym_beac_1 - T12 * xm_beac_1;
-	x23_p = xm_beac_3 - T23 * ym_beac_3;
-	y23_p = ym_beac_3 + T23 * xm_beac_3;
-	x31_p = (xm_beac_3 + xm_beac_1) + T31 * (ym_beac_3 - ym_beac_1);
-	y31_p = (ym_beac_3 + ym_beac_1) - T31 * (xm_beac_3 - xm_beac_1);
-
-	//Compute k31_p
-	k31_p = xm_beac_1*xm_beac_3 + ym_beac_1*ym_beac_3 + T31*(xm_beac_1*ym_beac_3 - xm_beac_3*ym_beac_1);
-
-	//Compute D
-	D = (x12_p-x23_p)*(y23_p-y31_p) - (y12_p-y23_p)*(x23_p-x31_p);
+	/* ----- triangulation computation start ----- //
+	* ToTal algorithm : http://www.telecom.ulg.ac.be/triangulation/
+ 	* Version with mathematical approximation of the limit for the pseudosingularities
+	*/
+	double cot_12 = 1/tan( alpha_2 - alpha_1 ) ;
+	double cot_23 = 1/tan( alpha_3 - alpha_2 ) ;
+	cot_12 = adjust_value_to_bounds( cot_12 , COT_MAX ) ;
+	cot_23 = adjust_value_to_bounds( cot_23 , COT_MAX ) ;
+	double cot_31 = ( 1.0 - cot_12 * cot_23 ) / ( cot_12 + cot_23 ) ;
+	cot_31 = adjust_value_to_bounds( cot_31 , COT_MAX ) ;
 	
-	// robot position
-	pos_tri->x = x_beac_2 + (k31_p*(y12_p-y23_p)) / D;
-	pos_tri->y = y_beac_2 + (k31_p*(x23_p-x12_p)) / D;
-	//************************************************************\\
+	double x1_ = x_beac_1 - x_beac_2 , y1_ = y_beac_1 - y_beac_2 , x3_ = x_beac_3 - x_beac_2 , y3_ = y_beac_3 - y_beac_2 ;
 
-	// robot orientation
-	switch (cvs->team_id)
-	{
-		case TEAM_A : pos_tri->theta = -PI/2 - alpha_3; break;
+	double c12x = x1_ + cot_12 * y1_ ;
+	double c12y = y1_ - cot_12 * x1_ ;
 
-		case TEAM_B : pos_tri->theta = PI/2 - alpha_3; break;
-	}
+	double c23x = x3_ - cot_23 * y3_ ;
+	double c23y = y3_ + cot_23 * x3_ ;
 
+	double c31x = (x3_ + x1_) + cot_31 * (y3_ - y1_) ;
+	double c31y = (y3_ + y1_) - cot_31 * (x3_ - x1_) ;
+	double k31 = (x3_ * x1_) + (y3_ * y1_) + cot_31 * ( (y3_ * x1_) - (x3_ * y1_) ) ;
+  
+  	double D = (c12x - c23x) * (c23y - c31y) - (c23x - c31x) * (c12y - c23y) ;
+  	double invD = 1.0 / D ;
+  	double K = k31 * invD ;
+  
+  	//Position of the Robot
+	pos_tri->x = K * (c12y - c23y) + x_beac_2 ;
+	pos_tri->y = K * (c23x - c12x) + y_beac_2 ;
 
+	//Orientation of the Robot //**********************Fait au cas par cas, il faudrait vérifier si pas déjà un algo existant*****
+	float theta_temp = 0.0;
+	theta_temp = - alpha_1 + atan2((y_beac_1 - pos_tri->y),(x_beac_1 - pos_tri->x));
+	pos_tri->theta =  limit_angle(theta_temp);
+	
+	//printf ( "triang :%f \t %f \t %f\n",pos_tri->x,pos_tri->y,pos_tri->theta);
 	// ----- triangulation computation end ----- //
 }
+	
 
 double predicted_angle(double x_r,double y_r,double x_b,double y_b,double alpha,double d){
 	double theta; // valeur que l'on va transmettre comme angle prédit
-	theta = atan((x_b-(x_r+cos(alpha)*d))/(y_b-(y_r+sin(alpha)*d)))-alpha;
+
+	theta = atan2((y_b-y_r),(x_b-x_r)) - alpha;
 	/* la fonction calcul l'angle en fonction de la position du robot. l'arctan prend la position du beacon(x_b,y_b) moins la 
-	position du robot(x_r,y_r) moins le decalage (d) de la tour radar qui n'est pas centrée que l'on vient multiplier
-	par le cos ou sin de l'orientation du robot. On déduit ensuite l'angle alpha 
-	qui est l'orientation du robot
+	position du robot(x_r,y_r) . On déduit ensuite l'angle theta qui est l'orientation du robot
 	*/
 return theta;
 }
 
-double normalize_angle(double alpha){
 
-	// on normalise la valeur de alpha pour que celui ci se trouve effectivement entre -PI et Pi 
-
-	alpha = (alpha > 2*PI) ? alpha - 2*PI : alpha;
-	alpha = (alpha > PI) ? alpha - 2*PI : alpha;				
-	alpha = (alpha < - 2*PI) ? alpha+2*PI : alpha;
-	alpha = (alpha < -PI) ? alpha + 2*PI : alpha;
-
-	return alpha;
-}
 
 NAMESPACE_CLOSE();
+
+
+
