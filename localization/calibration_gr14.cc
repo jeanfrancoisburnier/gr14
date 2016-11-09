@@ -48,10 +48,10 @@ void calibration(CtrlStruct *cvs)
 			break;
 
 		case CALIB_STATE_A: // move backward until contact with wall
-			speed_regulation(cvs, -4.0, -4.0);
+			speed_regulation(cvs, -5.0, -5.0);
 
 			// go to state B after 5 seconds
-			if (t - calib->t_flag > 5.0 || (cvs->inputs->u_switch[0] && cvs->inputs->u_switch[1]))
+			if (t - calib->t_flag > 2.0 || (inputs->u_switch[0] && inputs->u_switch[1]))
 			{
 				calib->flag = CALIB_STATE_B;
 
@@ -61,15 +61,16 @@ void calibration(CtrlStruct *cvs)
 
 		case CALIB_STATE_B: // move backward until pressed against wall -> initializes y coordinate and (theta)
 
-			// go to state C after 1 second
-			if (t - calib->t_flag > 1.0)
+			// go to state C after 0.5 second
+			if (t - calib->t_flag > 0.5)
 			{
 				calib->flag = CALIB_STATE_C;
 
 				calib->t_flag = t;
 
 				// Do not forget to take into that the robot could start on yellow side
-				rob_pos->y = 1.502;
+				rob_pos->y = 1.44;
+				rob_pos->theta = -M_PI/2;
 
 			}
 			break;
@@ -99,10 +100,10 @@ void calibration(CtrlStruct *cvs)
 			break;
 
 		case CALIB_STATE_E: // move backward until contact with wall
-			speed_regulation(cvs, -4.0, -4.0);
+			speed_regulation(cvs, -5.0, -5.0);
 
-			 // go to state F after 5 seconds
-			if (t - calib->t_flag > 5.0 || (cvs->inputs->u_switch[0] && cvs->inputs->u_switch[1]))
+			 // go to state F after 2 seconds
+			if (t - calib->t_flag > 2.0 || (inputs->u_switch[0] && inputs->u_switch[1]))
 			{
 				calib->flag = CALIB_STATE_F;
 
@@ -112,21 +113,21 @@ void calibration(CtrlStruct *cvs)
 
 		case CALIB_STATE_F: // move backward until pressed against wall -> initializes x coordinate and theta
 
-			// go to state G after 1 second
-			if (t - calib->t_flag > 1.0)
+			// go to state G after 0.5 second
+			if (t - calib->t_flag > 0.5)
 			{
 				calib->flag = CALIB_STATE_G;
 
 				calib->t_flag = t;
 
 				// Do not forget to take into that the robot could start on yellow side
-				rob_pos->x = 1.002;
+				rob_pos->x = 0.94;
 				rob_pos->theta = M_PI;
 			}
 			break;
 
 		case CALIB_STATE_G: // move forward
-			speed_regulation(cvs, 4.0, 4.0);
+			speed_regulation(cvs, 5.0, 5.0);
 
 			// go to state H after 2 seconds
 			if (t - calib->t_flag > 2.0)
@@ -151,6 +152,7 @@ void calibration(CtrlStruct *cvs)
 
 		case CALIB_FINISH: // wait before the match is starting
 			speed_regulation(cvs, 0.0, 0.0);
+			cvs->main_state = WAIT_INIT_STATE;
 			break;
 	
 		default:
