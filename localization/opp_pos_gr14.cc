@@ -23,12 +23,12 @@ void opponents_tower(CtrlStruct *cvs)
 	double rise_1, rise_2, fall_1, fall_2;
 
 	CtrlIn *inputs;
-	RobotPosition *rob_pos;
+	KalmanStruct *kalman_pos;
 	OpponentsPosition *opp_pos;
 
 	// variables initialization
 	inputs  = cvs->inputs;
-	rob_pos = cvs->rob_pos;
+	kalman_pos = cvs->kalman_pos;
 	opp_pos = cvs->opp_pos;
 
 	nb_opp = opp_pos->nb_opp;
@@ -88,7 +88,7 @@ void opponents_tower(CtrlStruct *cvs)
 		opp_a_y = opp_pos->y[0];
 
 		// Get new position of opponent a
-		single_opp_tower(rise_1, fall_1, rob_pos->x, rob_pos->y, rob_pos->theta, &opp_a_x, &opp_a_y);
+		single_opp_tower(rise_1, fall_1, kalman_pos->x, kalman_pos->y, kalman_pos->theta, &opp_a_x, &opp_a_y);
 
 		// Filter opponent position
 		opp_pos->x[0] = first_order_filter(opp_pos->x[0], opp_a_x, TAU, delta_t);
@@ -98,8 +98,8 @@ void opponents_tower(CtrlStruct *cvs)
 	{
 
 		// Get new position of opponent a and b
-		single_opp_tower(rise_1, fall_1, rob_pos->x, rob_pos->y, rob_pos->theta, &opp_a_x, &opp_a_y);
-		single_opp_tower(rise_2, fall_2, rob_pos->x, rob_pos->y, rob_pos->theta, &opp_b_x, &opp_b_y);
+		single_opp_tower(rise_1, fall_1, kalman_pos->x, kalman_pos->y, kalman_pos->theta, &opp_a_x, &opp_a_y);
+		single_opp_tower(rise_2, fall_2, kalman_pos->x, kalman_pos->y, kalman_pos->theta, &opp_b_x, &opp_b_y);
 
 		// Compute difference of old position and new position
 		delta_pos_1 = pow(opp_a_x - opp_pos->x[0],2) + pow(opp_a_y - opp_pos->y[0],2);
@@ -177,10 +177,10 @@ int check_opp_front(CtrlStruct *cvs)
 	int i, nb_opp;
 
 	OpponentsPosition *opp_pos;
-	RobotPosition *rob_pos;
+	KalmanStruct *kalman_pos;
 
 	// variables initialization
-	rob_pos = cvs->rob_pos;
+	kalman_pos = cvs->kalman_pos;
 	opp_pos = cvs->opp_pos;
 	nb_opp = opp_pos->nb_opp;
 
@@ -199,8 +199,8 @@ int check_opp_front(CtrlStruct *cvs)
 
 	for(i=0; i<nb_opp; i++)
 	{	
-		if (pow((opp_pos->x[i] - rob_pos->x + TOWER2CENTER*cos(rob_pos->theta)),2) +
-			pow((opp_pos->y[i] - rob_pos->y + TOWER2CENTER*sin(rob_pos->theta)),2) < 0.3 )
+		if (pow((opp_pos->x[i] - kalman_pos->x + TOWER2CENTER*cos(kalman_pos->theta)),2) +
+			pow((opp_pos->y[i] - kalman_pos->y + TOWER2CENTER*sin(kalman_pos->theta)),2) < 0.3 )
 		{
 			return 1;
 		}

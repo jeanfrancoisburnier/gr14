@@ -26,13 +26,13 @@ void calibration(CtrlStruct *cvs)
 
 	CtrlIn *inputs;
 	RobotCalibration *calib;
-	RobotPosition *rob_pos;
+	KalmanStruct *kalman_pos;
 
 	// variables initialization
 	inputs = cvs->inputs;
 	calib  = cvs->calib;
 
-	rob_pos = cvs->rob_pos;
+	kalman_pos = cvs->kalman_pos;
 	
 	t = inputs->t;
 	team_id = cvs->team_id;
@@ -69,8 +69,8 @@ void calibration(CtrlStruct *cvs)
 				calib->t_flag = t;
 
 				// Do not forget to take into that the robot could start on yellow side
-				rob_pos->y = 1.44;
-				rob_pos->theta = -M_PI/2;
+				kalman_pos->y = 1.44;
+				kalman_pos->theta = -M_PI/2;
 
 			}
 			break;
@@ -121,8 +121,8 @@ void calibration(CtrlStruct *cvs)
 				calib->t_flag = t;
 
 				// Do not forget to take into that the robot could start on yellow side
-				rob_pos->x = 0.94;
-				rob_pos->theta = M_PI;
+				kalman_pos->x = 0.94;
+				kalman_pos->theta = M_PI;
 			}
 			break;
 
