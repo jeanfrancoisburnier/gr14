@@ -11,7 +11,17 @@
 
 NAMESPACE_INIT(ctrlGr14);
 
-void follow_path(CtrlStruct *cvs);
+typedef struct Target_coordinate
+{
+	
+	float x;
+	float y;
+
+} target_coordinate_t;
+
+// void follow_path(CtrlStruct *cvs);
+void follow_path(CtrlStruct *cvs, target_coordinate_t* tab, uint8_t size);
+void reach_single_target(float gamma, float *l_speed, float *r_speed);
 
 NAMESPACE_CLOSE();
 

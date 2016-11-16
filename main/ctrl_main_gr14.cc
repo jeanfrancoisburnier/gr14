@@ -94,6 +94,11 @@ void controller_loop(CtrlStruct *cvs)
 	set_plot(cvs->kalman_pos->y,"y");
 	set_plot(cvs->kalman_pos->theta,"t");
 
+	printf("x: %f\t", cvs->kalman_pos->x);
+	printf("y: %f\t", cvs->kalman_pos->y);
+	printf("t: %f\n", cvs->kalman_pos->theta*180/M_PI);
+
+
 	// tower control
 	outputs->tower_command = 15.0;
 
