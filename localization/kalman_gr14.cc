@@ -77,7 +77,7 @@ void kalman(CtrlStruct *cvs)
 
 	//condition if the triangulation pos and the previous pos are too different it will ignore 
 	//particularly useful in the beggining before triagulation is working properly
-	if (std::abs(x_hat[0]-z_k[0])>0.1 || std::abs(x_hat[1]-z_k[1])>0.1 || std::abs(x_hat[2]-z_k[2])>0.1)
+	if ((std::abs(x_hat[0]-z_k[0])>0.1 || std::abs(x_hat[1]-z_k[1])>0.1 || std::abs(x_hat[2]-z_k[2])>0.1) && kalman_pos->last_t<-14.9)
 		{
 			return;
 		}
