@@ -79,7 +79,7 @@ void controller_loop(CtrlStruct *cvs)
 	t = inputs->t;
 
 	// update the robot odometry
-	update_odometry(cvs);
+	//update_odometry(cvs);
 
 	// triangulation
 	triangulation(cvs);
