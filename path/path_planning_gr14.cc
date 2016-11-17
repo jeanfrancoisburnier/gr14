@@ -4,6 +4,9 @@
 #include "useful_gr14.h"
 #include <math.h>
 
+#include "node_gr14.h"
+#include "edge_gr14.h" //not sure if useful
+
 #define NB_OBSTACLES 10 // 8 fixes obstacles + 2 oponents
 
 NAMESPACE_INIT(ctrlGr14);
@@ -23,6 +26,7 @@ PathPlanning* init_path_planning()
 
 	//creation of the obstacles
 	array<Obstacles, NB_OBSTACLES> list_obstacles;
+
 	list_obstacles[0].first_corner[X] = -0.850;
 	list_obstacles[0].first_corner[Y] = 1.0;
 	list_obstacles[0].second_corner[X] = -0.350;
@@ -76,7 +80,7 @@ PathPlanning* init_path_planning()
 	list_obstacles[9].second_corner[Y] = 0.00;
 
 
-	
+
 
 	// ----- path-planning initialization end ----- //
 
