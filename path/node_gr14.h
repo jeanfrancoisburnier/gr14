@@ -40,7 +40,7 @@ private:
 public:
 	int distance_to_start;	//total distance already travelled from the start (to see if we go in the good direction)
 
-	Node(int id_node, int* ptr_total_edge_index, bool free_init);
+	Node(int id_node, bool free_init);
 	~Node();
 
 	array<float, 2> node_get_coordinates();
