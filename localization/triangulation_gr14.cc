@@ -225,13 +225,10 @@ void triangulation(CtrlStruct *cvs)
 	pos_tri->y = K * (c23x - c12x) + y_beac_2;
 
 	//Orientation of the Robot //
-	float theta_temp = 0.0;
-	//theta_temp = - alpha_1 + atan2((y_beac_1 - pos_tri->y),(x_beac_1 - pos_tri->x));
-	//pos_tri->theta =  limit_angle(theta_temp);
 	pos_tri->theta = (limit_angle(atan2(y_beac_1 - pos_tri->y, x_beac_1 - pos_tri->x) - alpha_1)+
 		limit_angle(atan2(y_beac_2 - pos_tri->y, x_beac_2 - pos_tri->x) - alpha_2)+
-		limit_angle(atan2(y_beac_3 - pos_tri->y, x_beac_3 - pos_tri->x) - alpha_3))/3
-	pos_tri->theta =  limit_angle(theta_temp);
+		limit_angle(atan2(y_beac_3 - pos_tri->y, x_beac_3 - pos_tri->x) - alpha_3))/3;
+	
 
 	//Reajust the position of the robot with the tower offset
 	pos_tri->x = K * (c12y - c23y) + x_beac_2 - TOWER_OFFSET*cos(pos_tri->theta);
