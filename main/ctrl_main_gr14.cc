@@ -90,9 +90,17 @@ void controller_loop(CtrlStruct *cvs)
 	// opponents position
 	opponents_tower(cvs);
 
-	set_plot(cvs->kalman_pos->x,"x");
-	set_plot(cvs->kalman_pos->y,"y");
-	set_plot(cvs->kalman_pos->theta,"t");
+	// set_plot(cvs->kalman_pos->x,"x");
+	// set_plot(cvs->kalman_pos->y,"y");
+	// set_plot(cvs->kalman_pos->theta,"t");
+
+	// set_output(cvs->kalman_pos->x,"x_r");
+	// set_output(cvs->kalman_pos->y,"y_r");
+	// set_output(cvs->kalman_pos->theta,"theta_r");
+
+	// printf("x: %f\t", cvs->kalman_pos->x);
+	// printf("y: %f\t", cvs->kalman_pos->y);
+	//printf("t: %f\n", cvs->kalman_pos->theta*180/M_PI);
 
 	printf("x: %f\t", cvs->kalman_pos->x);
 	printf("y: %f\t", cvs->kalman_pos->y);
