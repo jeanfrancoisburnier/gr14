@@ -5,7 +5,6 @@
 #include <math.h>
 
 #include "node_gr14.h"
-#include "edge_gr14.h" //not sure if useful
 
 #include <vector>
 #include <array>

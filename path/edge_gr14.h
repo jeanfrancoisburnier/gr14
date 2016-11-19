@@ -25,10 +25,8 @@ class Edge
 {
 private:
 	int id;					//current edge's id
-	float weight;			//correspond to the length of the edge (twos differents values for us 1 or sqrt(2) or -1 if not not a travelled edge)
-	int id_connected_node;	
-	//int id_start_node;
-
+	float weight;			//correspond to the length of the edge (three differents values for us 1 or sqrt(2) or -1 if not a travelled edge)
+	int id_connected_node;	//id to the destination Node
 public:
 	int edge_get_id();
 	float edge_get_weight();

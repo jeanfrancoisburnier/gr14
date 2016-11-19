@@ -1,7 +1,7 @@
 /*! 
  * \author Group 14
  * \file node.h
- * \Node class
+ * \Node class + one function
  */
 #ifndef _NODE_GR14_H_
 #define _NODE_GR14_H_
@@ -35,7 +35,7 @@ const float peak_y = MAX_X * 0.001;			     //[m]
 const int NB_X = 2 * MAX_X / SQUARE_SIZE;
 const int NB_Y = 2 * MAX_Y / SQUARE_SIZE;
 
-using namespace std; //to be able to use array
+using namespace std; //to be able to use some identifier proper to C++
 
 
 
@@ -55,6 +55,10 @@ private:
 
 	float distance_to_goal;
 
+	void node_creation_edges(int state);
+	int node_identify_state(int id_n);
+	void node_build_valid_edge(int index, array<int, MAX_NB_EDGES> shift_i);
+
 public:
 	float distance_to_start;	//total distance already travelled from the start (to see if we go in the good direction)
 
@@ -70,10 +74,6 @@ public:
 	bool node_get_visited();
 	bool node_get_free_position();
 	float node_get_distance_to_goal();
-
-	
-
-	
 };
 
 
