@@ -47,6 +47,7 @@ void follow_path(CtrlStruct *cvs, target_coordinate_t* tab, uint8_t size)
 		i = 0;
 		return;
 	}
+	// printf("i is %d\n", i);
 
 	float beta = atan2(vector_y,vector_x); // absolute angle of target
 	// printf("Angle beta: %f\n", beta);
@@ -71,55 +72,55 @@ void reach_single_target(float gamma, float *l_speed, float *r_speed)
 	{
 		*l_speed = +5.0;
 		*r_speed = +5.0;
-		// printf("Dré!\n");
+		printf("Dré!\n");
 	}
 	else if (gamma > M_PI/8.0 && gamma < 3*M_PI/8.0) // target in front of robot
 	{
 		*l_speed = -1.0;
 		*r_speed = +5.0;
-		// printf("Tourne un peu à gauche\n");
+		printf("Tourne un peu à gauche\n");
 	}
 	else if (gamma > 3*M_PI/8.0 && gamma < 5*M_PI/8.0) // target in front of robot
 	{
 		*l_speed = -5.0;
 		*r_speed = +5.0;
-		// printf("Tourne un peu plus à gauche\n");
+		printf("Tourne un peu plus à gauche\n");
 	}
 	else if (gamma > 5*M_PI/8.0 && gamma < 7*M_PI/8.0) // target in front of robot
 	{
 		*l_speed = -8.0;
 		*r_speed = +8.0;
-		// printf("Tourne bien à gauche\n");
+		printf("Tourne bien à gauche\n");
 	}
 	else if (gamma > 7*M_PI/8.0 && gamma < M_PI) // target in front of robot
 	{
 		*l_speed = -10.0;
 		*r_speed = +10.0;
-		// printf("Tourne bcp à gauche\n");
+		printf("Tourne bcp à gauche\n");
 	}
 	else if (gamma > -M_PI && gamma < -7*M_PI/8.0)
 	{
 		*l_speed = +10.0;
 		*r_speed = -10.0;
-		// printf("Tourne bcp à droite\n");
+		printf("Tourne bcp à droite\n");
 	}
 	else if (gamma > -7*M_PI/8.0 && gamma < -5*M_PI/8.0) // target in front of robot
 	{
 		*l_speed = +8.0;
 		*r_speed = -8.0;
-		// printf("Tourne bien à droite\n");
+		printf("Tourne bien à droite\n");
 	}
 	else if (gamma > -5*M_PI/8.0 && gamma < -3*M_PI/8.0) // target in front of robot
 	{
 		*l_speed = +5.0;
 		*r_speed = -5.0;
-		// printf("Tourne un peu plus à droite\n");
+		printf("Tourne un peu plus à droite\n");
 	}
 	else if (gamma > -3*M_PI/8.0 && gamma < -M_PI/8.0) // target in front of robot
 	{
 		*l_speed = +5.0;
 		*r_speed = -1.0;
-		// printf("Tourne un peu à droite\n");
+		printf("Tourne un peu à droite\n");
 	}
 	else
 	{
