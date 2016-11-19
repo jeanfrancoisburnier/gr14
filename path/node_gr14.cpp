@@ -101,7 +101,7 @@ void Node::node_creation_edges(int state)
 		case LEFT_TOP_CORNER :
 			for(int i = 0; i < MAX_NB_EDGES; i++)
 			{
-				if( i==0 || i>4 )//edges pointing outside the map
+				if( i<=1 || i>4 )//edges pointing outside the map
 				{
 					direct_edges.push_back (Edge (i, -1, 0));
 				}
@@ -129,7 +129,7 @@ void Node::node_creation_edges(int state)
 		case RIGHT_TOP_CORNER :
 			for(int i = 0; i < MAX_NB_EDGES; i++)
 			{
-				if( i<=4 || i==7 )//edges pointing outside the map
+				if( i<4 || i==7 )//edges pointing outside the map
 				{
 					direct_edges.push_back (Edge (i, -1, 0));
 				}
@@ -185,7 +185,7 @@ void Node::node_creation_edges(int state)
 		case LEFT_BOTTOM_CORNER :
 			for(int i = 0; i < MAX_NB_EDGES; i++)
 			{
-				if( i>=1 && i<=5 )//edges pointing outside the map
+				if( i>=3 )//edges pointing outside the map
 				{
 					direct_edges.push_back (Edge (i, -1, 0));
 				}

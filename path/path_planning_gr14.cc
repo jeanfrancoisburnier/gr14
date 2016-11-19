@@ -3,6 +3,7 @@
 #include "opp_pos_gr14.h"
 #include "useful_gr14.h"
 #include <math.h>
+#include "set_output.h"
 
 #include "node_gr14.h"
 
@@ -23,7 +24,7 @@ NAMESPACE_INIT(ctrlGr14);
  * \param[in,out] path path-planning main structure
  */
 
-vector<Node> nodes_grid; //creation of our Node's grid in a global way, so each function of path_planning_gr14.cc will be able to use it
+static vector<Node> nodes_grid; //creation of our Node's grid in a global way, so each function of path_planning_gr14.cc will be able to use it
 
 
 
@@ -44,6 +45,7 @@ PathPlanning* init_path_planning()
 	float x_node = 0.0;
 	float y_node = 0.0;
 
+	static bool fini_grid = false;//to delete when note printing
 
 	// ----- Creation of our Node's grid ----- //
 	nodes_grid.reserve(NB_NODES);//The size will not change anymore after this loop
@@ -68,7 +70,21 @@ PathPlanning* init_path_planning()
 				nodes_grid.push_back( Node (id_n, FREE, x_node, y_node));
 			}
 		}
+		if(fini_grid == false)
+		{
+			printf("X = %f, Y = %f, %s, id = %d, %.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\n",
+				x_node, y_node, nodes_grid[id_n].node_get_free_position()? "FREE":"OCCUPIED", id_n,
+				nodes_grid[id_n].node_get_edges()[0].edge_get_weight(), nodes_grid[id_n].node_get_edges()[1].edge_get_weight(),
+				nodes_grid[id_n].node_get_edges()[2].edge_get_weight(), nodes_grid[id_n].node_get_edges()[3].edge_get_weight(),
+				nodes_grid[id_n].node_get_edges()[4].edge_get_weight(), nodes_grid[id_n].node_get_edges()[5].edge_get_weight(),
+				nodes_grid[id_n].node_get_edges()[6].edge_get_weight(), nodes_grid[id_n].node_get_edges()[7].edge_get_weight());
+
+			set_output(x_node, "x_pos");
+			set_output(y_node, "y_pos");
+			set_output(nodes_grid[id_n].node_get_free_position(), "etat_node");
+		}
 	}
+	fini_grid == true;
 	// ----- end of the creation of the Node's grid ----- //
 
 	// ----- path-planning initialization end ----- //
