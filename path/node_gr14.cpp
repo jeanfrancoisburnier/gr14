@@ -24,7 +24,7 @@ typedef enum
 NAMESPACE_INIT(ctrlGr14);
 
 
-Node::Node(int id_node, bool free_init, float x_p, float y_p): id(id_node), free_position(free_init)
+Node::Node(int id_node, bool free_init, float x_p, float y_p): id(id_node), free_position(free_init), heuristic_value(1000.0)
 {		
 	coordinates[X]=x_p;
 	coordinates[Y]=y_p;
@@ -220,8 +220,6 @@ void Node::node_creation_edges(int state)
 }
 
 
-
-
 void Node::node_build_valid_edge(int index, array<int, MAX_NB_EDGES> shift_i)
 {
 	if( (index % 2) == 0 )//indice pair (top, left, bottom, right)
@@ -236,55 +234,61 @@ void Node::node_build_valid_edge(int index, array<int, MAX_NB_EDGES> shift_i)
 
 
 
+// ------ Settings ----- //
+
 void Node::node_set_previous_node_id(int id_prev)
 {
 	previous_node_id=id_prev;
 }
 
-void Node::node_set_distance_to_goal(float x_g, float y_g)
+void Node::node_set_distance_to_goal(array<float, 2> coord_g)
 {
-	distance_to_goal = sqrt( pow((x_g - coordinates[X]),2) + pow((y_g - coordinates[Y]),2) );
+	distance_to_goal = sqrt( pow((coord_g[X] - coordinates[X]),2) + pow((coord_g[Y] - coordinates[Y]),2) );
+}
+
+void Node::node_set_distance_to_start(array<float, 2> coord_s)
+{
+	distance_to_goal = sqrt( pow((coord_s[X] - coordinates[X]),2) + pow((coord_s[Y] - coordinates[Y]),2) );
 }
 
 
 
+// ------ Getting ----- //
 
 array<float, 2> Node::node_get_coordinates()
 {
 	return coordinates;
 }
 
-
 vector<Edge> Node::node_get_edges()
 {
 	return direct_edges;
 }
-
 
 int Node::node_get_previous_node_id()
 {
 	return previous_node_id;
 }						
 	
-
 bool Node::node_get_visited()
 {
 	return visited;
 }
-
-
 
 bool Node::node_get_free_position()
 {
 	return free_position;
 }
 
-
 float Node::node_get_distance_to_goal()
 {
 	return distance_to_goal;
 }
 
+float Node::node_get_distance_to_start()
+{
+	return distance_to_start;
+}
 
 
 // ----- This function isn't in the class  ------ //

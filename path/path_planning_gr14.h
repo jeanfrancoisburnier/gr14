@@ -13,7 +13,9 @@
 #include "CtrlStruct_gr14.h"
 
 #include <array>
- 
+
+#define NB_OBSTACLES 10 // 8 fixed obstacles + 2 oponents
+
 using namespace std; //to be able to use array
 
 NAMESPACE_INIT(ctrlGr14);
@@ -38,6 +40,7 @@ struct Obstacles
 
 PathPlanning* init_path_planning();
 void free_path_planning(PathPlanning *path);
+array<Obstacles, NB_OBSTACLES> initialization_obstacles();
 
 NAMESPACE_CLOSE();
 

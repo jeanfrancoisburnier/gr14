@@ -54,19 +54,22 @@ private:
 	vector<Edge> direct_edges;	//differents edges of the Node (connection to other nodes)
 
 	float distance_to_goal;
+	float distance_to_start;	//total distance already travelled from the start (to see if we go in the good direction)
+	float heuristic_value;
 
 	void node_creation_edges(int state);
 	int node_identify_state(int id_n);
 	void node_build_valid_edge(int index, array<int, MAX_NB_EDGES> shift_i);
 
 public:
-	float distance_to_start;	//total distance already travelled from the start (to see if we go in the good direction)
+	
 
 	Node(int id_node, bool free_init, float x_p, float y_p);
 	~Node();
 
 	void node_set_previous_node_id(int id_prev);
-	void node_set_distance_to_goal(float x_g, float y_g);
+	void node_set_distance_to_goal(array<float, 2> coord_g);
+	void node_set_distance_to_start(array<float, 2> coord_s);
 
 	array<float, 2> node_get_coordinates();
 	vector<Edge> node_get_edges();
@@ -74,6 +77,7 @@ public:
 	bool node_get_visited();
 	bool node_get_free_position();
 	float node_get_distance_to_goal();
+	float node_get_distance_to_start();
 };
 
 
