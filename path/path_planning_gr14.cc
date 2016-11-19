@@ -53,8 +53,8 @@ PathPlanning* init_path_planning()
 		y_node = peak_y - (id_n/NB_X) * square_length - square_length/2;
 		//warning to understand this formula be cautious that id_n/NB_X is an operation between (int)
 		
-		x_node = -peak_x + square_length/2 + (id_n - (id_n/NB_X)*NB_X) * square_length;
-		//warning to understand this formula be cautious that id_n/NB_X*NB_X is an operation between (int)
+		x_node = -peak_x + square_length/2 + (id_n%NB_X) * square_length;
+		//warning to understand this formula be cautious that id_n%NB_X is an operation between (int)
 
 		for(int j=0; j<NB_OBSTACLES; j++)
 		{
@@ -73,7 +73,7 @@ PathPlanning* init_path_planning()
 
 	// ----- path-planning initialization end ----- //
 
-
+	
 
 	// return structure initialized
 	return path;
@@ -94,6 +94,16 @@ void free_path_planning(PathPlanning *path)
 	// ----- path-planning memory release end ----- //
 
 	free(path);
+}
+
+
+
+void reset_heuristic_value()
+{
+	for(int i=0; i<NB_NODES; i++)
+	{
+		nodes_grid[i].node_set_heuristic_value(H_VALUE_INIT);
+	}
 }
 
 

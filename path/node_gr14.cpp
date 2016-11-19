@@ -24,7 +24,7 @@ typedef enum
 NAMESPACE_INIT(ctrlGr14);
 
 
-Node::Node(int id_node, bool free_init, float x_p, float y_p): id(id_node), free_position(free_init), heuristic_value(1000.0)
+Node::Node(int id_node, bool free_init, float x_p, float y_p): id(id_node), free_position(free_init), heuristic_value(H_VALUE_INIT)
 {		
 	coordinates[X]=x_p;
 	coordinates[Y]=y_p;
@@ -88,7 +88,7 @@ int Node::node_identify_state(int id_n)
 //------ Do the initialization of the different edges ------//
 void Node::node_creation_edges(int state)
 {
-	array<int, MAX_NB_EDGES> shift_index = {id-NB_X, id-(NB_X -1), id-1, id+1, id+(NB_X-1), id+NB_X, id+(NB_X+1) , id-(NB_X+1)};
+	array<int, MAX_NB_EDGES> shift_index = {id-NB_X, id-(NB_X -1), id+1, id+(NB_X+1), id+NB_X, id+(NB_X-1), id-1, id-(NB_X+1)};
 	//shift (value to add to the actual Node's id) in our grid to obtain the id of the destination Node
 	//in the good order : top, top right, right, bottom right, bottom, bottom left, left, top left
 
@@ -251,6 +251,10 @@ void Node::node_set_distance_to_start(array<float, 2> coord_s)
 	distance_to_goal = sqrt( pow((coord_s[X] - coordinates[X]),2) + pow((coord_s[Y] - coordinates[Y]),2) );
 }
 
+void Node::node_set_heuristic_value(float h_value)
+{
+	heuristic_value = h_value;
+}
 
 
 // ------ Getting ----- //
@@ -289,6 +293,13 @@ float Node::node_get_distance_to_start()
 {
 	return distance_to_start;
 }
+
+float Node::node_get_heuristic_value()
+{
+	return heuristic_value;
+}
+
+
 
 
 // ----- This function isn't in the class  ------ //

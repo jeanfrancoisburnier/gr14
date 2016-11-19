@@ -40,6 +40,7 @@ struct Obstacles
 
 PathPlanning* init_path_planning();
 void free_path_planning(PathPlanning *path);
+void reset_heuristic_value();
 array<Obstacles, NB_OBSTACLES> initialization_obstacles();
 
 NAMESPACE_CLOSE();
