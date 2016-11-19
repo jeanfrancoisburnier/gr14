@@ -23,18 +23,18 @@ void update_odometry(CtrlStruct *cvs)
     double dx;
     double dy;
 
-	RobotPosition *rob_pos;
+	KalmanStruct *kalman_pos;
 	CtrlIn *inputs;
 
 	// variables initialization
 	inputs  = cvs->inputs;
-	rob_pos = cvs->rob_pos;
+	kalman_pos = cvs->kalman_pos;
 
     r_sp = wheel_speed_meter(inputs->r_wheel_speed,wheel_rad); // right wheel speed
 	l_sp = wheel_speed_meter(inputs->l_wheel_speed,wheel_rad); // left wheel speed
 
 	// time
-	dt = inputs->t - rob_pos->last_t; // time increment since last call
+	dt = inputs->t - kalman_pos->last_t; // time increment since last call
 
 	// safety
 	if (dt <= 0.0)
@@ -50,16 +50,16 @@ void update_odometry(CtrlStruct *cvs)
     dS = (dSr + dSl) / 2;
     d_theta = (dSr - dSl) / wheel_sep; // change in the robots orientation
     
-    dx = dS * cos(rob_pos->theta + d_theta/2);
-    dy = dS * sin(rob_pos->theta + d_theta/2);
+    dx = dS * cos(kalman_pos->theta + d_theta/2);
+    dy = dS * sin(kalman_pos->theta + d_theta/2);
 
 	// ----- odometry computation end ----- //
 
 	// last update time
-	rob_pos->last_t = inputs->t;
-    rob_pos->x = rob_pos->x + dx;
-    rob_pos->y = rob_pos->y + dy;
-    rob_pos->theta = limit_angle(rob_pos->theta + d_theta);
+	kalman_pos->last_t = inputs->t;
+    kalman_pos->x = kalman_pos->x + dx;
+    kalman_pos->y = kalman_pos->y + dy;
+    kalman_pos->theta = limit_angle(kalman_pos->theta + d_theta);
 }
 
 
