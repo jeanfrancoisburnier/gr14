@@ -21,7 +21,7 @@
 #define WHEEL_SEP 0.225
 #define WHEEL_RAD 0.030
 #define PI 3.1416
-#define ANGULAR_SPEED_MAX 0.0001
+#define ANGULAR_SPEED_MAX 0.00001
 #define TIME_BEFORE_KALMAN -14.6
 
 NAMESPACE_INIT(ctrlGr14);
@@ -103,7 +103,6 @@ void kalman(CtrlStruct *cvs)
     
     dS = (dSr + dSl) / 2;
     d_theta = (dSr - dSl) / WHEEL_SEP;
-    printf("D_theta: %f\n",d_theta);
 
     if (ANGULAR_SPEED_MAX < std::fabs(d_theta))
 	{
@@ -201,8 +200,9 @@ void kalman(CtrlStruct *cvs)
 	//--------end of the Kalman filter---------//
 
 	//printf ( "%f %f %f;\n",kalman_pos->x,kalman_pos->y,kalman_pos->theta);
-	set_output(cvs->kalman_pos->x,"x");
-	set_output(cvs->kalman_pos->y,"y");
+	// set_output(cvs->kalman_pos->x,"x");
+	// set_output(cvs->kalman_pos->y,"y");
+	// set_output(cvs->kalman_pos->y,"theta");
 	
 	// update time stamp for next loop
 	kalman_pos->last_t = inputs->t;
