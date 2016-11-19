@@ -41,6 +41,18 @@ void main_strategy(CtrlStruct *cvs)
 	Strategy *strat;
 	CtrlIn *inputs;
 
+	target_coordinate_t target_coordinate[5];
+	// target_coordinate[0].x = +0.7; target_coordinate[0].y = +0.6;
+	// target_coordinate[1].x = +0.25; target_coordinate[1].y = +0.6;
+	// target_coordinate[2].x = +0.25; target_coordinate[2].y = +1.25;
+	// target_coordinate[3].x = -0.4; target_coordinate[3].y = +0.6;
+
+	target_coordinate[0].x = +0.7; target_coordinate[0].y = +0.6;
+	target_coordinate[1].x = +0.7; target_coordinate[1].y = -0.6;
+	target_coordinate[2].x = -0.4; target_coordinate[2].y = -0.6;
+	target_coordinate[3].x = -0.8; target_coordinate[3].y = +0.0;
+	target_coordinate[4].x = -0.4; target_coordinate[4].y = +0.6;
+
 	// variables initialization
 	strat  = cvs->strat;
 	inputs = cvs->inputs;
@@ -48,7 +60,8 @@ void main_strategy(CtrlStruct *cvs)
 	switch (strat->main_state)
 	{
 		case GAME_STATE_A:
-			speed_regulation(cvs, 0.0, 0.0);
+			follow_path(cvs, target_coordinate, 5);
+			// speed_regulation(cvs, 0.0, 0.0);
 			break;
 
 		case GAME_STATE_B:

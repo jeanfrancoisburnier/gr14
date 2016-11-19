@@ -21,6 +21,8 @@
 #define WHEEL_SEP 0.225
 #define WHEEL_RAD 0.030
 #define PI 3.1416
+#define ANGULAR_SPEED_MAX 0.0001
+#define TIME_BEFORE_KALMAN -14.6
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -77,7 +79,7 @@ void kalman(CtrlStruct *cvs)
 
 	//condition if the triangulation pos and the previous pos are too different it will ignore 
 	//particularly useful in the beggining before triagulation is working properly
-	if ((std::abs(x_hat[0]-z_k[0])>0.1 || std::abs(x_hat[1]-z_k[1])>0.1 || std::abs(x_hat[2]-z_k[2])>0.1) && inputs->t<-14.6)
+	if (inputs->t < TIME_BEFORE_KALMAN)
 		{
 			return;
 		}
@@ -101,7 +103,14 @@ void kalman(CtrlStruct *cvs)
     
     dS = (dSr + dSl) / 2;
     d_theta = (dSr - dSl) / WHEEL_SEP;
-    
+    printf("D_theta: %f\n",d_theta);
+
+    if (ANGULAR_SPEED_MAX < std::fabs(d_theta))
+	{
+    update_odometry(cvs);
+    return;
+	}
+
 	//----------------------------------------//
 
 	//----------initialize u_k A_k, B_k---------//
@@ -170,6 +179,7 @@ void kalman(CtrlStruct *cvs)
 	if (!inv_mat_3x3(S_k,result_matrix))
 		{
 			printf("singular\n");
+			exit(EXIT_FAILURE);
 			return;
 		}
 
