@@ -43,7 +43,7 @@ void init_grid()
 	float x_node = 0.0;
 	float y_node = 0.0;
 
-	static bool fini_grid = false;//to delete when note printing
+	//static bool fini_grid = false;//to delete when note printing
 
 	// ----- Creation of our Node's grid ----- //
 	nodes_grid.reserve(NB_NODES);//The size will not change anymore after this loop
@@ -56,33 +56,47 @@ void init_grid()
 		x_node = -peak_x + square_length/2 + (id_n%NB_X) * square_length;
 		//warning to understand this formula be cautious that id_n%NB_X is an operation between (int)
 
+		bool state_pos = FREE;
 		for(int j=0; j<NB_OBSTACLES; j++)
 		{
 			if( (x_node > list_obst[j].first_corner[X]) && (x_node < list_obst[j].second_corner[X]) 
 				&& (y_node < list_obst[j].first_corner[Y]) && (y_node > list_obst[j].second_corner[Y]) ) //if the Node is on an obstacle --> occupied
 			{
-				nodes_grid.push_back( Node (id_n, OCCUPIED, x_node, y_node));
+				state_pos = OCCUPIED;
+				break;
 			}
 			else//if the Node is not on an obstacle --> Free
 			{
-				nodes_grid.push_back( Node (id_n, FREE, x_node, y_node));
+				state_pos = FREE;
 			}
 		}
-		if(fini_grid == false)
+		if(state_pos == FREE)
 		{
-			printf("X = %f, Y = %f, %s, id = %d, %.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f,%.1f\n",
+			nodes_grid.push_back( Node (id_n, FREE, x_node, y_node));
+		}
+		else
+		{
+			nodes_grid.push_back( Node (id_n, OCCUPIED, x_node, y_node));
+		}
+
+
+		
+		/*if(fini_grid == false)
+		{
+			printf("X = %.3f, Y = %.3f, %s, id = %d, t %d 	 tr %d 	 r %d	br %d  	b %d	bl %d	l %d	tl %d\n",
 				x_node, y_node, nodes_grid[id_n].node_get_free_position()? "FREE":"OCCUPIED", id_n,
-				nodes_grid[id_n].node_get_edges()[0].edge_get_weight(), nodes_grid[id_n].node_get_edges()[1].edge_get_weight(),
-				nodes_grid[id_n].node_get_edges()[2].edge_get_weight(), nodes_grid[id_n].node_get_edges()[3].edge_get_weight(),
-				nodes_grid[id_n].node_get_edges()[4].edge_get_weight(), nodes_grid[id_n].node_get_edges()[5].edge_get_weight(),
-				nodes_grid[id_n].node_get_edges()[6].edge_get_weight(), nodes_grid[id_n].node_get_edges()[7].edge_get_weight());
+				nodes_grid[id_n].node_get_edges()[0].edge_get_id_connected_node(), nodes_grid[id_n].node_get_edges()[1].edge_get_id_connected_node(),
+				nodes_grid[id_n].node_get_edges()[2].edge_get_id_connected_node(), nodes_grid[id_n].node_get_edges()[3].edge_get_id_connected_node(),
+				nodes_grid[id_n].node_get_edges()[4].edge_get_id_connected_node(), nodes_grid[id_n].node_get_edges()[5].edge_get_id_connected_node(),
+				nodes_grid[id_n].node_get_edges()[6].edge_get_id_connected_node(), nodes_grid[id_n].node_get_edges()[7].edge_get_id_connected_node());
 
 			set_output(x_node, "x_pos");
 			set_output(y_node, "y_pos");
 			set_output(nodes_grid[id_n].node_get_free_position(), "etat_node");
-		}
+		}*/
 	}
-	fini_grid = true;
+	//fini_grid = true;
+
 	// ----- end of the creation of the Node's grid ----- //
 
 	// ----- path-planning initialization end ----- //

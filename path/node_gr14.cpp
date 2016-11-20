@@ -10,13 +10,13 @@
 
 typedef enum
 {
-	LEFT_TOP_CORNER = 0,
+	TOP_LEFT_CORNER = 0,
 	TOP_BORDER = 1, //without corners
-	RIGHT_TOP_CORNER = 2,
+	TOP_RIGHT_CORNER = 2,
 	RIGHT_BORDER = 3,
-	RIGHT_BOTTOM_CORNER = 4,
+	BOTTOM_RIGHT_CORNER = 4,
 	BOTTOM_BORDER = 5,
-	LEFT_BOTTOM_CORNER = 6,
+	BOTTOM_LEFT_CORNER = 6,
 	LEFT_BORDER = 7,
 	INSIDE = 8 
 } position_node_t;
@@ -48,38 +48,48 @@ int Node::node_identify_state(int id_n)
 {
 	if( id_n == 0 )//Node in the top left corner
 	{
-		return LEFT_TOP_CORNER;
-	}
-	else if( id_n < (NB_X - 1) )//Nodes at the top border (except corners) 
-	{
-		return TOP_BORDER;
+		//printf("TOP_LEFT_CORNER\n");
+		return TOP_LEFT_CORNER;
 	}
 	else if( id_n == (NB_X - 1) )//Node at the top right corner
 	{
-		return RIGHT_TOP_CORNER;
-	}
-	else if( (id_n % (NB_X - 1)) == 0 )//Nodes at the right border (except corners)
-	{
-		return RIGHT_BORDER;
+		//printf("TOP_RIGHT_CORNER\n");
+		return TOP_RIGHT_CORNER;
 	}
 	else if( id_n == (NB_X*NB_Y - 1) )//Node at the bottom right corner
 	{
-		return RIGHT_BOTTOM_CORNER;
+		//printf("BOTTOM_RIGHT_CORNER\n");
+		return BOTTOM_RIGHT_CORNER;
 	}
+	else if( id_n == ((NB_Y-1) * NB_X))//Node at the bottom left corner
+	{
+		//printf("BOTTOM_LEFT_CORNER\n");
+		return BOTTOM_LEFT_CORNER;
+	}
+	else if( id_n < (NB_X - 1) )//Nodes at the top border (except corners) 
+	{
+		//printf("TOP_BORDER\n");
+		return TOP_BORDER;
+	}
+	else if( (id_n+1) % (NB_X) == 0)//Nodes at the right border (except corners)
+	{
+		//printf("RIGHT BORDER\n");
+		return RIGHT_BORDER;
+	}
+	
 	else if( id_n > ((NB_Y-1) * NB_X) )//Nodes at the bottom border (except corners)
 	{
+		//printf("BOTTOM_BORDER\n");
 		return BOTTOM_BORDER;
-	}
-	else if( id_n == ((NB_Y-1) * NB_X) )//Node at the bottom left corner
-	{
-		return LEFT_BOTTOM_CORNER;
 	}
 	else if( (id_n % NB_X) == 0 )//Nodes at the left border (except corners)
 	{
+		//printf("LEFT_BORDER\n");
 		return LEFT_BORDER;
 	}
 	else//node not on the map border
 	{
+		//printf("IN\n");
 		return INSIDE;
 	}
 }
@@ -99,7 +109,7 @@ void Node::node_creation_edges(int state)
 	//We give to the Edge class constructor the Edge's id, the pointed Node's id and the weight of the Edge (length)
 	switch(state)
 	{
-		case LEFT_TOP_CORNER :
+		case TOP_LEFT_CORNER :
 			for(int i = 0; i < MAX_NB_EDGES; i++)
 			{
 				if( i<=1 || i>4 )//edges pointing outside the map
@@ -127,7 +137,7 @@ void Node::node_creation_edges(int state)
 			}
 			break;
 
-		case RIGHT_TOP_CORNER :
+		case TOP_RIGHT_CORNER :
 			for(int i = 0; i < MAX_NB_EDGES; i++)
 			{
 				if( i<4 || i==7 )//edges pointing outside the map
@@ -155,7 +165,7 @@ void Node::node_creation_edges(int state)
 			}
 			break;
 
-		case RIGHT_BOTTOM_CORNER : 
+		case BOTTOM_RIGHT_CORNER : 
 			for(int i = 0; i < MAX_NB_EDGES; i++)
 			{
 				if( i>=1 && i<=5 )//edges pointing outside the map
@@ -183,7 +193,7 @@ void Node::node_creation_edges(int state)
 			}
 			break;
 
-		case LEFT_BOTTOM_CORNER :
+		case BOTTOM_LEFT_CORNER :
 			for(int i = 0; i < MAX_NB_EDGES; i++)
 			{
 				if( i>=3 )//edges pointing outside the map
