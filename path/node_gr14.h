@@ -76,7 +76,7 @@ public:
 	void node_set_distance_to_goal(array<float, 2> coord_g);
 	void node_set_distance_to_start(float dist);
 	void node_set_heuristic_value(float h_value);
-	void node_set_visited();
+	void node_set_visited(bool visit);
 
 	array<float, 2> node_get_coordinates();
 	vector<Edge> node_get_edges();
@@ -90,6 +90,7 @@ public:
 	vector<int> scan_edges(vector<Node>& node_list,Node goal);
 };
 
+//class made so that we can do the priority queue required in the a* function
 class compare_heuristic
 {
     public:

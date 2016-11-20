@@ -103,44 +103,68 @@ void init_grid()
  */
 void a_star(Node source, Node goal)
 {
+	//reset the values of the boolean visited to false
+	reset_visited_value();
+
+	//initialize the values of the source node
 	source.node_set_distance_to_goal(goal.node_get_coordinates());
 	source.node_set_distance_to_start(0);
 	source.node_set_heuristic_value(source.node_get_distance_to_goal());
+	source.node_set_visited(true);
 
 	//priority queue to sort nodes depending on the value of the heuristic function
 	priority_queue<Node,vector<Node>,compare_heuristic > open_paths;
 
+	// list of noe id that are reached by the current node and have not been visited yet
+	// intermediate node
 	vector<int> modified_ids;
 	Node next = source;	
 
+	//check if source and goal node are different
 	if (source.node_get_id() == goal.node_get_id())
 	{
 		return;
 	}
 
+	// do algorithm until goal node has been reached
 	while (next.node_get_id() != goal.node_get_id())
 	{
+		//find the ids of the nodes that have not been visited yet
 		modified_ids = next.scan_edges(nodes_grid,goal);
 
+		//add to the queue the new nodes
 		for(auto id:modified_ids)
 		{
 			open_paths.push(nodes_grid[id]);
 		}
+
+		//check if there are new nodes available in the queue and if not return an error 
+		if(open_paths.size() == 0)
+		{
+			printf("Unable to find path");
+			exit(EXIT_FAILURE);
+		}
+
+		//take the next node with the lowest heuristic function and remove that element for the list
 		next = open_paths.top();
 		open_paths.pop();
 	}
 
 }
 
-// generate a vector of x y coordinates to follow
+// generate a vector of x y coordinates to follow 
+// the beginning of the vector is the source 
 vector<array<float,2> > generate_path(Node source, Node goal)
 {
 	int next_id = goal.node_get_id();
 	int source_id = source.node_get_id();
 
 	vector<array<float,2> > path ;
+
+	// insert the goal in the vector
 	path.insert(path.begin(),goal.node_get_coordinates());
 
+	//add all the nodes coordinates of the path previously computed with a* using the previous_id each time 
 	while (next_id != source_id)
 	{
 		next_id = nodes_grid[next_id].node_get_previous_node_id();
@@ -168,11 +192,11 @@ void free_path_planning(PathPlanning *path)
 
 
 
-void reset_heuristic_value()
+void reset_visited_value()
 {
 	for(int i=0; i<NB_NODES; i++)
 	{
-		nodes_grid[i].node_set_heuristic_value(H_VALUE_INIT);
+		nodes_grid[i].node_set_visited(false);
 	}
 }
 

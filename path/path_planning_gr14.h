@@ -43,7 +43,7 @@ void init_grid();
 vector<array<float,2> > generate_path(Node source, Node goal);
 void a_star(Node source,Node goal);
 void free_path_planning(PathPlanning *path);
-void reset_heuristic_value();
+void reset_visited_value();
 array<Obstacles, NB_OBSTACLES> initialization_obstacles();
 
 NAMESPACE_CLOSE();
