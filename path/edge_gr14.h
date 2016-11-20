@@ -28,7 +28,7 @@ private:
 	float weight;			//correspond to the length of the edge (three differents values for us 1 or sqrt(2) or -1 if not a travelled edge)
 	int id_connected_node;	//id to the destination Node
 public:
-	int edge_get_id();
+	int edge_get_id_connected_node();
 	float edge_get_weight();
 
 	Edge(int id_edge, int id_end_node, float weight_edge);

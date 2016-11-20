@@ -16,13 +16,17 @@
 #define X 0 	//index of the x position in the array coordinates
 #define Y 1 	//index of the y position in the array coordinates
 
-#define SQUARE_SIZE 50 //[mm] dimensions of the grid's squares who've got a Node at their center
+#define SQUARE_SIZE 100 //[mm] dimensions of the grid's squares who've got a Node at their center
  					   //Has to divide of 2*MAX_X and 2*MAX_Y because we want a uniforme grid
 
-#define MAX_X 850 //(+-) Value in mm of the distance of the map along the x axis 
+
+ 
+#define MAX_X 850 //(+-) Value in mm of the distance of the map along the x axis  
  				   //substract to the dimensions of the robot + a security range 
  				   //to avoid colisions (Robot then considered as a material point)
 
+
+ 
 #define MAX_Y 1350 //Same as x but  along the Y axis
 
 #define MAX_NB_EDGES 8 //top, left, right, bottom and the other four diagonals
