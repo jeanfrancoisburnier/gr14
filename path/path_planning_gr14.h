@@ -37,8 +37,9 @@ struct Obstacles
 
 
 
-
-PathPlanning* init_path_planning();
+void init_grid();
+vector<array<float,2>> generate_path(node Source, node Goal);
+void a_star(node Source,node Goal);
 void free_path_planning(PathPlanning *path);
 void reset_heuristic_value();
 array<Obstacles, NB_OBSTACLES> initialization_obstacles();

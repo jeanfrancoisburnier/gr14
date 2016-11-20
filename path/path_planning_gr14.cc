@@ -23,12 +23,11 @@ NAMESPACE_INIT(ctrlGr14);
  * \param[in,out] path path-planning main structure
  */
 
-vector<Node> nodes_grid; //creation of our Node's grid in a global way, so each function of path_planning_gr14.cc will be able to use it
+static vector<Node> nodes_grid; //creation of our Node's grid in a global way, so each function of path_planning_gr14.cc will be able to use it
 
 
 
-
-PathPlanning* init_path_planning()
+void init_grid()
 {
 	PathPlanning *path;
 
@@ -75,10 +74,37 @@ PathPlanning* init_path_planning()
 
 	
 
-	// return structure initialized
-	return path;
+	// return 
+	return;
 }
 
+
+
+
+/*! \brief do the a-star algorithm to find the optimal path
+ * \param[in]  source node
+ * \param[in]  goal node
+ * \param[in,out] node_grid that we modify throughout the function
+ */
+void a_star(node Source,node Goal)
+{
+	vector<node> open_paths;
+	vector<int> modified ids;
+	node next;
+
+	if (source = goal)
+	{
+		return;
+	}
+
+	
+}
+
+// generate a vector of x y coordinates to follow
+vector<array<float,2>> generate_path(node Source, node Goal)
+{
+
+}
 
 
 

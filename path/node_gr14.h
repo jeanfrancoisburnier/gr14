@@ -81,6 +81,8 @@ public:
 	float node_get_distance_to_goal();
 	float node_get_distance_to_start();
 	float node_get_heuristic_value();
+	vector<int> scan_edges();
+
 };
 
 
