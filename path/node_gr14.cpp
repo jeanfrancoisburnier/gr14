@@ -34,7 +34,8 @@ Node::Node(int id_node, bool free_init, float x_p, float y_p): id(id_node), free
 	node_creation_edges(state);
 }
 
-
+Node::Node()
+{}
 Node::~Node()
 {}
 
@@ -256,14 +257,19 @@ void Node::node_set_distance_to_goal(array<float, 2> coord_g)
 	distance_to_goal = sqrt( pow((coord_g[X] - coordinates[X]),2) + pow((coord_g[Y] - coordinates[Y]),2) );
 }
 
-void Node::node_set_distance_to_start(array<float, 2> coord_s)
+void Node::node_set_distance_to_start(float dist)
 {
-	distance_to_goal = sqrt( pow((coord_s[X] - coordinates[X]),2) + pow((coord_s[Y] - coordinates[Y]),2) );
+	distance_to_start = dist;
 }
 
 void Node::node_set_heuristic_value(float h_value)
 {
 	heuristic_value = h_value;
+}
+
+void Node::node_set_visited(bool visit)
+{
+	visited = visit;
 }
 
 
@@ -309,10 +315,56 @@ float Node::node_get_heuristic_value()
 	return heuristic_value;
 }
 
+int Node::node_get_id()
+{
+	return id;
+}
 
 
+/*! \ Method to scan through the edges of a node
+ * 
+ * \param[in,out] List of all the nodes available so that we can modify the list with a*
+ * \param[in] goal node so that we can compute the distance to goal for the new nodes
+ * returns a list of node ids that have not been visited by the path finding algorithm yet
+ */
+vector<int> Node::scan_edges(vector<Node>& node_list,Node goal)
+{
+	vector<int> ids;
+	int next_node_id;
+	for (auto edge:node_get_edges())
+	{
+		//check if the destination node exists if not continue to the next one
+		if(edge.edge_get_weight() == 0)
+		{
+			continue;
+		}
 
-// ----- This function isn't in the class  ------ //
+		next_node_id = edge.edge_get_id_connected_node();
+
+		//check if the destination node has already been visited or if it is occupied by an obstacle
+		//if it returns true we go onto the next node
+		if(node_list[next_node_id].node_get_visited() == true || node_list[next_node_id].node_get_free_position() == OCCUPIED)
+		{
+			continue;
+		}
+
+		/*
+		* Set the distance to start of the new node, the distance to goal, it's heuristic function value, the id of 
+		* the node we arrived here from and finally sets the visited boolean to true 
+		*/
+		node_list[next_node_id].node_set_distance_to_start(node_get_distance_to_start() + edge.edge_get_weight());
+		node_list[next_node_id].node_set_distance_to_goal(goal.node_get_coordinates());
+		node_list[next_node_id].node_set_heuristic_value(node_list[next_node_id].node_get_distance_to_start() 
+														+ node_list[next_node_id].node_get_distance_to_goal());
+		node_list[next_node_id].node_set_previous_node_id(node_get_id());
+		node_list[next_node_id].node_set_visited(true);
+		ids.push_back(next_node_id);
+	} 
+	return ids;
+}
+
+
+// ----- These functions aren't in the class  ------ //
 //Find the id of the closest node to a point described by its coordinates.
 int node_find_closest_node(float x_p, float y_p)//return the id of the closest Node
 {
@@ -356,6 +408,15 @@ int node_find_closest_node(float x_p, float y_p)//return the id of the closest N
 		return (int)(id_temp);
 	}
 }
+
+//-------operator used in the priority queue-------//
+
+//
+bool compare_heuristic::operator()(Node& n1, Node& n2) 
+{
+       return n1.node_get_heuristic_value() > n2.node_get_heuristic_value();
+}
+
 
 NAMESPACE_CLOSE();
 
