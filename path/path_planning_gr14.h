@@ -11,8 +11,10 @@
  
 #include "namespace_ctrl.h"
 #include "CtrlStruct_gr14.h"
+#include "node_gr14.h"
 
 #include <array>
+#include <vector>
 
 #define NB_OBSTACLES 10 // 8 fixed obstacles + 2 oponents
 
@@ -38,8 +40,8 @@ struct Obstacles
 
 
 void init_grid();
-vector<array<float,2>> generate_path(node Source, node Goal);
-void a_star(node Source,node Goal);
+vector<array<float,2> > generate_path(Node source, Node goal);
+void a_star(Node source,Node goal);
 void free_path_planning(PathPlanning *path);
 void reset_heuristic_value();
 array<Obstacles, NB_OBSTACLES> initialization_obstacles();

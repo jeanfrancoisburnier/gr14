@@ -28,6 +28,9 @@
 #define MAX_NB_EDGES 8 //top, left, right, bottom and the other four diagonals
 #define H_VALUE_INIT 1000.0 //Initial heuristic value
 
+#define FREE true		//indicates if a node is free
+#define OCCUPIED false	//indicates if a node is occupied
+
 const float square_length = SQUARE_SIZE * 0.001; //conversion into [m] of the dimensions of the grid's squares who've got a Node at their center
 const float peak_x = MAX_X * 0.001;			     //[m]
 const float peak_y = MAX_Y * 0.001;			     //[m]
@@ -66,12 +69,14 @@ public:
 	
 
 	Node(int id_node, bool free_init, float x_p, float y_p);
+	Node();
 	~Node();
 
 	void node_set_previous_node_id(int id_prev);
 	void node_set_distance_to_goal(array<float, 2> coord_g);
-	void node_set_distance_to_start(array<float, 2> coord_s);
+	void node_set_distance_to_start(float dist);
 	void node_set_heuristic_value(float h_value);
+	void node_set_visited();
 
 	array<float, 2> node_get_coordinates();
 	vector<Edge> node_get_edges();
@@ -81,8 +86,14 @@ public:
 	float node_get_distance_to_goal();
 	float node_get_distance_to_start();
 	float node_get_heuristic_value();
-	vector<int> scan_edges();
+	int node_get_id();
+	vector<int> scan_edges(vector<Node>& node_list,Node goal);
+};
 
+class compare_heuristic
+{
+    public:
+    bool operator()(Node& n1, Node& n2);
 };
 
 

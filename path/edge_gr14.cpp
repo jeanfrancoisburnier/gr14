@@ -18,9 +18,9 @@ Edge::~Edge()
 {}
 
 
-int Edge::edge_get_id()
+int Edge::edge_get_id_connected_node()
 {
-	return id;
+	return id_connected_node;
 }
 
 float Edge::edge_get_weight()

@@ -58,7 +58,7 @@ void controller_init(CtrlStruct *cvs)
 	cvs->rob_pos->last_t = t;
 
 	//init grid
-	init_path_planning();
+	init_grid();
 
 	// speed regulation
 	cvs->sp_reg->last_t = t;

@@ -3,15 +3,14 @@
 #include "opp_pos_gr14.h"
 #include "useful_gr14.h"
 #include <math.h>
+#include <queue>
 #include "set_output.h"
 
 #include "node_gr14.h"
 
-#include <vector>
-#include <array>
 
-#define FREE true		//indicates if a node is free
-#define OCCUPIED false	//indicates if a node is occupied
+
+
 
 const int NB_NODES = NB_X * NB_Y;
 
@@ -83,7 +82,7 @@ void init_grid()
 			set_output(nodes_grid[id_n].node_get_free_position(), "etat_node");
 		}
 	}
-	fini_grid == true;
+	fini_grid = true;
 	// ----- end of the creation of the Node's grid ----- //
 
 	// ----- path-planning initialization end ----- //
@@ -102,23 +101,52 @@ void init_grid()
  * \param[in]  goal node
  * \param[in,out] node_grid that we modify throughout the function
  */
-void a_star(node Source,node Goal)
+void a_star(Node source, Node goal)
 {
-	vector<node> open_paths;
-	vector<int> modified ids;
-	node next;
+	source.node_set_distance_to_goal(goal.node_get_coordinates());
+	source.node_set_distance_to_start(0);
+	source.node_set_heuristic_value(source.node_get_distance_to_goal());
 
-	if (source = goal)
+	//priority queue to sort nodes depending on the value of the heuristic function
+	priority_queue<Node,vector<Node>,compare_heuristic > open_paths;
+
+	vector<int> modified_ids;
+	Node next = source;	
+
+	if (source.node_get_id() == goal.node_get_id())
 	{
 		return;
 	}
 
-	
+	while (next.node_get_id() != goal.node_get_id())
+	{
+		modified_ids = next.scan_edges(nodes_grid,goal);
+
+		for(auto id:modified_ids)
+		{
+			open_paths.push(nodes_grid[id]);
+		}
+		next = open_paths.top();
+		open_paths.pop();
+	}
+
 }
 
 // generate a vector of x y coordinates to follow
-vector<array<float,2>> generate_path(node Source, node Goal)
+vector<array<float,2> > generate_path(Node source, Node goal)
 {
+	int next_id = goal.node_get_id();
+	int source_id = source.node_get_id();
+
+	vector<array<float,2> > path ;
+	path.insert(path.begin(),goal.node_get_coordinates());
+
+	while (next_id != source_id)
+	{
+		next_id = nodes_grid[next_id].node_get_previous_node_id();
+		path.insert(path.begin(),nodes_grid[next_id].node_get_coordinates());
+	}
+	return path;
 
 }
 
