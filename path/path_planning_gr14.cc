@@ -115,77 +115,95 @@ void init_grid()
  * \param[in]  goal node
  * \param[in,out] node_grid that we modify throughout the function
  */
-void a_star(Node source, Node goal)
+void a_star(int source_id, int goal_id)
 {
-	//reset the values of the boolean visited to false
-	reset_visited_value();
+    if (source_id >= nodes_grid.size() || source_id < 0 || goal_id >= nodes_grid.size() || goal_id < 0
+        || !nodes_grid[source_id].node_get_free_position() || !nodes_grid[goal_id].node_get_free_position())
+    {
+        printf("invalid start or goal\n");
+        return;
+    }
+    //reset the values of the boolean visited to false
+    reset_visited_value();
+    
+    //initialize the values of the source node
+    nodes_grid[source_id].node_set_distance_to_goal(nodes_grid[goal_id].node_get_coordinates());
+    nodes_grid[source_id].node_set_distance_to_start(0);
+    nodes_grid[source_id].node_set_heuristic_value(nodes_grid[source_id].node_get_distance_to_goal());
+    nodes_grid[source_id].node_set_visited(true);
+    
+    //priority queue to sort nodes depending on the value of the heuristic function
+    priority_queue<Node,vector<Node>,compare_heuristic > open_paths;
+    
+    // list of noe id that are reached by the current node and have not been visited yet
+    // intermediate node
+    vector<int> modified_ids;
+    Node next = nodes_grid[source_id];
+    
+    //check if source and goal node are different
+    if (nodes_grid[source_id].node_get_id() == nodes_grid[goal_id].node_get_id())
+    {
+        return;
+    }
+    
+    // do algorithm until goal node has been reached
+    while (next.node_get_id() != nodes_grid[goal_id].node_get_id())
+    {
+        //find the ids of the nodes that have not been visited yet
+        modified_ids = next.scan_edges(nodes_grid,nodes_grid[goal_id]);
+        
+        //add to the queue the new nodes
+        for(auto id:modified_ids)
+        {
+            open_paths.push(nodes_grid[id]);
+        }
+        
+        //check if there are new nodes available in the queue and if not return an error
+        if(open_paths.size() == 0)
+        {
+            printf("Unable to find path\n");
+            return;
+        }
+        
+        //take the next node with the lowest heuristic function and remove that element for the list
+        next = open_paths.top();
+        //printf("%d\n",next.node_get_id());
+        open_paths.pop();
+        
+        //printf("node id: %d\t heuristic %f\n",next.node_get_id(),next.node_get_heuristic_value());
 
-	//initialize the values of the source node
-	source.node_set_distance_to_goal(goal.node_get_coordinates());
-	source.node_set_distance_to_start(0);
-	source.node_set_heuristic_value(source.node_get_distance_to_goal());
-	source.node_set_visited(true);
-
-	//priority queue to sort nodes depending on the value of the heuristic function
-	priority_queue<Node,vector<Node>,compare_heuristic > open_paths;
-
-	// list of noe id that are reached by the current node and have not been visited yet
-	// intermediate node
-	vector<int> modified_ids;
-	Node next = source;	
-
-	//check if source and goal node are different
-	if (source.node_get_id() == goal.node_get_id())
-	{
-		return;
-	}
-
-	// do algorithm until goal node has been reached
-	while (next.node_get_id() != goal.node_get_id())
-	{
-		//find the ids of the nodes that have not been visited yet
-		modified_ids = next.scan_edges(nodes_grid,goal);
-
-		//add to the queue the new nodes
-		for(auto id:modified_ids)
-		{
-			open_paths.push(nodes_grid[id]);
-		}
-
-		//check if there are new nodes available in the queue and if not return an error 
-		if(open_paths.size() == 0)
-		{
-			printf("Unable to find path");
-			exit(EXIT_FAILURE);
-		}
-
-		//take the next node with the lowest heuristic function and remove that element for the list
-		next = open_paths.top();
-		open_paths.pop();
-	}
-
+    }
+    return;
+    
 }
 
-// generate a vector of x y coordinates to follow 
-// the beginning of the vector is the source 
-vector<array<float,2> > generate_path(Node source, Node goal)
+// generate a vector of x y coordinates to follow
+// the beginning of the vector is the source
+vector<array<float,2> > generate_path(int source_id, int goal_id)
 {
-	int next_id = goal.node_get_id();
-	int source_id = source.node_get_id();
-
-	vector<array<float,2> > path ;
-
-	// insert the goal in the vector
-	path.insert(path.begin(),goal.node_get_coordinates());
-
-	//add all the nodes coordinates of the path previously computed with a* using the previous_id each time 
-	while (next_id != source_id)
-	{
-		next_id = nodes_grid[next_id].node_get_previous_node_id();
-		path.insert(path.begin(),nodes_grid[next_id].node_get_coordinates());
-	}
-	return path;
-
+    vector<array<float,2> > path ;
+    
+    if (source_id >= nodes_grid.size() || source_id < 0 || goal_id >= nodes_grid.size() || goal_id < 0
+        || !nodes_grid[source_id].node_get_free_position() || !nodes_grid[goal_id].node_get_free_position())
+    {
+        printf("invalid start or goal\n");
+        return path;
+    }
+    
+    int next_id = goal_id;
+    
+    
+    // insert the goal in the vector
+    path.insert(path.begin(),nodes_grid[goal_id].node_get_coordinates());
+    
+    //add all the nodes coordinates of the path previously computed with a* using the previous_id each time 
+    while (next_id != source_id)
+    {
+        next_id = nodes_grid[next_id].node_get_previous_node_id();
+        path.insert(path.begin(),nodes_grid[next_id].node_get_coordinates());
+    }
+    return path;
+    
 }
 
 

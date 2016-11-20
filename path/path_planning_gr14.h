@@ -40,8 +40,8 @@ struct Obstacles
 
 
 void init_grid();
-vector<array<float,2> > generate_path(Node source, Node goal);
-void a_star(Node source,Node goal);
+vector<array<float,2> > generate_path(int source_id,int goal_id);
+void a_star(int source_id,int goal_id);
 void free_path_planning(PathPlanning *path);
 void reset_visited_value();
 array<Obstacles, NB_OBSTACLES> initialization_obstacles();
