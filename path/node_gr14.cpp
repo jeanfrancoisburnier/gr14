@@ -272,6 +272,11 @@ void Node::node_set_visited(bool visit)
 	visited = visit;
 }
 
+void Node::node_set_free_position(bool free_pos)
+{
+	free_position = free_pos;
+}
+
 
 // ------ Getting ----- //
 
