@@ -15,6 +15,7 @@
 #include "strategy_gr14.h"
 #include "kalman_gr14.h"
 #include "set_output.h"
+#include "path_planning_gr14.h"
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -56,8 +57,13 @@ void controller_init(CtrlStruct *cvs)
 	cvs->kalman_pos->last_t = t;
 	cvs->rob_pos->last_t = t;
 
+	//init grid
+	init_grid();
+
 	// speed regulation
 	cvs->sp_reg->last_t = t;
+
+
 }
 
 /*! \brief controller loop (called every time-step)
