@@ -79,20 +79,20 @@ void controller_loop(CtrlStruct *cvs)
 	t = inputs->t;
 
 	// update the robot odometry
-	//update_odometry(cvs);
+	update_odometry(cvs);
 
 	// triangulation
-	triangulation(cvs);
+	// triangulation(cvs);
 
 	//Kalman
-	kalman(cvs);
+	// kalman(cvs);
 
 	// opponents position
 	opponents_tower(cvs);
 
-	// set_plot(cvs->kalman_pos->x,"x");
-	// set_plot(cvs->kalman_pos->y,"y");
-	// set_plot(cvs->kalman_pos->theta,"t");
+	set_plot(cvs->kalman_pos->x,"x");
+	set_plot(cvs->kalman_pos->y,"y");
+	set_plot(cvs->kalman_pos->theta,"t");
 
 	// set_output(cvs->kalman_pos->x,"x_r");
 	// set_output(cvs->kalman_pos->y,"y_r");
@@ -102,9 +102,9 @@ void controller_loop(CtrlStruct *cvs)
 	// printf("y: %f\t", cvs->kalman_pos->y);
 	//printf("t: %f\n", cvs->kalman_pos->theta*180/M_PI);
 
-	printf("x: %f\t", cvs->kalman_pos->x);
-	printf("y: %f\t", cvs->kalman_pos->y);
-	printf("t: %f\n", cvs->kalman_pos->theta*180/M_PI);
+	// printf("x: %f\t", cvs->kalman_pos->x);
+	// printf("y: %f\t", cvs->kalman_pos->y);
+	// printf("t: %f\n", cvs->kalman_pos->theta*180/M_PI);
 
 
 	// tower control

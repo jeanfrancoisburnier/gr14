@@ -11,16 +11,33 @@
 
 NAMESPACE_INIT(ctrlGr14);
 
-typedef struct Target_coordinate
+typedef struct Traget_path
 {
-	
+
 	float x;
 	float y;
 
-} target_coordinate_t;
+} target_path_t;
+
+typedef struct  Target 
+{
+	int nb_via;
+	target_path_t* target_path;
+
+} target_t;
+
+typedef struct Path
+{
+	int nb_target;
+	int current_target;
+	target_t* targets;
+
+	double last_t;
+
+} path_t;
 
 // void follow_path(CtrlStruct *cvs);
-void follow_path(CtrlStruct *cvs, target_coordinate_t* tab, uint8_t size);
+void follow_path(CtrlStruct *cvs, path_t* tab);
 void reach_single_target(float gamma, float *l_speed, float *r_speed);
 
 NAMESPACE_CLOSE();
