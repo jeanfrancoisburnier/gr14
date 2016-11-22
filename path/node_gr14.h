@@ -81,6 +81,7 @@ public:
 	void node_set_distance_to_start(float dist);
 	void node_set_heuristic_value(float h_value);
 	void node_set_visited(bool visit);
+	void node_set_free_position(bool free_pos);
 
 	array<float, 2> node_get_coordinates();
 	vector<Edge> node_get_edges();
