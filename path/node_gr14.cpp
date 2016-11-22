@@ -400,8 +400,8 @@ int node_find_closest_node(float x_p, float y_p)//return the id of the closest N
 	float id_y=0.0;
 	float id_temp=0.0;
 
-	id_x = (peak_x - square_length/2 + x_p) / square_length;
-	id_y = (peak_y + square_length/2 - y_p) / square_length;
+	id_x = (-peak_x + square_length/2 - x_p) / square_length;
+	id_y = (peak_y - square_length/2 - y_p) / square_length;
 	id_temp = id_x + NB_X * id_y;
 
 	if( id_temp - (int)(id_temp) > 0.5 )

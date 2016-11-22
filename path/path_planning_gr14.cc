@@ -85,8 +85,8 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 	if (source_id >= nodes_grid.size() || source_id < 0 || goal_id >= nodes_grid.size() || goal_id < 0
         || !nodes_grid[source_id].node_get_free_position() || !nodes_grid[goal_id].node_get_free_position())
     {
-        printf("invalid start or goal\n");
-        //return;
+        printf("invalid start or goal OCCUPIED or outside the map\n");
+        exit(EXIT_FAILURE);
         //Set the flag "path generated" to 0 and return Null
     }
     //maybe add later a test if the goal is set on an obstacle
@@ -126,6 +126,7 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
     //check if source and goal node are different
     if (nodes_grid[source_id].node_get_id() == nodes_grid[goal_id].node_get_id())
     {
+    	printf("Already on goal\n");
         return;
     }
     
@@ -144,8 +145,8 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
         //check if there are new nodes available in the queue and if not return an error
         if(open_paths.size() == 0)
         {
-            printf("Unable to find path\n");
-            return;
+            printf("No nodes available in the queue\n");
+        	exit(EXIT_FAILURE);
         }
         
         //take the next node with the lowest heuristic function and remove that element for the list
@@ -167,14 +168,7 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
 vector<array<float,2> > generate_path(int source_id, int goal_id)
 {
     vector<array<float,2> > path ;
-    
-    if (source_id >= nodes_grid.size() || source_id < 0 || goal_id >= nodes_grid.size() || goal_id < 0
-        || !nodes_grid[source_id].node_get_free_position() || !nodes_grid[goal_id].node_get_free_position())
-    {
-        printf("invalid start or goal\n");
-        return path;
-    }
-    
+        
     int next_id = goal_id;
     
     // insert the goal in the vector
