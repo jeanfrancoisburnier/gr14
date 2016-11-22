@@ -23,6 +23,7 @@
 #define PI 3.1416
 #define ANGULAR_SPEED_MAX 0.00001
 #define TIME_BEFORE_KALMAN -14.6
+#define NOISE 0.1
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -79,8 +80,9 @@ void kalman(CtrlStruct *cvs)
 
 	//condition if the triangulation pos and the previous pos are too different it will ignore 
 	//particularly useful in the beggining before triagulation is working properly
-	if (inputs->t < TIME_BEFORE_KALMAN)
+	if (inputs->t < TIME_BEFORE_KALMAN || std::abs(z_k[2]-x_hat[2]) > NOISE)
 		{
+			update_odometry(cvs);
 			return;
 		}
 
