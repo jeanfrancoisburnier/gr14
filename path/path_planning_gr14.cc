@@ -80,6 +80,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 {
 	int source_id = node_find_closest_node(source_pos[X], source_pos[Y]);
     int goal_id = node_find_closest_node(goal_pos[X], goal_pos[Y]);
+    printf("SOURCE_ID: %d \t GOAL_ID: %d\n", source_id, goal_id);
 
 
 	if (source_id >= nodes_grid.size() || source_id < 0 || goal_id >= nodes_grid.size() || goal_id < 0

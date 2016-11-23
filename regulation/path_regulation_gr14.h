@@ -8,6 +8,10 @@
 #define _PATH_REGULATION_GR14_H_
 
 #include "CtrlStruct_gr14.h"
+#include <vector>
+#include <array>
+
+using namespace std;
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -36,8 +40,8 @@ typedef struct Path
 
 } path_t;
 
-// void follow_path(CtrlStruct *cvs);
-void follow_path(CtrlStruct *cvs, path_t* tab);
+void follow_path(CtrlStruct *cvs, vector<array<float,2> > path);
+// void follow_path(CtrlStruct *cvs, path_t* tab);
 void reach_single_target(float gamma, float *l_speed, float *r_speed);
 
 NAMESPACE_CLOSE();
