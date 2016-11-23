@@ -59,7 +59,8 @@ void init_grid()
 				&& (y_node < list_obst[j].first_corner[Y]) && (y_node > list_obst[j].second_corner[Y]) ) //if the Node is on an obstacle --> occupied
 			{
 				state_pos = OCCUPIED;
-				id_occupied.push_back(j); //add the id of the node on an obstacle
+				id_occupied.push_back(id_n); //add the id of the node on an obstacle
+				// printf("id_occupied: %d\n", id_n);
 				break;
 			}
 			else//if the Node is not on an obstacle --> Free
@@ -252,6 +253,12 @@ void reset_value_grid(array<Obstacles, NB_OPPONENTS> moving_obstacles)
 
 				nodes_grid[i].node_set_free_position(state_pos);
 			}
+			else // if on fixed obstacle
+			{
+				nodes_grid[i].node_set_free_position(OCCUPIED);
+				break;
+			}
+			printf("STATE: %s\n", nodes_grid[id_occupied[k]].node_get_free_position()? "FREE":"OCCUPIED");
 		}
 	}
 }

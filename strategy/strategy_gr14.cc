@@ -80,7 +80,7 @@ void main_strategy(CtrlStruct *cvs)
 		case GAME_STATE_B:
 			printf("initialization of path...");
 			source_pos[0] = 0.7;//cvs->kalman_pos->x;
-			source_pos[1] = 0.7;//cvs->kalman_pos->y;
+			source_pos[1] = 1.0;//cvs->kalman_pos->y;
 			goal_pos[0] = -0.4;
 			goal_pos[1] = -0.6;
 			path_ = path_planning_compute(cvs, source_pos, goal_pos);
