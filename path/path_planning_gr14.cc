@@ -22,7 +22,7 @@ NAMESPACE_INIT(ctrlGr14);
  */
 
 static vector<Node> nodes_grid; //creation of our Node's grid in a global way, so each function of path_planning_gr14.cc will be able to use it
-
+static vector<int> id_occupied; //id of the Nodes who are on a fixed obstacle !
 
 
 void init_grid()
@@ -59,6 +59,7 @@ void init_grid()
 				&& (y_node < list_obst[j].first_corner[Y]) && (y_node > list_obst[j].second_corner[Y]) ) //if the Node is on an obstacle --> occupied
 			{
 				state_pos = OCCUPIED;
+				id_occupied.push_back(j); //add the id of the node on an obstacle
 				break;
 			}
 			else//if the Node is not on an obstacle --> Free
@@ -219,32 +220,38 @@ void reset_value_grid(array<Obstacles, NB_OPPONENTS> moving_obstacles)
 {
 	for(int i=0; i<NB_NODES; i++)
 	{
-		nodes_grid[i].node_set_visited(false);
-
-		bool state_pos;
-		float x_node = 0.0;
-		float y_node = 0.0;
-
-		array<float, 2> pos_node = nodes_grid[i].node_get_coordinates();
-		x_node = pos_node[X];
-		y_node = pos_node[Y];
-
-		for(int j=0; j<NB_OPPONENTS; j++)
+		for(int k=0; k<id_occupied.size(); k++)
 		{
-			if( (x_node > moving_obstacles[j].first_corner[X]) && (x_node < moving_obstacles[j].second_corner[X]) 
-				&& (y_node < moving_obstacles[j].first_corner[Y]) && (y_node > moving_obstacles[j].second_corner[Y]) )
-				//if the Node is on an obstacle --> occupied
+			if( i!= (id_occupied[k]) )//if we're not already on a fixed obstacle
 			{
-				state_pos = OCCUPIED;
-				break;
-			}
-			else//if the Node is not on an obstacle --> Free
-			{
-				state_pos = FREE;
+				nodes_grid[i].node_set_visited(false);
+
+				bool state_pos;
+				float x_node = 0.0;
+				float y_node = 0.0;
+
+				array<float, 2> pos_node = nodes_grid[i].node_get_coordinates();
+				x_node = pos_node[X];
+				y_node = pos_node[Y];
+
+				for(int j=0; j<NB_OPPONENTS; j++)
+				{
+					if( (x_node > moving_obstacles[j].first_corner[X]) && (x_node < moving_obstacles[j].second_corner[X]) 
+						&& (y_node < moving_obstacles[j].first_corner[Y]) && (y_node > moving_obstacles[j].second_corner[Y]) )
+						//if the Node is on an opponent --> occupied
+					{
+						state_pos = OCCUPIED;
+						break;
+					}
+					else//if the Node is not on an obstacle --> Free
+					{
+						state_pos = FREE;
+					}
+				}
+
+				nodes_grid[i].node_set_free_position(state_pos);
 			}
 		}
-
-		nodes_grid[i].node_set_free_position(state_pos);
 	}
 }
 
