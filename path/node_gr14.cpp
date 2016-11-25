@@ -416,14 +416,6 @@ int node_find_closest_node(float x_p, float y_p)//return the id of the closest N
 
 
 
-//This function return the id of a free node close to the occupied one we have chosen
-//We search in a cross (+) around the actual node (A spiral would have been better but 
-//way more complicated to implement, boundaries problem)
-int node_search_free_neighboors(int id_o)
-{
-	return 0;
-}
-
 //-------operator used in the priority queue-------//
 
 //

@@ -59,7 +59,7 @@ void init_grid()
 				&& (y_node < list_obst[j].first_corner[Y]) && (y_node > list_obst[j].second_corner[Y]) ) //if the Node is on an obstacle --> occupied
 			{
 				state_pos = OCCUPIED;
-				id_occupied.push_back(j); //add the id of the node on an obstacle
+				id_occupied.push_back(id_n); //add the id of the node on an obstacle
 				break;
 			}
 			else//if the Node is not on an obstacle --> Free
@@ -77,20 +77,33 @@ void init_grid()
 
 
 
+
+
 vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos)
 {
 	int source_id = node_find_closest_node(source_pos[X], source_pos[Y]);
     int goal_id = node_find_closest_node(goal_pos[X], goal_pos[Y]);
 
 
-	if (source_id >= nodes_grid.size() || source_id < 0 || goal_id >= nodes_grid.size() || goal_id < 0
-        || !nodes_grid[source_id].node_get_free_position() || !nodes_grid[goal_id].node_get_free_position())
+	if( source_id >= nodes_grid.size() || source_id < 0 || goal_id >= nodes_grid.size() || goal_id < 0 )
     {
-        printf("invalid start or goal OCCUPIED or outside the map\n");
+        printf("invalid start or goal, outside the map\n");
         exit(EXIT_FAILURE);
         //Set the flag "path generated" to 0 and return Null
     }
-    //maybe add later a test if the goal is set on an obstacle
+    
+    if( !nodes_grid[source_id].node_get_free_position() )
+    {
+    	printf("invalid start, on an occupied node\n");
+    	source_id = search_free_neighbours(source_id);
+    }
+    
+    if( !nodes_grid[goal_id].node_get_free_position() )
+    {
+    	printf("invalid goal, on an occupied node\n");
+    	goal_id = search_free_neighbours(goal_id);
+    }
+    
 
     update_grid(cvs);
     a_star(cvs, source_id, goal_id);
@@ -106,7 +119,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 /*! \brief do the a-star algorithm to find the optimal path
  * \param[in]  source node
  * \param[in]  goal node
- * \param[in,out] node_grid that we modify throughout the function
+ * \param[in,out] nodes_grid that we modify throughout the function
  */
 void a_star(CtrlStruct *cvs, int source_id, int goal_id)
 {
@@ -185,8 +198,6 @@ vector<array<float,2> > generate_path(int source_id, int goal_id)
 }
 
 
-
-
 /*! \brief close the path-planning algorithm (memory released)
  * 
  * \param[in,out] path path-planning main structure
@@ -201,6 +212,32 @@ void free_path_planning(PathPlanning *path)
 	free(path);
 }
 
+
+
+//This function return the id of a free node close to the occupied one 
+//We first search for direct neighbours but if they are also occupied we extend
+//our search in a cross (+) around the actual node (A spiral would have been better but 
+//way more complicated to implement, boundaries problem)
+int search_free_neighbours(int id_occ)
+{
+	int id_fr;
+	int id_test;
+	vector<Edge> edges_node_occ = nodes_grid[id_occ].node_get_edges();
+	for(int i=0; i<8; i++)
+	{
+		if( edges_node_occ[i].edge_get_weight() != 0 )//if we do not search for neighbours outside the map
+		{
+			id_test = edges_node_occ[i].edge_get_id_connected_node();
+			if( nodes_grid[id_test].node_get_free_position() == FREE )//if the neighbor is free
+			{
+				id_fr = id_test;
+				return id_fr;
+			}
+		}
+	}
+
+	return id_occ;//to change, if I don't find direct free neighbours --> expend out research.
+}
 
 
 
@@ -250,6 +287,11 @@ void reset_value_grid(array<Obstacles, NB_OPPONENTS> moving_obstacles)
 				}
 
 				nodes_grid[i].node_set_free_position(state_pos);
+			}
+			else
+			{
+				nodes_grid[i].node_set_free_position(OCCUPIED);
+				break;
 			}
 		}
 	}
@@ -321,6 +363,7 @@ array<Obstacles, NB_FIXED_OBSTACLES> initialization_fixed_obstacles()
 
 	return list_obstacles;
 }
+
 
 
 NAMESPACE_CLOSE();
