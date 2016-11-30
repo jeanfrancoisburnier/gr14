@@ -85,7 +85,7 @@ void controller_loop(CtrlStruct *cvs)
 	t = inputs->t;
 
 	// update the robot odometry
-	//update_odometry(cvs);
+	// update_odometry(cvs);
 
 	// triangulation
 	triangulation(cvs);
@@ -100,13 +100,21 @@ void controller_loop(CtrlStruct *cvs)
 	// set_plot(cvs->kalman_pos->y,"y");
 	// set_plot(cvs->kalman_pos->theta,"t");
 
-	// set_output(cvs->kalman_pos->x,"x_r");
-	// set_output(cvs->kalman_pos->y,"y_r");
-	// set_output(cvs->kalman_pos->theta,"theta_r");
+	// set_plot(inputs->r_wheel_speed,"r_wheel_speed");
+	// set_plot(inputs->l_wheel_speed,"l_wheel_speed");
+
+	set_output(cvs->kalman_pos->x,"x_r");
+	set_output(cvs->kalman_pos->y,"y_r");
+	set_output(cvs->kalman_pos->theta,"theta_r");
 
 	// printf("x: %f\t", cvs->kalman_pos->x);
 	// printf("y: %f\t", cvs->kalman_pos->y);
 	//printf("t: %f\n", cvs->kalman_pos->theta*180/M_PI);
+
+	// printf("x: %f\t", cvs->kalman_pos->x);
+	// printf("y: %f\t", cvs->kalman_pos->y);
+	// printf("t: %f\n", cvs->kalman_pos->theta*180/M_PI);
+
 
 	// tower control
 	outputs->tower_command = 15.0;
@@ -125,14 +133,13 @@ void controller_loop(CtrlStruct *cvs)
 			if (t > 0.0)
 			{
 				cvs->main_state = RUN_STATE;
-				cvs->strat->main_state = GAME_STATE_A;
+				cvs->strat->main_state = GAME_STATE_B;
 			}
 			break;
 
 		// during game
 		case RUN_STATE:
 			main_strategy(cvs);
-
 			if (t > 89.0) // 1 second safety
 			{
 				cvs->main_state = STOP_END_STATE;
