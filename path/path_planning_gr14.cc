@@ -217,18 +217,22 @@ void free_path_planning(PathPlanning *path)
 
 //This function return the id of a free node close to the occupied one 
 //We first search for direct neighbours but if they are also occupied we extend
-//our search in a cross (+) around the actual node (A spiral would have been better but 
-//way more complicated to implement, boundaries problem)
+//serach each time for direct neighbours even if there is some redundancy ... 
+//(we can do an expension of 3 squares)
 int search_free_neighbours(int id_occ)
 {
 	int id_fr;
 	int id_test;
+	vector<int> path_non_blocked;
 	vector<Edge> edges_node_occ = nodes_grid[id_occ].node_get_edges();
-	for(int i=0; i<8; i++)
+	for(int i=0; i<MAX_NB_EDGES; i++)//first level
 	{
 		if( edges_node_occ[i].edge_get_weight() != 0 )//if we do not search for neighbours outside the map
 		{
 			id_test = edges_node_occ[i].edge_get_id_connected_node();
+
+			path_non_blocked.push_back(id_test);
+
 			if( nodes_grid[id_test].node_get_free_position() == FREE )//if the neighbor is free
 			{
 				id_fr = id_test;
@@ -236,10 +240,53 @@ int search_free_neighbours(int id_occ)
 			}
 		}
 	}
+	int start_size = path_non_blocked.size();
+	for(int j=0; j<start_size; j++)//second level
+	{
+		edges_node_occ = nodes_grid[ path_non_blocked[j] ].node_get_edges();
+		//we take the edges of a node we want to inspect its surrondings
 
+		for(int k=0; k<MAX_NB_EDGES; k++)
+		{
+			if( edges_node_occ[k].edge_get_weight() != 0 )//if we do not search for neighbours outside the map
+			{
+				id_test = edges_node_occ[k].edge_get_id_connected_node();
+
+				path_non_blocked.push_back(id_test); 
+				
+
+				if( nodes_grid[id_test].node_get_free_position() == FREE )//if the neighbor is free
+				{
+					id_fr = id_test;
+					return id_fr;
+				}
+			}
+		}
+	}
+
+	for(int j=0; j<(path_non_blocked.size() - start_size); j++)//third level //maybe change the condition in the way we decide to solve the problem 1
+	{
+		edges_node_occ = nodes_grid[ path_non_blocked[j + start_size -1] ].node_get_edges();
+		//we take the edges of a node we want to inspect its surrondings
+
+		for(int k=0; k<MAX_NB_EDGES; k++)
+		{
+			if( edges_node_occ[k].edge_get_weight() != 0 )//if we do not search for neighbours outside the map
+			{
+				id_test = edges_node_occ[k].edge_get_id_connected_node();
+
+				if( nodes_grid[id_test].node_get_free_position() == FREE )//if the neighbor is free
+				{
+					id_fr = id_test;
+					return id_fr;
+				}
+			}
+		}
+	}
 	return id_occ;//to change, if I don't find direct free neighbours --> expend out research.
 }
-
+/*MAybe do a paramtrization of the max squares in an obstacle and do a research on a number of a parametrized  levels
+We can do the algo above a certain number of time (stop condition depending on the max sqqaures in an obstacles (node)*/
 
 
 //update the grid when we start a new path planning
