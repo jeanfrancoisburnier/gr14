@@ -67,8 +67,8 @@ void main_strategy(CtrlStruct *cvs)
 		case GAME_STATE_B:
 			source_pos[0] = 0.7;//cvs->kalman_pos->x;
 			source_pos[1] = 1.0;//cvs->kalman_pos->y;
-			goal_pos[0] = -0.4;
-			goal_pos[1] = -0.6;
+			goal_pos[0] = +0.0;
+			goal_pos[1] = +1.25;
 			path = path_planning_compute(cvs, source_pos, goal_pos);
 			strat->main_state = GAME_STATE_C;
 			break;
@@ -78,10 +78,10 @@ void main_strategy(CtrlStruct *cvs)
 			break;
 
 		case GAME_STATE_D:
-			source_pos[0] = -0.8;//cvs->kalman_pos->x;
-			source_pos[1] = +0.0;//cvs->kalman_pos->y;
-			goal_pos[0] = -0.4;
-			goal_pos[1] = -0.6;
+			source_pos[0] = +0.7;//cvs->kalman_pos->x;
+			source_pos[1] = -0.6;//cvs->kalman_pos->y;
+			goal_pos[0] = +0.25;
+			goal_pos[1] = +1.25;
 			path = path_planning_compute(cvs, source_pos, goal_pos);
 			strat->main_state = GAME_STATE_C;
 			break;

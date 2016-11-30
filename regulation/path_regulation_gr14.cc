@@ -51,7 +51,16 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	if (i >= path.size())
 	{
 		i = 0;
-		cvs->strat->main_state = GAME_STATE_E;
+		static bool first = false;
+		if (first)
+		{
+			cvs->strat->main_state = GAME_STATE_D;
+			first = false;
+		}
+		else
+		{
+			cvs->strat->main_state = GAME_STATE_E;
+		}
 		return;
 	}
 	// ...Until here
@@ -74,47 +83,57 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 
 void get_new_speed(float gamma, float *l_speed, float *r_speed)
 {
-	if (gamma > -ALPHA/2 && gamma < ALPHA/2) // point in front of robot
+	if (gamma > -ALPHA/2 && gamma <= ALPHA/2) // point in front of robot
 	{
 		*l_speed = +10.0;
 		*r_speed = +10.0;
 	}
-	else if (gamma > ALPHA/2 && gamma < BETA+ALPHA/2) // point a bit on the left
+	else if (gamma > ALPHA/2 && gamma <= BETA+ALPHA/2) // point a bit on the left
 	{
 		*l_speed = +5.0;
 		*r_speed = +10.0;
 	}
-	else if (gamma > BETA+ALPHA/2 && gamma < GAMMA+BETA+ALPHA/2) // point a bit more on the left
+	else if (gamma > BETA+ALPHA/2 && gamma <= M_PI/2-(BETA+ALPHA/2)) // point a bit more on the left
 	{
-		*l_speed = +2.5;
+		*l_speed = +2.0;
 		*r_speed = +10.0;
 	}
-	else if (gamma > GAMMA+BETA+ALPHA/2 && gamma < DELTA+GAMMA+BETA+ALPHA/2) // point on the left
+	else if (gamma > M_PI/2-(BETA+ALPHA/2) && gamma <= M_PI-(BETA+ALPHA/2)) // point on the left
 	{
-		*l_speed = -8.0;
-		*r_speed = +8.0;
-	}
-	else if (gamma > DELTA+GAMMA+BETA+ALPHA/2 && gamma < M_PI) // point behind on the left
-	{
-		*l_speed = -10.0;
-		*r_speed = +10.0;
-	}
-	else if (gamma > -M_PI && gamma < -(DELTA+GAMMA+BETA+ALPHA/2)) // point behind on the right
-	{
-		*l_speed = +10.0;
+		*l_speed = -2.0;
 		*r_speed = -10.0;
 	}
-	else if (gamma > -(DELTA+GAMMA+BETA+ALPHA/2) && gamma < -(GAMMA+BETA+ALPHA/2)) // point on the right
+	else if (gamma > M_PI-(BETA+ALPHA/2) && gamma <= M_PI-(ALPHA/2)) // point behind on the left
 	{
-		*l_speed = +8.0;
-		*r_speed = -8.0;
+		*l_speed = -5.0;
+		*r_speed = -10.0;
 	}
-	else if (gamma > -(GAMMA+BETA+ALPHA/2) && gamma < -(BETA+ALPHA/2)) // point on a bit more the right
+	else if (gamma > M_PI-(ALPHA/2) && gamma <= M_PI) // point behind on the right
+	{
+		*l_speed = -10.0;
+		*r_speed = -10.0;
+	}
+	else if (gamma > -M_PI && gamma <= -(M_PI-(ALPHA/2))) // point on the right
+	{
+		*l_speed = -10.0;
+		*r_speed = -10.0;
+	}
+	else if (gamma > -(M_PI-(ALPHA/2)) && gamma <= -(M_PI-(BETA+ALPHA/2))) // point on a bit more the right
+	{
+		*l_speed = -10.0;
+		*r_speed = -5.0;
+	}
+	else if (gamma > -(M_PI-(BETA+ALPHA/2)) && gamma <= -(M_PI/2-(BETA+ALPHA/2))) // point a bit on the right
+	{
+		*l_speed = -10.0;
+		*r_speed = -2.0;
+	}
+	else if (gamma > -(M_PI/2-(BETA+ALPHA/2)) && gamma <= -(BETA+ALPHA/2)) // point a bit on the right
 	{
 		*l_speed = +10.0;
-		*r_speed = +2.5;
+		*r_speed = +2.0;
 	}
-	else if (gamma > -(BETA+ALPHA/2) && gamma < -ALPHA/2) // point a bit on the right
+	else if (gamma > -(BETA+ALPHA/2) && gamma <= -ALPHA/2) // point a bit on the right
 	{
 		*l_speed = +10.0;
 		*r_speed = +5.0;
