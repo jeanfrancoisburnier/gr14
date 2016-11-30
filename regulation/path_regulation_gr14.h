@@ -15,34 +15,20 @@ using namespace std;
 
 NAMESPACE_INIT(ctrlGr14);
 
-typedef struct Traget_path
-{
-
-	float x;
-	float y;
-
-} target_path_t;
-
-typedef struct  Target 
-{
-	int nb_via;
-	target_path_t* target_path;
-
-} target_t;
-
-typedef struct Path
-{
-	int nb_target;
-	int current_target;
-	target_t* targets;
-
-	double last_t;
-
-} path_t;
-
+/*
+ * \brief: 	follow a given path
+ * \param: 	path 	path composed of the coordinate
+ *					of all the intermediate point
+ */
 void follow_path(CtrlStruct *cvs, vector<array<float,2> > path);
-// void follow_path(CtrlStruct *cvs, path_t* tab);
-void reach_single_target(float gamma, float *l_speed, float *r_speed);
+
+/*
+ * \brief: 	get the new speed command for the wheels
+ * \param: 	gamma	direction of the point to reach in rad
+ *			l_speed	point on left speed
+ *			r_speed point on right speed
+ */
+void get_new_speed(float gamma, float *l_speed, float *r_speed);
 
 NAMESPACE_CLOSE();
 
