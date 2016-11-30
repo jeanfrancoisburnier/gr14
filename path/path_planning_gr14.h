@@ -42,7 +42,7 @@ struct Obstacles
 };
 
 
-vector<array<float,2> > path_planning_compute();
+vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos);
 
 void init_grid();
 vector<array<float,2> > generate_path(int source_id,int goal_id);
