@@ -7,13 +7,15 @@
 
 NAMESPACE_INIT(ctrlGr14);
 
-#define TAU 0.03
+#define TAU 0.01
 #define RADIUS_TOL 0.0144
 
 #define ALPHA 	M_PI/32
 #define BETA 	M_PI/16
 #define GAMMA 	M_PI/8
 #define DELTA 	M_PI/4
+
+#define K 4
 
 static double last_t = 0;
 
@@ -39,19 +41,36 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	float vector_x = x_point-kalman_pos->x;
 	float vector_y = y_point-kalman_pos->y;
 
-	if (pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL) 
+	if (i+1 < path.size() && pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL) 
 	{
 		set_output(path[i][0],"x_path");
 		set_output(path[i][1],"y_path");
 		set_output(path.size(),"path_size");
 		i++;
 	}
-
+	else if (i+1 == path.size() && cvs->inputs->target_detected)//pow(vector_x,2)+pow(vector_y,2) < 0.01)
+	{
+		i++;
+		printf("Target Reached!\n");
+		printf("Color seen: %d\n", cvs->inputs->color_seen);
+	}
 	// Need to check this ....
 	if (i >= path.size())
 	{
 		i = 0;
-		cvs->strat->main_state = GAME_STATE_E;
+		if (++cvs->strat->current_target_id < 7)
+		{
+			if (cvs->inputs->color_seen == 4)
+			{
+				cvs->outputs->flag_release = 1;
+				cvs->outputs->flag_release = 0;
+			}
+			cvs->strat->main_state = GAME_STATE_WAIT;
+		}
+		else
+		{
+			cvs->strat->main_state = GAME_STATE_E;
+		}
 		return;
 	}
 	// ...Until here
@@ -74,50 +93,60 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 
 void get_new_speed(float gamma, float *l_speed, float *r_speed)
 {
-	if (gamma > -ALPHA/2 && gamma < ALPHA/2) // point in front of robot
+	if (gamma > -ALPHA/2 && gamma <= ALPHA/2) // point in front of robot
 	{
-		*l_speed = +10.0;
-		*r_speed = +10.0;
+		*l_speed = +10.0*K;
+		*r_speed = +10.0*K;
 	}
-	else if (gamma > ALPHA/2 && gamma < BETA+ALPHA/2) // point a bit on the left
+	else if (gamma > ALPHA/2 && gamma <= BETA+ALPHA/2) // point a bit on the left
 	{
-		*l_speed = +5.0;
-		*r_speed = +10.0;
+		*l_speed = +5.0*K;
+		*r_speed = +10.0*K;
 	}
-	else if (gamma > BETA+ALPHA/2 && gamma < GAMMA+BETA+ALPHA/2) // point a bit more on the left
+	else if (gamma > BETA+ALPHA/2 && gamma <= M_PI/2-(BETA+ALPHA/2)) // point a bit more on the left
 	{
-		*l_speed = +2.5;
-		*r_speed = +10.0;
+		*l_speed = +2.0*K;
+		*r_speed = +10.0*K;
 	}
-	else if (gamma > GAMMA+BETA+ALPHA/2 && gamma < DELTA+GAMMA+BETA+ALPHA/2) // point on the left
+	else if (gamma > M_PI/2-(BETA+ALPHA/2) && gamma <= M_PI-(BETA+ALPHA/2)) // point on the left
 	{
-		*l_speed = -8.0;
-		*r_speed = +8.0;
+		*l_speed = -2.0*K;
+		*r_speed = -10.0*K;
 	}
-	else if (gamma > DELTA+GAMMA+BETA+ALPHA/2 && gamma < M_PI) // point behind on the left
+	else if (gamma > M_PI-(BETA+ALPHA/2) && gamma <= M_PI-(ALPHA/2)) // point behind on the left
 	{
-		*l_speed = -10.0;
-		*r_speed = +10.0;
+		*l_speed = -5.0*K;
+		*r_speed = -10.0*K;
 	}
-	else if (gamma > -M_PI && gamma < -(DELTA+GAMMA+BETA+ALPHA/2)) // point behind on the right
+	else if (gamma > M_PI-(ALPHA/2) && gamma <= M_PI) // point behind on the right
 	{
-		*l_speed = +10.0;
-		*r_speed = -10.0;
+		*l_speed = -10.0*K;
+		*r_speed = -10.0*K;
 	}
-	else if (gamma > -(DELTA+GAMMA+BETA+ALPHA/2) && gamma < -(GAMMA+BETA+ALPHA/2)) // point on the right
+	else if (gamma > -M_PI && gamma <= -(M_PI-(ALPHA/2))) // point on the right
 	{
-		*l_speed = +8.0;
-		*r_speed = -8.0;
+		*l_speed = -10.0*K;
+		*r_speed = -10.0*K;
 	}
-	else if (gamma > -(GAMMA+BETA+ALPHA/2) && gamma < -(BETA+ALPHA/2)) // point on a bit more the right
+	else if (gamma > -(M_PI-(ALPHA/2)) && gamma <= -(M_PI-(BETA+ALPHA/2))) // point on a bit more the right
 	{
-		*l_speed = +10.0;
-		*r_speed = +2.5;
+		*l_speed = -10.0*K;
+		*r_speed = -5.0*K;
 	}
-	else if (gamma > -(BETA+ALPHA/2) && gamma < -ALPHA/2) // point a bit on the right
+	else if (gamma > -(M_PI-(BETA+ALPHA/2)) && gamma <= -(M_PI/2-(BETA+ALPHA/2))) // point a bit on the right
 	{
-		*l_speed = +10.0;
-		*r_speed = +5.0;
+		*l_speed = -10.0*K;
+		*r_speed = -2.0*K;
+	}
+	else if (gamma > -(M_PI/2-(BETA+ALPHA/2)) && gamma <= -(BETA+ALPHA/2)) // point a bit on the right
+	{
+		*l_speed = +10.0*K;
+		*r_speed = +2.0*K;
+	}
+	else if (gamma > -(BETA+ALPHA/2) && gamma <= -ALPHA/2) // point a bit on the right
+	{
+		*l_speed = +10.0*K;
+		*r_speed = +5.0*K;
 	}
 	else
 	{

@@ -54,6 +54,8 @@ array<Obstacles, NB_FIXED_OBSTACLES> initialization_fixed_obstacles();
 array<Obstacles, NB_OPPONENTS> update_moving_obstacles(CtrlStruct *cvs);
 void update_grid(CtrlStruct *cvs);
 
+int search_free_neighbours(int id_occ);
+
 
 NAMESPACE_CLOSE();
 

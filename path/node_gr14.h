@@ -104,7 +104,7 @@ class compare_heuristic
 
 
 int node_find_closest_node(float x_p, float y_p);//return the id of the closest Node
-int node_search_free_neighboors(int id_o);//return the id of a free node close to the occupied one 
+
 
 NAMESPACE_CLOSE();
 
