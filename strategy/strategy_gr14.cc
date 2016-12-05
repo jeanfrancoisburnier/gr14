@@ -88,7 +88,7 @@ void main_strategy(CtrlStruct *cvs)
 	// variables declaration
 	Strategy *strat;
 	CtrlIn *inputs;
-	uint target_id;
+	uint8_t target_id;
 
 	// variables initialization
 	strat  = cvs->strat;
@@ -106,8 +106,8 @@ void main_strategy(CtrlStruct *cvs)
 		case GAME_STATE_INITIAL:
 			source_pos[0] = 0.7;//cvs->kalman_pos->x;
 			source_pos[1] = 1.0;//cvs->kalman_pos->y;
-			goal_pos[0] = strat->target[0].x;
-			goal_pos[1] = strat->target[0].y;
+			goal_pos[0] = strat->target[3].x;
+			goal_pos[1] = strat->target[3].y;
 			path = path_planning_compute(cvs, source_pos, goal_pos);
 			strat->main_state = GAME_STATE_GO_TO_GOAL;
 			break;

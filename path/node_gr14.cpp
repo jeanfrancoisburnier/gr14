@@ -373,24 +373,29 @@ vector<int> Node::scan_edges(vector<Node>& node_list,Node goal)
 //Find the id of the closest node to a point described by its coordinates.
 int node_find_closest_node(float x_p, float y_p)//return the id of the closest Node
 {
+	printf("fct point coordinates before finding id, X = %3f, Y = %3f\n", x_p, y_p);
 	if( x_p>peak_x )
 	{
+		printf("ERROR\n");
 		cout << "Warning your coordinates are outside the range of the robot\n" << endl;
 		x_p = peak_x;
 	}
 	else if( x_p<-peak_x )
 	{
+		printf("ERROR\n");
 		cout << "Warning your coordinates are outside the range of the robot\n" << endl;
 		x_p = -peak_x;
 	}
 
 	if( y_p>peak_y )
 	{
+		printf("ERROR\n");
 		cout << "Warning your coordinates are outside the range of the robot\n" << endl;
 		y_p = peak_y;
 	}
 	else if( x_p<-peak_x )
 	{
+		printf("ERROR\n");
 		cout << "Warning your coordinates are outside the range of the robot\n" << endl;
 		y_p = -peak_y;
 	}
@@ -401,15 +406,20 @@ int node_find_closest_node(float x_p, float y_p)//return the id of the closest N
 	float id_temp=0.0;
 
 	id_x = (peak_x - square_length/2 + x_p) / square_length;
+	id_x = round(id_x);
 	id_y = (peak_y - square_length/2 - y_p) / square_length;
+	id_y = round(id_y);
 	id_temp = id_x + NB_X * id_y;
+	printf("fct id_x = %3f, id_y = %3f, id_temp=%3f\n", id_x,id_y,id_temp);
 
 	if( id_temp - (int)(id_temp) > 0.5 )
 	{
+		printf("fct closest node id %d\n", (int)(id_temp+1));
 		return (int)(id_temp + 1);
 	}
 	else
 	{
+		printf("fct closest node id %d\n", (int)(id_temp));
 		return (int)(id_temp);
 	}
 }

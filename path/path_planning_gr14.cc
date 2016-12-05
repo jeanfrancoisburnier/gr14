@@ -82,8 +82,11 @@ void init_grid()
 vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos)
 {
 	int source_id = node_find_closest_node(source_pos[X], source_pos[Y]);
+	printf("\nXs_return : %3f, Ys_return : %3f\n", nodes_grid[source_id].node_get_coordinates()[X], nodes_grid[source_id].node_get_coordinates()[Y]);
+	printf("SOURCE_ID: %d\n", source_id);
     int goal_id = node_find_closest_node(goal_pos[X], goal_pos[Y]);
-    printf("SOURCE_ID: %d \t GOAL_ID: %d\n", source_id, goal_id);
+    printf("Xs_return : %3f, Ys_return : %3f\n", nodes_grid[goal_id].node_get_coordinates()[X], nodes_grid[goal_id].node_get_coordinates()[Y]);
+	printf("goal_ID: %d\n", goal_id);
 
 
 	if( source_id >= nodes_grid.size() || source_id < 0 || goal_id >= nodes_grid.size() || goal_id < 0 )
@@ -104,8 +107,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     	printf("invalid goal, on an occupied node\n");
     	goal_id = search_free_neighbours(goal_id);
     }
-    
-
+  
     update_grid(cvs);
     a_star(cvs, source_id, goal_id);
     vector<array<float,2> > path = generate_path(source_id, goal_id);

@@ -53,7 +53,7 @@ typedef struct Target_base
 typedef struct Strategy
 {
 	int main_state; ///< main state of the strategy
-	uint current_target_id;
+	uint8_t current_target_id;
 	target_t target[8];
 	start_base_t  start_base;
 	target_base_t target_base;

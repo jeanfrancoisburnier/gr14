@@ -32,8 +32,6 @@
 #define MAX_NB_EDGES 8 //top, left, right, bottom and the other four diagonals
 #define H_VALUE_INIT 1000.0 //Initial heuristic value
 
-#define RANGE_ERROR_ID 4 //if we want to give an id as a goal but it's occupied, we search around in a range of 4 nodes in a cross
-
 #define FREE true		//indicates if a node is free
 #define OCCUPIED false	//indicates if a node is occupied
 
