@@ -81,13 +81,14 @@ void init_grid()
 
 vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos)
 {
-	int source_id = node_find_closest_node(source_pos[X], source_pos[Y]);
-	printf("\nXs_return : %3f, Ys_return : %3f\n", nodes_grid[source_id].node_get_coordinates()[X], nodes_grid[source_id].node_get_coordinates()[Y]);
-	printf("SOURCE_ID: %d\n", source_id);
-    int goal_id = node_find_closest_node(goal_pos[X], goal_pos[Y]);
-    printf("Xs_return : %3f, Ys_return : %3f\n", nodes_grid[goal_id].node_get_coordinates()[X], nodes_grid[goal_id].node_get_coordinates()[Y]);
-	printf("goal_ID: %d\n", goal_id);
+	bool recompute_needed = true;// we assume that we always have to recompute a new path
 
+	int source_id = node_find_closest_node(source_pos[X], source_pos[Y]);
+    int goal_id = node_find_closest_node(goal_pos[X], goal_pos[Y]);
+
+    static vector<array<float,2> > path;
+    static int last_goal_id  = goal_id;//will be useful later to test if we changed the goal 
+    
 
 	if( source_id >= nodes_grid.size() || source_id < 0 || goal_id >= nodes_grid.size() || goal_id < 0 )
     {
@@ -109,8 +110,38 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     }
   
     update_grid(cvs);
-    a_star(cvs, source_id, goal_id);
-    vector<array<float,2> > path = generate_path(source_id, goal_id);
+
+    
+    if(last_goal_id == goal_id) //if the gol is the same as last call
+    {
+    	int id_actual_n;
+
+    	//check if the path already compute is still available
+    	for(int i = 0; i < path.size(); i++)
+    	{
+    		id_actual_n = node_find_closest_node(path[i][X], path[i][Y]);
+    		if(nodes_grid[id_actual_n].node_get_free_position() == OCCUPIED)//if a node of the path is now occupied
+    		{
+    			recompute_needed = true;//we need to recompute a new path
+    			break;
+    		}
+    		else
+    		{
+    			recompute_needed = false;//no break needed because we haven't check all the elements yet
+    		}
+    	}
+    }
+
+    if(recompute_needed == true)//compute a new path
+    {
+    	path.clear();//remove the old path
+		printf("%d\n", path.empty());
+    	a_star(cvs, source_id, goal_id);
+    	path = generate_path(source_id, goal_id);
+    }
+    
+
+    last_goal_id = goal_id;
 
     //Set the flag "path generated" to 1 and return path
     return path;
