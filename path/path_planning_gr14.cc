@@ -92,10 +92,17 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     static int last_goal_id  = goal_id;//will be useful later to test if we changed the goal 
     
 
-	if( source_id >= nodes_grid.size() || source_id < 0 || goal_id >= nodes_grid.size() || goal_id < 0 )
+	if(source_id >= nodes_grid.size() || source_id < 0 )
     {
-        printf("invalid start or goal, outside the map\n");
-        exit(EXIT_FAILURE);
+        printf("invalid start, outside the map\n");
+        
+        //Set the flag "path generated" to 0 and return Null
+    }
+
+    if(goal_id >= nodes_grid.size() || goal_id < 0 )
+    {
+        printf("invalid goal, outside the map\n");
+        
         //Set the flag "path generated" to 0 and return Null
     }
     
@@ -136,8 +143,14 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 
     if(recompute_needed == true)//compute a new path
     {
+    	bool compute = true
     	path.clear();//remove the old path
-    	a_star(cvs, source_id, goal_id);
+    	compute = a_star(cvs, source_id, goal_id);
+    	while(compute)
+    	{
+    		update_grid(cvs);
+    		compute = a_star(cvs, source_id, goal_id);
+    	}
     	path = generate_path(source_id, goal_id);
     }
     
@@ -156,7 +169,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
  * \param[in]  goal node
  * \param[in,out] nodes_grid that we modify throughout the function
  */
-void a_star(CtrlStruct *cvs, int source_id, int goal_id)
+bool a_star(CtrlStruct *cvs, int source_id, int goal_id)
 {
     //initialize the values of the source node
     nodes_grid[source_id].node_set_distance_to_goal(nodes_grid[goal_id].node_get_coordinates());
@@ -166,6 +179,7 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
     
     //priority queue to sort nodes depending on the value of the heuristic function
     priority_queue<Node,vector<Node>,compare_heuristic > open_paths;
+
     
     // list of noe id that are reached by the current node and have not been visited yet
     // intermediate node
@@ -176,7 +190,7 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
     if (nodes_grid[source_id].node_get_id() == nodes_grid[goal_id].node_get_id())
     {
     	printf("Already on goal\n");
-        return;
+        return false;
     }
     
     // do algorithm until goal node has been reached
@@ -195,7 +209,7 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
         if(open_paths.size() == 0)
         {
             printf("No nodes available in the queue\n");
-        	exit(EXIT_FAILURE);
+        	return true;
         }
         
         //take the next node with the lowest heuristic function and remove that element for the list
@@ -205,7 +219,7 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
         
         //printf("node id: %d\t heuristic %f\n",next.node_get_id(),next.node_get_heuristic_value());
     }
-    return;
+    return false;
     
 }
 

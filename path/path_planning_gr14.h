@@ -47,7 +47,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 
 void init_grid();
 vector<array<float,2> > generate_path(int source_id,int goal_id);
-void a_star(CtrlStruct *cvs, int source_id,int goal_id);
+bool a_star(CtrlStruct *cvs, int source_id,int goal_id);
 void free_path_planning(PathPlanning *path);
 
 void reset_value_grid(array<Obstacles, NB_OPPONENTS> moving_obstacles);
