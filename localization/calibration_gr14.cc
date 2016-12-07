@@ -130,7 +130,7 @@ void calibration(CtrlStruct *cvs)
 			speed_regulation(cvs, 5.0, 5.0);
 
 			// go to state H after 2 seconds
-			if (t - calib->t_flag > 2.0)
+			if (t - calib->t_flag > 1.5)
 			{
 				calib->flag = CALIB_STATE_H;
 

@@ -16,7 +16,11 @@
 #include <array>
 #include <vector>
 
-#define NB_OBSTACLES 10 // 8 fixed obstacles + 2 oponents
+#define NB_OPPONENTS 2
+#define NB_FIXED_OBSTACLES 10 // 8 fixed obstacles + 2 oponents
+#define ROBOT_SIZE 0.260 //[m] diameter
+#define SECURITY_RANGE 0.020 //[m] security range add to the obstacles 
+ 							//(and to robot's size / 2) to be able to consider the robot as a material point
 
 using namespace std; //to be able to use array
 
@@ -39,13 +43,20 @@ struct Obstacles
 };
 
 
+vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos);
 
 void init_grid();
 vector<array<float,2> > generate_path(int source_id,int goal_id);
-void a_star(int source_id,int goal_id);
+void a_star(CtrlStruct *cvs, int source_id,int goal_id);
 void free_path_planning(PathPlanning *path);
-void reset_visited_value();
-array<Obstacles, NB_OBSTACLES> initialization_obstacles();
+
+void reset_value_grid(array<Obstacles, NB_OPPONENTS> moving_obstacles);
+array<Obstacles, NB_FIXED_OBSTACLES> initialization_fixed_obstacles();
+array<Obstacles, NB_OPPONENTS> update_moving_obstacles(CtrlStruct *cvs);
+void update_grid(CtrlStruct *cvs);
+
+int search_free_neighbours(int id_occ);
+
 
 NAMESPACE_CLOSE();
 
