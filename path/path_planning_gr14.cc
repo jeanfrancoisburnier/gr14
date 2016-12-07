@@ -81,6 +81,8 @@ void init_grid()
 
 vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos)
 {
+	//will be completely test after jf update his part (call path_planning_compute each 1 or 2 seconds)
+	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
 	bool recompute_needed = true;// we assume that we always have to recompute a new path
 
 	int source_id = node_find_closest_node(source_pos[X], source_pos[Y]);
@@ -135,7 +137,6 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     if(recompute_needed == true)//compute a new path
     {
     	path.clear();//remove the old path
-		printf("%d\n", path.empty());
     	a_star(cvs, source_id, goal_id);
     	path = generate_path(source_id, goal_id);
     }
@@ -273,7 +274,9 @@ int search_free_neighbours(int id_occ)
 			}
 		}
 	}
+
 	int start_size = path_non_blocked.size();
+
 	for(int j=0; j<start_size; j++)//second level
 	{
 		edges_node_occ = nodes_grid[ path_non_blocked[j] ].node_get_edges();
@@ -297,7 +300,7 @@ int search_free_neighbours(int id_occ)
 		}
 	}
 
-	for(int j=0; j<(path_non_blocked.size() - start_size); j++)//third level //maybe change the condition in the way we decide to solve the problem 1
+	for(int j=0; j<(path_non_blocked.size() - start_size); j++)//third level
 	{
 		edges_node_occ = nodes_grid[ path_non_blocked[j + start_size -1] ].node_get_edges();
 		//we take the edges of a node we want to inspect its surrondings
