@@ -8,13 +8,14 @@
 NAMESPACE_INIT(ctrlGr14);
 
 #define TAU 0.01
-#define RADIUS_TOL 0.01//0.0144
+#define RADIUS_TOL 0.0144
+#define RADIUS_TOL_NEW 0.05
 
 #define ALPHA 	M_PI/32
 #define BETA 	M_PI/16
 #define GAMMA 	M_PI/4
 
-#define K 1
+static int K = 3;
 
 static size_t i = 0;
 
@@ -41,18 +42,27 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	// Vector from robot to target
 	float vector_x = x_point-kalman_pos->x;
 	float vector_y = y_point-kalman_pos->y;
+		
+	if (i+1 < path.size())
+	{
+		K = 3;
 
-	if (i+1 < path.size() && pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL) 
-	{
-		set_output(path[i][0],"x_path");
-		set_output(path[i][1],"y_path");
-		set_output(path.size(),"path_size");
-		i++;
+		if (pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL) 
+		{
+			set_output(path[i][0],"x_path");
+			set_output(path[i][1],"y_path");
+			set_output(path.size(),"path_size");
+			i++;
+		}
 	}
-	else if (i+1 == path.size() && pow(vector_x,2)+pow(vector_y,2) < 0.005)//cvs->inputs->target_detected)//pow(vector_x,2)+pow(vector_y,2) < 0.005)
+	else if (i+1 == path.size() && pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL_NEW)
 	{
-		i++;
-		// printf("Color seen: %d\n", cvs->inputs->color_seen);
+		K = 1;
+
+		if (pow(vector_x,2)+pow(vector_y,2) < 0.005)
+		{
+			i++;
+		}
 	}
 	// Need to check this ....
 	if (i >= path.size())
@@ -74,9 +84,9 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 			else
 			{
 				cvs->strat->current_target_id++;
-				// printf("Target Reached! Robots is at x: %.3f \t y: %.3f\n", kalman_pos->x, kalman_pos->y);
-				// printf("Deltax: %.3f \t Deltay: %.3f\n", vector_x, vector_y);
-				// printf("XPoint: %.3f \t YPoint: %.3f\n", x_point, y_point);
+				printf("Target Reached! Robots is at x: %.3f \t y: %.3f\n", kalman_pos->x, kalman_pos->y);
+				printf("Deltax: %.3f \t Deltay: %.3f\n", vector_x, vector_y);
+				printf("XPoint: %.3f \t YPoint: %.3f\n", x_point, y_point);
 			}
 			cvs->strat->main_state = GAME_STATE_WAIT;
 		}

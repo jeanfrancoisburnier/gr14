@@ -39,8 +39,8 @@ Strategy* init_strategy()
 	strat->target[2].y = +0.6;
 	strat->target[2].status = TARGET_FREE;
 
-	strat->target[3].x = +0.25;
-	strat->target[3].y = +1.25;
+	strat->target[3].x = +0.2;//+0.25;
+	strat->target[3].y = +1.2;//+1.25;
 	strat->target[3].status = TARGET_FREE;
 
 	strat->target[4].x = +0.1;
@@ -51,8 +51,8 @@ Strategy* init_strategy()
 	strat->target[5].y = -0.6;
 	strat->target[5].status = TARGET_FREE;
 
-	strat->target[6].x = +0.25;
-	strat->target[6].y = -1.25;
+	strat->target[6].x = +0.2;//0.25;
+	strat->target[6].y = -1.3;//-1.25;
 	strat->target[6].status = TARGET_FREE;
 
 	strat->target[7].x = -0.4;
@@ -62,7 +62,7 @@ Strategy* init_strategy()
 	strat->start_base.x = +0.7;
 	strat->start_base.y = +0.6;
 
-	strat->target_base.x = -0.8;
+	strat->target_base.x = -0.7;
 	strat->target_base.y = -1.2;
 
 	strat->current_target_id = 0;
@@ -115,7 +115,7 @@ void main_strategy(CtrlStruct *cvs)
 			break;
 
 		case GAME_STATE_COMPUTE_PATH:
-			reset_current_point_id();
+			// reset_current_point_id();
 			source_pos[0] = cvs->kalman_pos->x;
 			source_pos[1] = cvs->kalman_pos->y;
 			if (inputs->nb_targets < 2)
@@ -133,22 +133,23 @@ void main_strategy(CtrlStruct *cvs)
 				goal_pos[0] = strat->target_base.x;
 				goal_pos[1] = strat->target_base.y;
 			}
+			
 			path = path_planning_compute(cvs, source_pos, goal_pos);
 			strat->main_state = GAME_STATE_GO_TO_GOAL;
 			last_t_path = inputs->t;
-			printf("Size in follow_path: %lu\n", path.size());
-			for (size_t l = 0; l< path.size(); l++)
- 				{
- 					printf("Going for x:%.3f y: %.3f\n", path[l][0], path[l][1]);
- 				}
+			// printf("Size in follow_path: %lu\n", path.size());
+			// for (size_t l = 0; l< path.size(); l++)
+ 		// 		{
+ 		// 			printf("Going for x:%.3f y: %.3f\n", path[l][0], path[l][1]);
+ 		// 		}
 			break;
 
 		case GAME_STATE_GO_TO_GOAL:
-			if (inputs->t - last_t_path >= 0.3)
-			{
-				strat->main_state = GAME_STATE_COMPUTE_PATH;
-				break;
-			}
+			// if (inputs->t - last_t_path >= 0.3)
+			// {
+				// strat->main_state = GAME_STATE_COMPUTE_PATH;
+				// break;
+			// }
 			follow_path(cvs, path);
 			last_t_wait = inputs->t;
 			break;
