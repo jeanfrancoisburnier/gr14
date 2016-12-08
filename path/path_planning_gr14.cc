@@ -78,8 +78,17 @@ void init_grid()
 
 
 
+/*
+Input : *cvs : to access the opponents caracteristics (number + position)
+		source_pos : Position X and Y of the source of the path
+		goal_pos : Position X and Y of the goal of the path
+		indice : pointer on the index of the actual node of the last path, reinitialized at zero if path recompute
 
-vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos,int *indice)
+Output : path : list of the node's coordinates composing the path we'll have to follow
+				If the goal hasn't change from the last call and is still available it is returned as it was before
+				(we still have the "indice" of where we were before)
+*/
+vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos, int *indice)
 {
 	bool recompute_needed = true;// we assume that we always have to recompute a new path
 

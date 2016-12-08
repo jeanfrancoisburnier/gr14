@@ -111,7 +111,7 @@ void main_strategy(CtrlStruct *cvs)
 			goal_pos[0] = 0.400;
 			goal_pos[1] = -1.0;
 
-			path = path_planning_compute(cvs, source_pos, goal_pos);
+			path = path_planning_compute(cvs, source_pos, goal_pos); //%%%%%%%%%%%%Add a condition if the path returned is empty
 			strat->main_state = GAME_STATE_GO_TO_GOAL;
 			break;
 
@@ -132,7 +132,7 @@ void main_strategy(CtrlStruct *cvs)
 				goal_pos[0] = strat->target_base.x;
 				goal_pos[1] = strat->target_base.y;
 			}
-			path = path_planning_compute(cvs, source_pos, goal_pos);
+			path = path_planning_compute(cvs, source_pos, goal_pos);//%%%%%%%%%%%%Add a condition if the path returned is empty
 			strat->main_state = GAME_STATE_GO_TO_GOAL;
 
 			// printf("Size in follow_path: %lu\n", path.size());
