@@ -81,18 +81,28 @@ void init_grid()
 
 vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos)
 {
+	//will be completely test after jf update his part (call path_planning_compute each 1 or 2 seconds)
+	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
+	bool recompute_needed = true;// we assume that we always have to recompute a new path
+
 	int source_id = node_find_closest_node(source_pos[X], source_pos[Y]);
-	printf("\nXs_return : %3f, Ys_return : %3f\n", nodes_grid[source_id].node_get_coordinates()[X], nodes_grid[source_id].node_get_coordinates()[Y]);
-	printf("SOURCE_ID: %d\n", source_id);
     int goal_id = node_find_closest_node(goal_pos[X], goal_pos[Y]);
-    printf("Xs_return : %3f, Ys_return : %3f\n", nodes_grid[goal_id].node_get_coordinates()[X], nodes_grid[goal_id].node_get_coordinates()[Y]);
-	printf("goal_ID: %d\n", goal_id);
 
+    static vector<array<float,2> > path;
+    static int last_goal_id  = goal_id;//will be useful later to test if we changed the goal 
+    
 
-	if( source_id >= nodes_grid.size() || source_id < 0 || goal_id >= nodes_grid.size() || goal_id < 0 )
+	if(source_id >= nodes_grid.size() || source_id < 0 )
     {
-        printf("invalid start or goal, outside the map\n");
-        exit(EXIT_FAILURE);
+        printf("invalid start, outside the map\n");
+        
+        //Set the flag "path generated" to 0 and return Null
+    }
+
+    if(goal_id >= nodes_grid.size() || goal_id < 0 )
+    {
+        printf("invalid goal, outside the map\n");
+        
         //Set the flag "path generated" to 0 and return Null
     }
     
@@ -109,8 +119,43 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     }
   
     update_grid(cvs);
-    a_star(cvs, source_id, goal_id);
-    vector<array<float,2> > path = generate_path(source_id, goal_id);
+
+    
+    if(last_goal_id == goal_id) //if the gol is the same as last call
+    {
+    	int id_actual_n;
+
+    	//check if the path already compute is still available
+    	for(int i = 0; i < path.size(); i++)
+    	{
+    		id_actual_n = node_find_closest_node(path[i][X], path[i][Y]);
+    		if(nodes_grid[id_actual_n].node_get_free_position() == OCCUPIED)//if a node of the path is now occupied
+    		{
+    			recompute_needed = true;//we need to recompute a new path
+    			break;
+    		}
+    		else
+    		{
+    			recompute_needed = false;//no break needed because we haven't check all the elements yet
+    		}
+    	}
+    }
+
+    if(recompute_needed == true)//compute a new path
+    {
+    	bool compute = true
+    	path.clear();//remove the old path
+    	compute = a_star(cvs, source_id, goal_id);
+    	while(compute)
+    	{
+    		update_grid(cvs);
+    		compute = a_star(cvs, source_id, goal_id);
+    	}
+    	path = generate_path(source_id, goal_id);
+    }
+    
+
+    last_goal_id = goal_id;
 
     //Set the flag "path generated" to 1 and return path
     return path;
@@ -124,7 +169,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
  * \param[in]  goal node
  * \param[in,out] nodes_grid that we modify throughout the function
  */
-void a_star(CtrlStruct *cvs, int source_id, int goal_id)
+bool a_star(CtrlStruct *cvs, int source_id, int goal_id)
 {
     //initialize the values of the source node
     nodes_grid[source_id].node_set_distance_to_goal(nodes_grid[goal_id].node_get_coordinates());
@@ -134,6 +179,7 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
     
     //priority queue to sort nodes depending on the value of the heuristic function
     priority_queue<Node,vector<Node>,compare_heuristic > open_paths;
+
     
     // list of noe id that are reached by the current node and have not been visited yet
     // intermediate node
@@ -144,7 +190,7 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
     if (nodes_grid[source_id].node_get_id() == nodes_grid[goal_id].node_get_id())
     {
     	printf("Already on goal\n");
-        return;
+        return false;
     }
     
     // do algorithm until goal node has been reached
@@ -163,7 +209,7 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
         if(open_paths.size() == 0)
         {
             printf("No nodes available in the queue\n");
-        	exit(EXIT_FAILURE);
+        	return true;
         }
         
         //take the next node with the lowest heuristic function and remove that element for the list
@@ -173,7 +219,7 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
         
         //printf("node id: %d\t heuristic %f\n",next.node_get_id(),next.node_get_heuristic_value());
     }
-    return;
+    return false;
     
 }
 
@@ -242,7 +288,9 @@ int search_free_neighbours(int id_occ)
 			}
 		}
 	}
+
 	int start_size = path_non_blocked.size();
+
 	for(int j=0; j<start_size; j++)//second level
 	{
 		edges_node_occ = nodes_grid[ path_non_blocked[j] ].node_get_edges();
@@ -266,7 +314,7 @@ int search_free_neighbours(int id_occ)
 		}
 	}
 
-	for(int j=0; j<(path_non_blocked.size() - start_size); j++)//third level //maybe change the condition in the way we decide to solve the problem 1
+	for(int j=0; j<(path_non_blocked.size() - start_size); j++)//third level
 	{
 		edges_node_occ = nodes_grid[ path_non_blocked[j + start_size -1] ].node_get_edges();
 		//we take the edges of a node we want to inspect its surrondings
