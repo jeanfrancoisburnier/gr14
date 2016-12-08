@@ -15,6 +15,11 @@ using namespace std;
 
 NAMESPACE_INIT(ctrlGr14);
 
+
+int get_actual_index_node_path();
+void update_actual_index_node_path(int indice);
+
+
 /*
  * \brief: 	follow a given path
  * \param: 	path 	path composed of the coordinate
@@ -29,6 +34,8 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path);
  *			r_speed point on right speed
  */
 void get_new_speed(float gamma, float *l_speed, float *r_speed);
+
+void reset_current_point_id(void);
 
 NAMESPACE_CLOSE();
 

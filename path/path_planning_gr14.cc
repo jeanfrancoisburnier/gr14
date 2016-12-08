@@ -77,14 +77,24 @@ void init_grid()
 
 
 
-
-
-vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos,int *indice)
+/*\brief compute an path
+* \Input : *cvs : to access the opponents caracteristics (number + position)
+*		source_pos : Position X and Y of the source of the path
+*		goal_pos : Position X and Y of the goal of the path
+*		indice : pointer on the index of the actual node of the last path, reinitialized at zero if path recompute
+*
+* \Output : path : list of the node's coordinates composing the path we'll have to follow
+*				If the goal hasn't change from the last call and is still available it is returned as it was before
+*				(we still have the "indice" of where we were before)
+*/
+vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos, int *indice)
 {
 	bool recompute_needed = true;// we assume that we always have to recompute a new path
 
 	int source_id = node_find_closest_node(source_pos[X], source_pos[Y]);
     int goal_id = node_find_closest_node(goal_pos[X], goal_pos[Y]);
+
+    int last_id;
 
     //printf("Before correction : source_id = %d \t goal_id = %d\n", source_id, goal_id);
 
@@ -96,6 +106,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
  //        exit(EXIT_FAILURE);
  //        //Set the flag "path generated" to 0 and return Null
  //    }
+
     
  //    if( source_id >= nodes_grid.size() || source_id < 0)
  //    {
@@ -107,20 +118,35 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     if( !nodes_grid[source_id].node_get_free_position() )
     {
     	printf("invalid start, on an occupied node\n");
+    	last_id = source_id;
     	source_id = search_free_neighbours(source_id);
+    	if(source_id == last_id)//search free neighbours failed (will not happened normally)
+    	{
+    		printf("Still invalid, path is now empty\n");
+    		path.clear();
+    		return path;//path returned is empty
+    	}
+    		
+
     }
     
     if( !nodes_grid[goal_id].node_get_free_position() )
     {
     	printf("invalid goal, on an occupied node\n");
+    	last_id = goal_id;
     	goal_id = search_free_neighbours(goal_id);
+    	if(goal_id == last_id)//search free neighbours failed (will not happened normally)
+    	{
+    		printf("Still invalid, path is now empty\n");
+    		path.clear();
+    		return path;//path returned is empty
+    	}
     }
   	
   	static int last_goal_id  = goal_id;//will be useful later to test if we changed the goal 
   	//printf("After correction : source_id = %d \t goal_id = %d\n\n", source_id, goal_id);
     update_grid(cvs);
 
-    
     if(last_goal_id == goal_id) //if the goal is the same as last call
     {
     	int id_actual_n;
@@ -145,12 +171,12 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     if(recompute_needed == true)//compute a new path
     {
     	path.clear();//remove the old path
-    	//printf("Before a_star : source_id = %d \t goal_id = %d\n\n", source_id, goal_id);
     	bool path_not_found;
     	path_not_found = a_star(cvs, source_id, goal_id);
-    	//printf("Outside astar\n");
+    	
     	if(path_not_found)
     	{
+    		printf("path not found", path_not_found);
     		path.clear();
     		return path;
     	}
@@ -162,9 +188,8 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     last_goal_id = goal_id;
 
     //Set the flag "path generated" to 1 and return path
-    return path;
+    return path; 
 }
-
 
 
 
@@ -293,7 +318,6 @@ int search_free_neighbours(int id_occ)
 			}
 		}
 	}
-
 	int last_size = 0;
 
 	for(int l=0; l<MAX_NB_NODE_IN_OBST; l++)
@@ -324,10 +348,8 @@ int search_free_neighbours(int id_occ)
 		last_size = path_non_blocked.size();
 	}
 
-	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%//
-	return id_occ;
-	//to change, if I don't find free neighbours, return an error to ask for a change 
-	//of goal or start because here the a_star will start to search a path non computable --> exit_faillure
+	return id_occ;//if it didn't find a free id, we return the actual occupied node (it will be considered as an error after)
+	
 }
 
 
@@ -349,15 +371,25 @@ void reset_value_grid(vector<Obstacles> moving_obstacles)
 {
 	int nb_mov_obst = moving_obstacles.size();
 
-	for(int i=0; i<NB_NODES; i++)
+
+	if(nb_mov_obst == 0) // there is no opponent
 	{
-		for(int k=0; k<id_occupied.size(); k++)
+		for(int i=0; i<NB_NODES; i++)
 		{
-			nodes_grid[i].node_set_visited(false);
-
-
-			if(nb_mov_obst =! 0)//if there is at least one opponent on the map, we'll have to update the free properties of some nodes
+			for(int k=0; k<id_occupied.size(); k++)
 			{
+				nodes_grid[i].node_set_visited(false);
+			}
+		}
+	}
+	else// there is at least one opponent
+	{
+		for(int i=0; i<NB_NODES; i++)
+		{
+			for(int k=0; k<id_occupied.size(); k++)
+			{
+				nodes_grid[i].node_set_visited(false);
+
 				if( i!= (id_occupied[k]) )//if we're not already on a fixed obstacle
 				{
 					bool state_pos;
@@ -367,7 +399,6 @@ void reset_value_grid(vector<Obstacles> moving_obstacles)
 					array<float, 2> pos_node = nodes_grid[i].node_get_coordinates();
 					x_node = pos_node[X];
 					y_node = pos_node[Y];
-
 					
 					for(int j=0; j<nb_mov_obst; j++)
 					{
@@ -391,9 +422,11 @@ void reset_value_grid(vector<Obstacles> moving_obstacles)
 					nodes_grid[i].node_set_free_position(OCCUPIED);
 					break;
 				}
+				
 			}
 		}
 	}
+	
 }
 
 
@@ -406,16 +439,46 @@ vector<Obstacles> update_moving_obstacles(CtrlStruct *cvs)
 
  	for(int i=0; i<n; i++)
  	{
- 		oppon.first_corner[X] = cvs->opp_pos->x[i] - ROBOT_SIZE/2 - SECURITY_RANGE;
-		oppon.first_corner[Y] =  cvs->opp_pos->y[i] + ROBOT_SIZE/2 + SECURITY_RANGE;
-		oppon.second_corner[X] =  cvs->opp_pos->x[i] + ROBOT_SIZE/2 + SECURITY_RANGE;
-		oppon.second_corner[Y] =  cvs->opp_pos->y[i] - ROBOT_SIZE/2 - SECURITY_RANGE; 
+ 		//printf("opp_x = %3f \t opp_y = %3f t = %3f\n", cvs->opp_pos->x[i], cvs->opp_pos->y[i], cvs->inputs->t);
+ 		oppon.first_corner[X] = cvs->opp_pos->x[i] - ROBOT_SIZE/2 - 2*SECURITY_RANGE;
+		oppon.first_corner[Y] =  cvs->opp_pos->y[i] + ROBOT_SIZE/2 + 2*SECURITY_RANGE;
+		oppon.second_corner[X] =  cvs->opp_pos->x[i] + ROBOT_SIZE/2 + 2*SECURITY_RANGE;
+		oppon.second_corner[Y] =  cvs->opp_pos->y[i] - ROBOT_SIZE/2 - 2*SECURITY_RANGE; 
 
 		moving_obstacles.push_back(oppon);
  	}
 	
 	return moving_obstacles;
 }
+
+
+
+
+bool test_if_goal_is_set_on_opponent(CtrlStruct *cvs, array<float, 2> goal_pos)
+{
+	vector<Obstacles> moving_obstacles;
+	moving_obstacles = update_moving_obstacles(cvs);
+	int nb_mov_obst = moving_obstacles.size();
+
+	float x_node = goal_pos[X];
+	float y_node = goal_pos[Y];
+
+
+	for(int j=0; j<nb_mov_obst; j++)
+	{
+		if( (x_node > moving_obstacles[j].first_corner[X]) && (x_node < moving_obstacles[j].second_corner[X]) 
+			&& (y_node < moving_obstacles[j].first_corner[Y]) && (y_node > moving_obstacles[j].second_corner[Y]) )
+		{
+			return true;
+		}
+		else 
+		{
+			return false;
+		}
+	}
+}
+
+
 
 
 

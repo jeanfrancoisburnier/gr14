@@ -55,6 +55,7 @@ vector<Obstacles> update_moving_obstacles(CtrlStruct *cvs);
 void update_grid(CtrlStruct *cvs);
 
 int search_free_neighbours(int id_occ);
+bool test_if_goal_is_set_on_opponent(CtrlStruct *cvs, array<float, 2> goal_pos);
 
 
 NAMESPACE_CLOSE();
