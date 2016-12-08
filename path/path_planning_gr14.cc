@@ -151,7 +151,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     	//printf("Outside astar\n");
     	if(path_not_found)
     	{
-    		path.clear
+    		path.clear();
     		return path;
     	}
     	path = generate_path(source_id, goal_id);
