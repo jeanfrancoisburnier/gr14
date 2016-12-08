@@ -86,27 +86,38 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 	int source_id = node_find_closest_node(source_pos[X], source_pos[Y]);
     int goal_id = node_find_closest_node(goal_pos[X], goal_pos[Y]);
 
+    int last_id;
+
     //printf("Before correction : source_id = %d \t goal_id = %d\n", source_id, goal_id);
 
     static vector<array<float,2> > path; 
-
-	if( source_id >= nodes_grid.size() || source_id < 0 || goal_id >= nodes_grid.size() || goal_id < 0 )
-    {
-        printf("invalid start or goal, outside the map\n");
-        exit(EXIT_FAILURE);
-        //Set the flag "path generated" to 0 and return Null
-    }
     
     if( !nodes_grid[source_id].node_get_free_position() )
     {
     	printf("invalid start, on an occupied node\n");
+    	last_id = source_id;
     	source_id = search_free_neighbours(source_id);
+    	if(source_id == last_id)//search free neighbours failed (will not happened normally)
+    	{
+    		printf("Still invalid, path is now empty\n");
+    		path.clear();
+    		return path;//path returned is empty
+    	}
+    		
+
     }
     
     if( !nodes_grid[goal_id].node_get_free_position() )
     {
     	printf("invalid goal, on an occupied node\n");
+    	last_id = goal_id;
     	goal_id = search_free_neighbours(goal_id);
+    	if(goal_id == last_id)//search free neighbours failed (will not happened normally)
+    	{
+    		printf("Still invalid, path is now empty\n");
+    		path.clear();
+    		return path;//path returned is empty
+    	}
     }
   	
   	static int last_goal_id  = goal_id;//will be useful later to test if we changed the goal 
