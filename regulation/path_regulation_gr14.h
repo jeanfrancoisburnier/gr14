@@ -30,6 +30,8 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path);
  */
 void get_new_speed(float gamma, float *l_speed, float *r_speed);
 
+void reset_current_point_id(void);
+
 NAMESPACE_CLOSE();
 
 #endif

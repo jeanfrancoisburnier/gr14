@@ -148,7 +148,6 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
   	//printf("After correction : source_id = %d \t goal_id = %d\n\n", source_id, goal_id);
     update_grid(cvs);
 
-    
     if(last_goal_id == goal_id) //if the goal is the same as last call
     {
     	int id_actual_n;
@@ -321,7 +320,6 @@ int search_free_neighbours(int id_occ)
 			}
 		}
 	}
-
 	int last_size = 0;
 
 	for(int l=0; l<MAX_NB_NODE_IN_OBST; l++)
