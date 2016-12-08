@@ -89,13 +89,20 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 	printf("goal_ID: %d\n", goal_id);
 
 
-	if( source_id >= nodes_grid.size() || source_id < 0 || goal_id >= nodes_grid.size() || goal_id < 0 )
+	if(goal_id >= nodes_grid.size() || goal_id < 0 )
     {
-        printf("invalid start or goal, outside the map\n");
+        printf("invalid goal, outside the map\n");
         exit(EXIT_FAILURE);
         //Set the flag "path generated" to 0 and return Null
     }
     
+    if( source_id >= nodes_grid.size() || source_id < 0)
+    {
+        printf("invalid start, outside the map\n");
+        exit(EXIT_FAILURE);
+        //Set the flag "path generated" to 0 and return Null
+    }
+
     if( !nodes_grid[source_id].node_get_free_position() )
     {
     	printf("invalid start, on an occupied node\n");
@@ -124,7 +131,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
  * \param[in]  goal node
  * \param[in,out] nodes_grid that we modify throughout the function
  */
-void a_star(CtrlStruct *cvs, int source_id, int goal_id)
+bool a_star(CtrlStruct *cvs, int source_id, int goal_id)
 {
     //initialize the values of the source node
     nodes_grid[source_id].node_set_distance_to_goal(nodes_grid[goal_id].node_get_coordinates());
