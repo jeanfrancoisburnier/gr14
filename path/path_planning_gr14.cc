@@ -79,7 +79,7 @@ void init_grid()
 
 
 
-vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos)
+vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos,int *indice)
 {
 	bool recompute_needed = true;// we assume that we always have to recompute a new path
 
@@ -91,7 +91,22 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     //printf("Before correction : source_id = %d \t goal_id = %d\n", source_id, goal_id);
 
     static vector<array<float,2> > path; 
+
+// 	   if(goal_id >= nodes_grid.size() || goal_id < 0 )
+ //    {
+ //        printf("invalid goal, outside the map\n");
+ //        exit(EXIT_FAILURE);
+ //        //Set the flag "path generated" to 0 and return Null
+ //    }
+
     
+ //    if( source_id >= nodes_grid.size() || source_id < 0)
+ //    {
+ //        printf("invalid start, outside the map\n");
+ //        exit(EXIT_FAILURE);
+ //        //Set the flag "path generated" to 0 and return Null
+ //    }
+
     if( !nodes_grid[source_id].node_get_free_position() )
     {
     	printf("invalid start, on an occupied node\n");
@@ -150,9 +165,16 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     {
     	path.clear();//remove the old path
     	//printf("Before a_star : source_id = %d \t goal_id = %d\n\n", source_id, goal_id);
-    	a_star(cvs, source_id, goal_id);
+    	bool path_not_found;
+    	path_not_found = a_star(cvs, source_id, goal_id);
     	//printf("Outside astar\n");
+    	if(path_not_found)
+    	{
+    		path.clear();
+    		return path;
+    	}
     	path = generate_path(source_id, goal_id);
+    	*indice = 0;
     }
     
 
@@ -170,7 +192,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
  * \param[in]  goal node
  * \param[in,out] nodes_grid that we modify throughout the function
  */
-void a_star(CtrlStruct *cvs, int source_id, int goal_id)
+bool a_star(CtrlStruct *cvs, int source_id, int goal_id)
 {
     //initialize the values of the source node
     nodes_grid[source_id].node_set_distance_to_goal(nodes_grid[goal_id].node_get_coordinates());
@@ -190,7 +212,7 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
     if (nodes_grid[source_id].node_get_id() == nodes_grid[goal_id].node_get_id())
     {
     	printf("Already on goal\n");
-        return;
+        return false;
     }
     
     // do algorithm until goal node has been reached
@@ -209,7 +231,7 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
         if(open_paths.size() == 0)
         {
             printf("No nodes available in the queue\n");
-        	exit(EXIT_FAILURE);
+        	return true;
         }
         
         //take the next node with the lowest heuristic function and remove that element for the list
@@ -219,7 +241,7 @@ void a_star(CtrlStruct *cvs, int source_id, int goal_id)
         
         //printf("node id: %d\t heuristic %f\n",next.node_get_id(),next.node_get_heuristic_value());
     }
-    return;
+    return false;
     
 }
 
