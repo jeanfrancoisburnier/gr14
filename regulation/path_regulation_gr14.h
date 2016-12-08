@@ -15,6 +15,11 @@ using namespace std;
 
 NAMESPACE_INIT(ctrlGr14);
 
+
+int get_actual_index_node_path();
+void update_actual_index_node_path(int indice);
+
+
 /*
  * \brief: 	follow a given path
  * \param: 	path 	path composed of the coordinate

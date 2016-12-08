@@ -45,4 +45,5 @@ void free_path_planning(PathPlanning *path);
 void reset_visited_value();
 array<Obstacles, NB_OBSTACLES> initialization_obstacles();
 
+
 #endif

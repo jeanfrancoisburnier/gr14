@@ -21,6 +21,19 @@ static size_t i = 0;
 
 static double last_t = 0;
 
+
+
+int get_actual_index_node_path()
+{
+	return (int) i;
+}
+
+void update_actual_index_node_path(int indice)
+{
+	i = (size_t) indice;
+}
+
+
 /*! \brief follow a given path
  * 
  * \param[in,out] cvs controller main structure
