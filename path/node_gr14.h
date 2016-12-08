@@ -35,6 +35,9 @@
 #define FREE true		//indicates if a node is free
 #define OCCUPIED false	//indicates if a node is occupied
 
+
+#define MAX_NB_NODE_IN_OBST	7 //indicates the maximum number of nodes included in the biggest obstacle
+
 const float square_length = SQUARE_SIZE * 0.001; //conversion into [m] of the dimensions of the grid's squares who've got a Node at their center
 const float peak_x = MAX_X * 0.001;			     //[m]
 const float peak_y = MAX_Y * 0.001;			     //[m]
@@ -42,6 +45,7 @@ const float peak_y = MAX_Y * 0.001;			     //[m]
 //Number of nodes along the x/y axis
 const int NB_X = 2 * MAX_X / SQUARE_SIZE;
 const int NB_Y = 2 * MAX_Y / SQUARE_SIZE;
+
 
 using namespace std; //to be able to use some identifier proper to C++
 
