@@ -7,6 +7,8 @@
 #ifndef _STRATEGY_GR14_H_
 #define _STRATEGY_GR14_H_
 
+#define NB_TARGET 8 //number of target
+
 #include "CtrlStruct_gr14.h"
 
 NAMESPACE_INIT(ctrlGr14);
@@ -55,7 +57,7 @@ typedef struct Strategy
 	int main_state; ///< main state of the strategy
 	uint8_t current_target_id;
 	uint8_t current_point_id;
-	target_t target[8];
+	target_t target[NB_TARGET];
 	start_base_t  start_base;
 	target_base_t target_base;
 	
@@ -64,6 +66,9 @@ typedef struct Strategy
 Strategy* init_strategy();
 void free_strategy(Strategy *strat);
 void main_strategy(CtrlStruct *cvs);
+
+void update_target_status(CtrlStruct *cvs);
+
 
 NAMESPACE_CLOSE();
 

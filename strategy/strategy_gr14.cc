@@ -230,4 +230,43 @@ void main_strategy(CtrlStruct *cvs)
 	}
 }
 
+
+//to call each 1.5 sec to see if the opponent just pass above the target or stopped to take it
+void update_target_status(CtrlStruct *cvs)
+{
+	Strategy *strat;
+	strat  = cvs->strat;
+	
+	static bool was_on_it[8] = {false};
+
+	int n = cvs->inputs->nb_opponents;
+	vector<Obstacles> moving_obstacles = update_moving_obstacles(cvs);//update the posîtion of the opponent robot
+
+	for(int j=0; j<n; j++)
+	{
+		for(int i=0; i<NB_TARGET; i++)
+		{
+			if( (strat->target[i].status == TARGET_STOLEN) || (strat->target[i].status == TARGET_CARRYING) )
+			{
+				if( (strat->target[i].x > moving_obstacles[j].first_corner[X]) && 
+						(strat->target[i].x < moving_obstacles[j].second_corner[X]) && 
+						(strat->target[i].y < moving_obstacles[j].first_corner[Y]) && 
+						(strat->target[i].y > moving_obstacles[j].second_corner[Y]) )
+				{
+					if(was_on_it[i] == false)
+					{
+						was_on_it[i] = true;
+					}
+					else
+					{
+						strat->target[i].status = TARGET_STOLEN;
+						was_on_it[i] = false;
+					}
+				}	
+			}
+		}	
+	}
+}
+
+
 NAMESPACE_CLOSE();
