@@ -58,6 +58,8 @@ typedef struct Strategy
 	target_t target[8];
 	start_base_t  start_base;
 	target_base_t target_base;
+	double last_t_wait;
+	double last_t_path;
 	
 } Strategy;
 

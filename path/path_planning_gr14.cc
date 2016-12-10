@@ -5,6 +5,7 @@
 #include <math.h>
 #include <queue>
 #include "set_output.h"
+#include "strategy_gr14.h"
 
 #include "node_gr14.h"
 
@@ -87,7 +88,7 @@ void init_grid()
 *				If the goal hasn't change from the last call and is still available it is returned as it was before
 *				(we still have the "indice" of where we were before)
 */
-vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos, int *indice)
+vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> source_pos, array<float, 2> goal_pos)
 {
 	bool recompute_needed = true;// we assume that we always have to recompute a new path
 
@@ -95,6 +96,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     int goal_id = node_find_closest_node(goal_pos[X], goal_pos[Y]);
 
     int last_id;
+
 
     //printf("Before correction : source_id = %d \t goal_id = %d\n", source_id, goal_id);
 
@@ -181,7 +183,13 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     		return path;
     	}
     	path = generate_path(source_id, goal_id);
-    	*indice = 0;
+    	cvs->strat->current_point_id = 0;
+
+    	//
+    	static int nb_path = 0;
+    	nb_path++;
+    	set_output(nb_path,"nb_path");
+    	//
     }
     
 

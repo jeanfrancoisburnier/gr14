@@ -68,6 +68,9 @@ Strategy* init_strategy()
 	strat->current_target_id = 0;
 	strat->current_point_id = 0;
 
+	strat->last_t_wait = 0;
+	strat->last_t_path = 0;
+
 	return strat;
 }
 
@@ -95,65 +98,23 @@ void main_strategy(CtrlStruct *cvs)
 	strat  = cvs->strat;
 	inputs = cvs->inputs;
 	target_id = strat->current_target_id;
-
-
-	static double last_t_wait = inputs->t;
-	static double last_t_path = inputs->t;
+	// printf("Target id: %d\n", target_id);
 
 	array<float, 2> source_pos;
 	array<float, 2> goal_pos;
 
-	int indice;
-
 	switch (strat->main_state)
 	{
-		case GAME_STATE_INITIAL:
-			source_pos[0] = /*0.7;//*/cvs->kalman_pos->x;
-			source_pos[1] = /*1.0;//*/cvs->kalman_pos->y;
-			goal_pos[0] = strat->target[0].x;
-			goal_pos[1] = strat->target[0].y;
-			//goal_pos[0] = 0.400;
-			//goal_pos[1] = -1.0;
-
-
-			indice = get_actual_index_node_path();
-			path = path_planning_compute(cvs, source_pos, goal_pos, &indice);
-			update_actual_index_node_path(indice);
-
-			target_id = 0;
-			while(test_if_goal_is_set_on_opponent(cvs, goal_pos))//if goal on an opponent, go to the next target
-			{
-				target_id++;
-				if(target_id == 8)
-				{
-					target_id = 0;
-				}
-				goal_pos[0] = strat->target[target_id].x;
-				goal_pos[1] = strat->target[target_id].y;
-			}
-
-			while(path.empty())//if we're not able to compute a path, we do it again until we got one
-			{
-				indice = get_actual_index_node_path();
-				path = path_planning_compute(cvs, source_pos, goal_pos, &indice); 
-				update_actual_index_node_path(indice);
-			}
-
-
-			strat->main_state = GAME_STATE_GO_TO_GOAL;
-			break;
-
 		case GAME_STATE_COMPUTE_PATH:
-			// reset_current_point_id();
 			source_pos[0] = cvs->kalman_pos->x;
 			source_pos[1] = cvs->kalman_pos->y;
 			if (inputs->nb_targets < 2)
 			{
-				while (target_id <= 7 && strat->target[target_id].status == TARGET_STOLEN)
-				{
-					target_id++;
-				}
-				printf("Going for target %d\n", target_id+1);
+				// while (target_id <= 7 && strat->target[target_id].status == TARGET_STOLEN)
+				// {
+				// 	target_id++;
+				// }
+				// printf("Going for target %d\n", target_id+1);
 				goal_pos[0] = strat->target[target_id].x;
 				goal_pos[1] = strat->target[target_id].y;
 			}
@@ -164,45 +125,42 @@ void main_strategy(CtrlStruct *cvs)
 			}
 
 
-			while(test_if_goal_is_set_on_opponent(cvs, goal_pos))//if goal on an opponent, go to the next target
+			// while(test_if_goal_is_set_on_opponent(cvs, goal_pos))//if goal on an opponent, go to the next target
+			// {
+			// 	target_id++;
+			// 	if(target_id == 8)
+			// 	{
+			// 		target_id = 0;
+			// 	}
+			// 	goal_pos[0] = strat->target[target_id].x;
+			// 	goal_pos[1] = strat->target[target_id].y;
+			// }
+			path = path_planning_compute(cvs, source_pos, goal_pos);
+			if (!path.empty())//if we're not able to compute a path, we do it again until we got one
 			{
-				target_id++;
-				if(target_id == 8)
-				{
-					target_id = 0;
-				}
-				goal_pos[0] = strat->target[target_id].x;
-				goal_pos[1] = strat->target[target_id].y;
+				strat->main_state = GAME_STATE_GO_TO_GOAL;
+				// printf("Size in follow_path: %lu\n", path.size());
+				// for (size_t l = 0; l< path.size(); l++)
+				// {
+				// 	printf("Going for x:%.3f y: %.3f\n", path[l][0], path[l][1]);
+				// }
 			}
-
-
-			indice = get_actual_index_node_path();
-			path = path_planning_compute(cvs, source_pos, goal_pos, &indice);
-			update_actual_index_node_path(indice);
-			while(path.empty())//if we're not able to compute a path, we do it again until we got one
+			else
 			{
-				indice = get_actual_index_node_path();
-				path = path_planning_compute(cvs, source_pos, goal_pos, &indice);
-				update_actual_index_node_path(indice);
+				printf("Path is empty\n");
 			}
-
-			strat->main_state = GAME_STATE_GO_TO_GOAL;
-			last_t_path = inputs->t;
-			// printf("Size in follow_path: %lu\n", path.size());
-			// for (size_t l = 0; l< path.size(); l++)
- 		// 		{
- 		// 			printf("Going for x:%.3f y: %.3f\n", path[l][0], path[l][1]);
- 		// 		}
+			strat->last_t_path = inputs->t;
 			break;
 
 		case GAME_STATE_GO_TO_GOAL:
-			if (inputs->t - last_t_path >= 0.3)
-			 {
+			if (inputs->t - strat->last_t_path >= 0.3)
+			{
+				// printf("=========>We need to compute a path!!!\n");
 			 	strat->main_state = GAME_STATE_COMPUTE_PATH;
 				break;
-			 }
+			}
 			follow_path(cvs, path);
-			last_t_wait = inputs->t;
+			strat->last_t_wait = inputs->t;
 			break;
 
 		case GAME_STATE_D:
@@ -216,9 +174,9 @@ void main_strategy(CtrlStruct *cvs)
 
 		case GAME_STATE_WAIT:
 			speed_regulation(cvs, 0.0, 0.0);
-			if ( inputs->t - last_t_wait > 1.5)
+			if ( inputs->t - strat->last_t_wait > 1.5)
  			{
- 				last_t_wait = inputs->t;
+ 				strat->last_t_wait = inputs->t;
 				cvs->outputs->flag_release = 0;
  				strat->main_state = GAME_STATE_COMPUTE_PATH;
  			}

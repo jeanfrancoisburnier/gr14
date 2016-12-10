@@ -5,10 +5,13 @@
 #include "strategy_gr14.h"
 #include "set_output.h"
 
+#include <math.h>
+
 NAMESPACE_INIT(ctrlGr14);
 
 #define TAU 0.01
-#define RADIUS_TOL 0.0144
+#define RADIUS_TOL 0.001//0.0144
+#define RADIUS_TOL_TAR 0.005
 #define RADIUS_TOL_NEW 0.05
 
 #define ALPHA 	M_PI/32
@@ -72,7 +75,7 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	{
 		K = 1;
 
-		if (pow(vector_x,2)+pow(vector_y,2) < 0.005)
+		if (pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL_TAR)
 		{
 			i++;
 		}
@@ -122,169 +125,178 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	// Filter new speed command
 	r_speed = first_order_filter(cvs->inputs->r_wheel_speed, r_speed, TAU, delta_t);
 	l_speed = first_order_filter(cvs->inputs->l_wheel_speed, l_speed, TAU, delta_t);
-
+	// printf("XPoint: %.3f \t YPoint: %.3f\n", x_point, y_point);
 	// Set new speed
 	speed_regulation(cvs, r_speed, l_speed);
 }
 
 void get_new_speed(float gamma, float *l_speed, float *r_speed)
 {
-	// bool a = 0;
-	// bool sign = 0;
-	// int b = 0;
+	int quadrant = 0;
+	int b = 0;
 
-	// double speed[4] = {10.0,5.0,2.0,-10.0};
+	double speed[4] = {10.0,5.0,2.0,-10.0};
 
-	// if (gamma > 0 && gamma < M_PI/2)
-	// {
-	// 	a = 0;
-	// 	sign = 0;	
-	// }
-	// else if (gamma > M_PI/2 && gamma < M_PI)
-	// {
-	// 	a = 0;
-	// 	sign = 1;
-	// }
-	// else if (gamma > -M_PI && gamma < -M_PI/2)
-	// {
-	// 	a = 1;
-	// 	sign = 1;
-	// }
-	// else if (gamma > -M_PI/2 && gamma < 0)
-	// {
-	// 	a = 1;
-	// 	sign = 0;
-	// }
-	// else
-	// {
-	// 	printf("Error\n");
-	// 	exit(EXIT_FAILURE);
-	// }
-
-	// if (gamma < ALPHA/2)
-	// {
-	// 	b = 1;
-	// }
-	// else if (gamma < ALPHA/2+BETA)
-	// {
-	// 	b = 2;
-	// }
-	// else if (gamma < ALPHA/2+BETA+GAMMA)
-	// {
-	// 	b = 3;
-	// }
-	// else
-	// {
-	// 	b = 4;
-	// }
-
-	// if (a)
-	// {
-	// 	*l_speed = 10;
-	// 	*r_speed = speed[b];
-	// }
-	// else
-	// {
-	// 	*l_speed = speed[b];
-	// 	*r_speed = 10;
-	// }
-
-	// if (sign)
-	// {
-	// 	*l_speed *= -1.0;
-	// 	*r_speed *= -1.0;
-	// }
-
-	// Zone 1
-	if (gamma > -ALPHA/2 && gamma <= ALPHA/2) // point in front of robot
+	if (gamma > 0 && gamma <= M_PI/2)
 	{
-		*l_speed = +10.0*K;
-		*r_speed = +10.0*K;
+		quadrant = 0;	
 	}
-	// Zone 2
-	else if (gamma > ALPHA/2 && gamma <= BETA+ALPHA/2) // point a bit on the left
+	else if (gamma > M_PI/2 && gamma <= M_PI)
 	{
-		*l_speed = +5.0*K;
-		*r_speed = +10.0*K;
+		quadrant = 1;
 	}
-	// Zone 3
-	else if (gamma > BETA+ALPHA/2 && gamma <= GAMMA+BETA+ALPHA/2) // point a bit more on the left
+	else if (gamma >= -M_PI && gamma <= -M_PI/2)
 	{
-		*l_speed = +2.0*K;
-		*r_speed = +10.0*K;
+		quadrant = 3;
 	}
-	else if (gamma > GAMMA+BETA+ALPHA/2 && gamma <= M_PI/2)
+	else if (gamma > -M_PI/2 && gamma <= 0)
 	{
-		*l_speed = -5.0*K;
-		*r_speed = +5.0*K;
-	}
-	// Zone 4
-	else if (gamma > M_PI/2 && gamma <= M_PI-(GAMMA+BETA+ALPHA/2)) // point on the left
-	{
-		*l_speed = +5.0*K;
-		*r_speed = -5.0*K;
-	}
-	// Zone 5
-	else if (gamma > M_PI-(GAMMA+BETA+ALPHA/2) && gamma <= M_PI-(BETA+ALPHA/2)) // point behind on the left
-	{
-		*l_speed = -2.0*K;
-		*r_speed = -10.0*K;
-	}
-	// Zone 6
-	else if (gamma > M_PI-(BETA+ALPHA/2) && gamma <= M_PI-(ALPHA/2)) // point behind on the right
-	{
-		*l_speed = -5.0*K;
-		*r_speed = -10.0*K;
-	}
-	// Zone 7
-	else if (gamma > M_PI-(ALPHA/2) && gamma <= M_PI) // point on the right
-	{
-		*l_speed = -10.0*K;
-		*r_speed = -10.0*K;
-	}
-	// Zone 8
-	else if (gamma > -M_PI && gamma <= -(M_PI-(ALPHA/2))) // point on a bit more the right
-	{
-		*l_speed = -10.0*K;
-		*r_speed = -10.0*K;
-	}
-	// Zone 9
-	else if (gamma > -(M_PI-(ALPHA/2)) && gamma <= -(M_PI-(BETA+ALPHA/2))) // point a bit on the right
-	{
-		*l_speed = -10.0*K;
-		*r_speed = -5.0*K;
-	}
-	// Zone 10
-	else if (gamma > -(M_PI-(BETA+ALPHA/2)) && gamma <= -(M_PI-(GAMMA+BETA+ALPHA/2))) // point a bit on the right
-	{
-		*l_speed = -10.0*K;
-		*r_speed = -2.0*K;
-	}
-	// Zone 11
-	else if (gamma > -(M_PI-(GAMMA+BETA+ALPHA/2)) && gamma <= -M_PI/2)// point a bit on the right
-	{
-		*l_speed = -5.0*K;
-		*r_speed = +5.0*K;
-	}
-	else if (gamma > -M_PI/2 && gamma <= -(GAMMA+BETA+ALPHA/2)) // point a bit on the right
-	{
-		*l_speed = +5.0*K;
-		*r_speed = -5.0*K;
-	}
-	else if (gamma > -(GAMMA+BETA+ALPHA/2) && gamma <= -(BETA+ALPHA/2)) // point a bit on the right
-	{
-		*l_speed = +10.0*K;
-		*r_speed = +2.0*K;
-	}
-	else if (gamma > -(BETA+ALPHA/2) && gamma <= -(ALPHA/2)) // point a bit on the right
-	{
-		*l_speed = +10.0*K;
-		*r_speed = +5.0*K;
+		quadrant = 2;
 	}
 	else
 	{
-		printf("reach single target failure\n");
+		printf("Error\n");
+		return;
 	}
+
+	gamma = fabs(gamma);
+    if (gamma > M_PI/2)
+    {
+        gamma = M_PI - gamma;
+    }
+
+    // printf("gamma is:%.3f\n", gamma);
+	if (gamma < ALPHA/2)
+	{
+		b = 0;
+	}
+	else if (gamma < ALPHA/2+BETA)
+	{
+		b = 1;
+	}
+	else if (gamma < ALPHA/2+BETA+GAMMA)
+	{
+		b = 2;
+	}
+	else
+	{
+		b = 3;
+	}
+
+	if (quadrant >> 1)
+	{
+		// printf("In quandrant 2 or 3\n");
+		*l_speed = 10.0;
+		*r_speed = speed[b];
+	}
+	else
+	{
+		*l_speed = speed[b];
+		*r_speed = 10.0;
+	}
+
+	if (quadrant & 1)
+	{
+		// printf("In quandrant 1 or 3\n");
+		*l_speed *= -1.0;
+		*r_speed *= -1.0;
+	}
+
+	*l_speed *= K;
+	*r_speed *= K;
+
+	// printf("Quadrant: %d, b = %d \t l: %.3f, r: %.3f\n", quadrant, b, *l_speed, *r_speed);
+
+	// // Zone 1
+	// if (gamma > -ALPHA/2 && gamma <= ALPHA/2) // point in front of robot
+	// {
+	// 	*l_speed = +10.0*K;
+	// 	*r_speed = +10.0*K;
+	// }
+	// // Zone 2
+	// else if (gamma > ALPHA/2 && gamma <= BETA+ALPHA/2) // point a bit on the left
+	// {
+	// 	*l_speed = +5.0*K;
+	// 	*r_speed = +10.0*K;
+	// }
+	// // Zone 3
+	// else if (gamma > BETA+ALPHA/2 && gamma <= GAMMA+BETA+ALPHA/2) // point a bit more on the left
+	// {
+	// 	*l_speed = +2.0*K;
+	// 	*r_speed = +10.0*K;
+	// }
+	// else if (gamma > GAMMA+BETA+ALPHA/2 && gamma <= M_PI/2)
+	// {
+	// 	*l_speed = -5.0*K;
+	// 	*r_speed = +5.0*K;
+	// }
+	// // Zone 4
+	// else if (gamma > M_PI/2 && gamma <= M_PI-(GAMMA+BETA+ALPHA/2)) // point on the left
+	// {
+	// 	*l_speed = +5.0*K;
+	// 	*r_speed = -5.0*K;
+	// }
+	// // Zone 5
+	// else if (gamma > M_PI-(GAMMA+BETA+ALPHA/2) && gamma <= M_PI-(BETA+ALPHA/2)) // point behind on the left
+	// {
+	// 	*l_speed = -2.0*K;
+	// 	*r_speed = -10.0*K;
+	// }
+	// // Zone 6
+	// else if (gamma > M_PI-(BETA+ALPHA/2) && gamma <= M_PI-(ALPHA/2)) // point behind on the right
+	// {
+	// 	*l_speed = -5.0*K;
+	// 	*r_speed = -10.0*K;
+	// }
+	// // Zone 7
+	// else if (gamma > M_PI-(ALPHA/2) && gamma <= M_PI) // point on the right
+	// {
+	// 	*l_speed = -10.0*K;
+	// 	*r_speed = -10.0*K;
+	// }
+	// // Zone 8
+	// else if (gamma > -M_PI && gamma <= -(M_PI-(ALPHA/2))) // point on a bit more the right
+	// {
+	// 	*l_speed = -10.0*K;
+	// 	*r_speed = -10.0*K;
+	// }
+	// // Zone 9
+	// else if (gamma > -(M_PI-(ALPHA/2)) && gamma <= -(M_PI-(BETA+ALPHA/2))) // point a bit on the right
+	// {
+	// 	*l_speed = -10.0*K;
+	// 	*r_speed = -5.0*K;
+	// }
+	// // Zone 10
+	// else if (gamma > -(M_PI-(BETA+ALPHA/2)) && gamma <= -(M_PI-(GAMMA+BETA+ALPHA/2))) // point a bit on the right
+	// {
+	// 	*l_speed = -10.0*K;
+	// 	*r_speed = -2.0*K;
+	// }
+	// // Zone 11
+	// else if (gamma > -(M_PI-(GAMMA+BETA+ALPHA/2)) && gamma <= -M_PI/2)// point a bit on the right
+	// {
+	// 	*l_speed = -5.0*K;
+	// 	*r_speed = +5.0*K;
+	// }
+	// else if (gamma > -M_PI/2 && gamma <= -(GAMMA+BETA+ALPHA/2)) // point a bit on the right
+	// {
+	// 	*l_speed = +5.0*K;
+	// 	*r_speed = -5.0*K;
+	// }
+	// else if (gamma > -(GAMMA+BETA+ALPHA/2) && gamma <= -(BETA+ALPHA/2)) // point a bit on the right
+	// {
+	// 	*l_speed = +10.0*K;
+	// 	*r_speed = +2.0*K;
+	// }
+	// else if (gamma > -(BETA+ALPHA/2) && gamma <= -(ALPHA/2)) // point a bit on the right
+	// {
+	// 	*l_speed = +10.0*K;
+	// 	*r_speed = +5.0*K;
+	// }
+	// else
+	// {
+	// 	printf("reach single target failure\n");
+	// }
 }
 
 void reset_current_point_id(void)
