@@ -181,6 +181,8 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     		return path;
     	}
     	path = generate_path(source_id, goal_id);
+    	path.pop_back();
+    	path.push_back(goal_pos);
     	*indice = 0;
     }
     
