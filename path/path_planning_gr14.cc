@@ -183,13 +183,9 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     		return path;
     	}
     	path = generate_path(source_id, goal_id);
+    	path.pop_back();
+    	path.push_back(goal_pos);
     	cvs->strat->current_point_id = 0;
-
-    	//
-    	static int nb_path = 0;
-    	nb_path++;
-    	set_output(nb_path,"nb_path");
-    	//
     }
     
 
