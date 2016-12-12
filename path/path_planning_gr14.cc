@@ -96,7 +96,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     int goal_id = node_find_closest_node(goal_pos[X], goal_pos[Y]);
 
     int last_id;
-
+    printf("ID_FOUND\n");
 
     //printf("Before correction : source_id = %d \t goal_id = %d\n", source_id, goal_id);
 
@@ -119,9 +119,11 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 
     if( !nodes_grid[source_id].node_get_free_position() )
     {
+    	printf("In the FIRST IF\n");
     	printf("invalid start, on an occupied node\n");
     	last_id = source_id;
     	source_id = search_free_neighbours(source_id);
+    	printf("FREE NEIGHBOURS FOUND\n");
     	if(source_id == last_id)//search free neighbours failed (will not happened normally)
     	{
     		printf("Still invalid, path is now empty\n");
@@ -131,7 +133,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     		
 
     }
-    
+    printf("FIRST IF DONE\n");
     if( !nodes_grid[goal_id].node_get_free_position() )
     {
     	printf("invalid goal, on an occupied node\n");
@@ -144,11 +146,11 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     		return path;//path returned is empty
     	}
     }
-  	
+  	printf("SECOND IF DONE\n");
   	static int last_goal_id  = goal_id;//will be useful later to test if we changed the goal 
   	//printf("After correction : source_id = %d \t goal_id = %d\n\n", source_id, goal_id);
     update_grid(cvs);
-
+    printf("GRID UPDATED\n");
     if(last_goal_id == goal_id) //if the goal is the same as last call
     {
     	int id_actual_n;

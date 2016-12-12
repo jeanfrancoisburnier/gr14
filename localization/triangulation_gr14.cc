@@ -28,7 +28,7 @@ void fixed_beacon_positions(int team_id, double *x_beac_1, double *y_beac_1,
 {
 	switch (team_id)
 	{
-		case TEAM_A: //blue team
+		case TEAM_A: // team A
 			*x_beac_1 = 1.062;
 			*y_beac_1 = 1.562;
 

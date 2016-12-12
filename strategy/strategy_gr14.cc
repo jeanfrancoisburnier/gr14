@@ -59,12 +59,6 @@ Strategy* init_strategy()
 	strat->target[7].y = -0.6;
 	strat->target[7].status = TARGET_FREE;
 
-	strat->start_base.x = +0.7;
-	strat->start_base.y = +0.6;
-
-	strat->target_base.x = -0.7;
-	strat->target_base.y = -1.2;
-
 	strat->current_target_id = 0;
 	strat->current_point_id = 0;
 
@@ -98,6 +92,24 @@ void main_strategy(CtrlStruct *cvs)
 	strat  = cvs->strat;
 	inputs = cvs->inputs;
 	target_id = strat->current_target_id;
+
+	if (cvs->team_id == TEAM_A)
+	{
+		strat->start_base.x = +0.7;
+		strat->start_base.y = +0.6;
+
+		strat->target_base.x = -0.7;
+		strat->target_base.y = -1.2;
+
+	}
+	else
+	{
+		strat->start_base.x = +0.7;
+		strat->start_base.y = -0.6;
+
+		strat->target_base.x = -0.7;
+		strat->target_base.y = +1.2;
+	}
 	// printf("Target id: %d\n", target_id);
 
 	array<float, 2> source_pos;
@@ -135,7 +147,9 @@ void main_strategy(CtrlStruct *cvs)
 			// 	goal_pos[0] = strat->target[target_id].x;
 			// 	goal_pos[1] = strat->target[target_id].y;
 			// }
+			printf("COMPUTE_PATH: \t");
 			path = path_planning_compute(cvs, source_pos, goal_pos);
+			printf("OK \n");
 			if (!path.empty())//if we're not able to compute a path, we do it again until we got one
 			{
 				strat->main_state = GAME_STATE_GO_TO_GOAL;

@@ -28,6 +28,12 @@ void calibration(CtrlStruct *cvs)
 	RobotCalibration *calib;
 	KalmanStruct *kalman_pos;
 
+	double r_speed[2][8] = {{+0.0,-5.0,+5.0,-2.356,-5.0,+5.0,+2.356,+0.0},
+							{+0.0,-5.0,+5.0,+2.356,-5.0,+5.0,-2.356,+0.0}};
+
+	double l_speed[2][8] = {{+0.0,-5.0,+5.0,+2.356,-5.0,+5.0,-2.356,+0.0},
+							{+0.0,-5.0,+5.0,-2.356,-5.0,+5.0,+2.356,+0.0}};
+
 	// variables initialization
 	inputs = cvs->inputs;
 	calib  = cvs->calib;
@@ -41,14 +47,14 @@ void calibration(CtrlStruct *cvs)
 	switch (calib->flag)
 	{
 		case CALIB_START: // start calibration
-			speed_regulation(cvs, 0.0, 0.0);
+			speed_regulation(cvs, r_speed[cvs->team_id][0], l_speed[cvs->team_id][0]);
 
 			calib->flag = CALIB_STATE_A; // directly go to state A
 			calib->t_flag = t;
 			break;
 
 		case CALIB_STATE_A: // move backward until contact with wall
-			speed_regulation(cvs, -5.0, -5.0);
+			speed_regulation(cvs, r_speed[cvs->team_id][1], l_speed[cvs->team_id][1]);
 
 			// go to state B after 5 seconds
 			if (t - calib->t_flag > 2.0 || (inputs->u_switch[0] && inputs->u_switch[1]))
@@ -68,15 +74,22 @@ void calibration(CtrlStruct *cvs)
 
 				calib->t_flag = t;
 
-				// Do not forget to take into that the robot could start on yellow side
-				kalman_pos->y = 1.44;
-				kalman_pos->theta = -M_PI/2;
+				if (cvs->team_id == TEAM_A)
+				{
+					kalman_pos->y = 1.44;
+					kalman_pos->theta = -M_PI/2;
+				}
+				else
+				{
+					kalman_pos->y = -1.5;
+					kalman_pos->theta = +M_PI/2;
+				}
 
 			}
 			break;
 
 		case CALIB_STATE_C: // move forward
-			speed_regulation(cvs, 5.0, 5.0);
+			speed_regulation(cvs, r_speed[cvs->team_id][2], l_speed[cvs->team_id][2]);
 
 			// go to state D after 1 second
 			if (t - calib->t_flag > 1.0)
@@ -88,7 +101,7 @@ void calibration(CtrlStruct *cvs)
 			break;
 
 		case CALIB_STATE_D: // rotation of -90°
-			speed_regulation(cvs, -2.356, +2.356);
+			speed_regulation(cvs, r_speed[cvs->team_id][3], l_speed[cvs->team_id][3]);
 
 			// go to state E after 2.5 seconds
 			if (t - calib->t_flag > 2.5)
@@ -100,7 +113,7 @@ void calibration(CtrlStruct *cvs)
 			break;
 
 		case CALIB_STATE_E: // move backward until contact with wall
-			speed_regulation(cvs, -5.0, -5.0);
+			speed_regulation(cvs, r_speed[cvs->team_id][4], l_speed[cvs->team_id][4]);
 
 			 // go to state F after 2 seconds
 			if (t - calib->t_flag > 2.0 || (inputs->u_switch[0] && inputs->u_switch[1]))
@@ -120,14 +133,21 @@ void calibration(CtrlStruct *cvs)
 
 				calib->t_flag = t;
 
-				// Do not forget to take into that the robot could start on yellow side
-				kalman_pos->x = 0.94;
-				kalman_pos->theta = M_PI;
+				if (cvs->team_id == TEAM_A)
+				{
+					kalman_pos->x = +0.94;
+					kalman_pos->theta = M_PI;
+				}
+				else
+				{
+					kalman_pos->x = +1.0;
+					kalman_pos->theta = -M_PI;
+				}
 			}
 			break;
 
 		case CALIB_STATE_G: // move forward
-			speed_regulation(cvs, 5.0, 5.0);
+			speed_regulation(cvs, r_speed[cvs->team_id][5], l_speed[cvs->team_id][5]);
 
 			// go to state H after 2 seconds
 			if (t - calib->t_flag > 1.5)
@@ -139,7 +159,7 @@ void calibration(CtrlStruct *cvs)
 			break;
 
 		case CALIB_STATE_H: // rotation of 90°
-			speed_regulation(cvs, +2.356, -2.356);
+			speed_regulation(cvs, r_speed[cvs->team_id][6], l_speed[cvs->team_id][6]);
 
 			// go to final state after 2.5 seconds
 			if (t - calib->t_flag > 2.5)
@@ -151,7 +171,7 @@ void calibration(CtrlStruct *cvs)
 			break;
 
 		case CALIB_FINISH: // wait before the match is starting
-			speed_regulation(cvs, 0.0, 0.0);
+			speed_regulation(cvs, r_speed[cvs->team_id][7], l_speed[cvs->team_id][7]);
 			cvs->main_state = WAIT_INIT_STATE;
 			break;
 	

@@ -139,7 +139,9 @@ void controller_loop(CtrlStruct *cvs)
 
 		// during game
 		case RUN_STATE:
+			printf("Strategy bug?: ");
 			main_strategy(cvs);
+			printf("No!\n");
 			if (t > 89.0) // 1 second safety
 			{
 				cvs->main_state = STOP_END_STATE;
