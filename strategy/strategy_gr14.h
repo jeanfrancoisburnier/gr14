@@ -19,7 +19,7 @@ typedef enum Target_status
 
 	TARGET_FREE,
 	TARGET_STOLEN,
-	TARGET_CARRYING
+	TARGET_RECOVERED
 
 } Target_status_t;
 

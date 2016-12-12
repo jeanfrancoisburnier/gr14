@@ -39,8 +39,8 @@ Strategy* init_strategy()
 	strat->target[2].y = +0.6;
 	strat->target[2].status = TARGET_FREE;
 
-	strat->target[3].x = +0.2;//+0.25;
-	strat->target[3].y = +1.2;//+1.25;
+	strat->target[3].x = +0.25;
+	strat->target[3].y = +1.25;
 	strat->target[3].status = TARGET_FREE;
 
 	strat->target[4].x = +0.1;
@@ -51,8 +51,8 @@ Strategy* init_strategy()
 	strat->target[5].y = -0.6;
 	strat->target[5].status = TARGET_FREE;
 
-	strat->target[6].x = +0.2;//0.25;
-	strat->target[6].y = -1.3;//-1.25;
+	strat->target[6].x = +0.25;
+	strat->target[6].y = -1.25;
 	strat->target[6].status = TARGET_FREE;
 
 	strat->target[7].x = -0.4;
@@ -115,8 +115,8 @@ void main_strategy(CtrlStruct *cvs)
 				// 	target_id++;
 				// }
 				// printf("Going for target %d\n", target_id+1);
-				goal_pos[0] = strat->target[target_id].x;
-				goal_pos[1] = strat->target[target_id].y;
+				goal_pos[0] = strat->target[target_id % 8].x;
+				goal_pos[1] = strat->target[target_id % 8].y;
 			}
 			else
 			{

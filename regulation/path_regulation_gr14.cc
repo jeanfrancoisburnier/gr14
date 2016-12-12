@@ -4,14 +4,15 @@
 #include "init_pos_gr14.h"
 #include "strategy_gr14.h"
 #include "set_output.h"
+#include "ColorSensor.hh"
 
 #include <math.h>
 
 NAMESPACE_INIT(ctrlGr14);
 
 #define TAU 0.01
-#define RADIUS_TOL 0.001//0.0144
-#define RADIUS_TOL_TAR 0.005
+#define RADIUS_TOL 0.0144
+#define RADIUS_TOL_TAR 0.003
 #define RADIUS_TOL_NEW 0.05
 
 #define ALPHA 	M_PI/32
@@ -20,22 +21,7 @@ NAMESPACE_INIT(ctrlGr14);
 
 static int K = 3;
 
-static size_t i = 0;
-
 static double last_t = 0;
-
-
-
-int get_actual_index_node_path()
-{
-	return (int) i;
-}
-
-void update_actual_index_node_path(int indice)
-{
-	i = (size_t) indice;
-}
-
 
 /*! \brief follow a given path
  * 
@@ -44,7 +30,10 @@ void update_actual_index_node_path(int indice)
 void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 {
 	// Robot current position
-	KalmanStruct *kalman_pos = cvs->kalman_pos;
+	KalmanStruct* kalman_pos = cvs->kalman_pos;
+	Strategy* strat = cvs->strat;
+
+	size_t i = strat->current_point_id;
 
 	// Position of the next point to reach
 	float x_point = path[i][0];
@@ -59,7 +48,7 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	float vector_x = x_point-kalman_pos->x;
 	float vector_y = y_point-kalman_pos->y;
 		
-	if (i+1 < path.size())
+	if (i < path.size() - 1)
 	{
 		K = 3;
 
@@ -68,51 +57,38 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 			set_output(path[i][0],"x_path");
 			set_output(path[i][1],"y_path");
 			set_output(path.size(),"path_size");
-			i++;
+			strat->current_point_id++;
 		}
 	}
-	else if (i+1 == path.size() && pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL_NEW)
+	else if (i == path.size() - 1 && pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL_NEW)
 	{
 		K = 1;
 
 		if (pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL_TAR)
 		{
-			i++;
-		}
-	}
-	// Need to check this ....
-	if (i >= path.size())
-	{
-		// printf("Entering condition 1\n");
-		// printf("Color seen: %d\n", cvs->inputs->color_seen);
-		i = 0;
-		if (cvs->strat->current_target_id <= 7)
-		{
-			// printf("Entering condition 2\n");
+			printf("i is:%lu and size is: %lu\n",i, path.size());
+			strat->current_point_id = 0;
+			if (cvs->strat->current_target_id <= 7)
+			{
 
-			if (cvs->inputs->color_seen == 4)
-			{
-				// printf("Entering condition 3\n");
-				cvs->outputs->flag_release = 1;
-				printf("Target Released!\n");
-				// cvs->outputs->flag_release = 0;
+				if (cvs->inputs->color_seen == MAP_BLUE)
+				{
+					cvs->outputs->flag_release = 1;
+					printf("Target Released!\n");
+				}
+				else
+				{
+					strat->current_target_id = (strat->current_target_id + 1)%8;
+					printf("Target Reached! Robots is at x: %.3f \t y: %.3f\n", kalman_pos->x, kalman_pos->y);
+					printf("Deltax: %.3f \t Deltay: %.3f\n", vector_x, vector_y);
+					printf("XPoint: %.3f \t YPoint: %.3f\n", x_point, y_point);
+					printf("Distance2: %.3f\n", pow(vector_x,2)+pow(vector_y,2));
+				}
+				strat->main_state = GAME_STATE_WAIT;
 			}
-			else
-			{
-				cvs->strat->current_target_id++;
-				printf("Target Reached! Robots is at x: %.3f \t y: %.3f\n", kalman_pos->x, kalman_pos->y);
-				printf("Deltax: %.3f \t Deltay: %.3f\n", vector_x, vector_y);
-				printf("XPoint: %.3f \t YPoint: %.3f\n", x_point, y_point);
-			}
-			cvs->strat->main_state = GAME_STATE_WAIT;
+			return;
 		}
-		else
-		{
-			cvs->strat->main_state = GAME_STATE_E;
-		}
-		return;
 	}
-	// ...Until here
 
 	float beta  = atan2(vector_y,vector_x); // absolute angle of target
 	float gamma = limit_angle(beta-kalman_pos->theta); // relative angle of target with robot
@@ -297,12 +273,6 @@ void get_new_speed(float gamma, float *l_speed, float *r_speed)
 	// {
 	// 	printf("reach single target failure\n");
 	// }
-}
-
-void reset_current_point_id(void)
-{
-	i = 0;
-	return;
 }
 
 NAMESPACE_CLOSE();
