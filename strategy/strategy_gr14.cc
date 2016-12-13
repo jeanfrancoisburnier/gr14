@@ -71,6 +71,11 @@ Strategy* init_strategy()
 	strat->last_t_wait = 0;
 	strat->last_t_path = 0;
 
+	strat->carrying_target_id[0] = -1;
+	strat->carrying_target_id[1] = -1;
+
+	strat->prev_nb_target_carrying = 0;
+
 	return strat;
 }
 
@@ -106,24 +111,36 @@ void main_strategy(CtrlStruct *cvs)
 	switch (strat->main_state)
 	{
 		case GAME_STATE_COMPUTE_PATH:
+			cvs->outputs->flag_release = 0;
 			source_pos[0] = cvs->kalman_pos->x;
 			source_pos[1] = cvs->kalman_pos->y;
 			if (inputs->nb_targets < 2)
 			{
-				// while (target_id <= 7 && strat->target[target_id].status == TARGET_STOLEN)
-				// {
-				// 	target_id++;
-				// }
-				// printf("Going for target %d\n", target_id+1);
+				strat->status = STRAT_TARGET;
+				int k = 0;
+				while (strat->target[target_id].status == TARGET_WON)
+				{
+					if (++k > 8)
+					{
+						printf("END GAME at t = %.2f!\n", cvs->inputs->t);
+						strat->main_state = GAME_STATE_E;
+						return;
+					}
+					strat->current_target_id = (strat->current_target_id + 1) % 8;
+					target_id = strat->current_target_id;
+				}
 				goal_pos[0] = strat->target[target_id % 8].x;
 				goal_pos[1] = strat->target[target_id % 8].y;
+				printf("Going from x: %.3f y: %.3f\n", source_pos[0], source_pos[1]);
+				printf("Going for target %d at x: %.3f y: %.3f\n", target_id+1, goal_pos[0], goal_pos[1]);
+
 			}
 			else
 			{
+				strat->status = STRAT_SCORING;
 				goal_pos[0] = strat->target_base.x;
 				goal_pos[1] = strat->target_base.y;
 			}
-
 
 			// while(test_if_goal_is_set_on_opponent(cvs, goal_pos))//if goal on an opponent, go to the next target
 			// {
@@ -177,7 +194,21 @@ void main_strategy(CtrlStruct *cvs)
 			if ( inputs->t - strat->last_t_wait > 1.5)
  			{
  				strat->last_t_wait = inputs->t;
-				cvs->outputs->flag_release = 0;
+ 				if (strat->prev_nb_target_carrying + 1 == inputs->nb_targets)
+ 				{
+ 					// Target picked up
+ 					strat->prev_nb_target_carrying++;
+ 					if (inputs->nb_targets == 1)
+					{
+						strat->carrying_target_id[0] = strat->current_target_id;
+					}
+					else
+					{
+						strat->carrying_target_id[1] = strat->current_target_id;
+					}
+					strat->current_target_id = (strat->current_target_id + 1)%8;
+					strat->current_point_id = 0;
+ 				}
  				strat->main_state = GAME_STATE_COMPUTE_PATH;
  			}
 			break;

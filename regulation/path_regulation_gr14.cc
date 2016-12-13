@@ -36,8 +36,8 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	size_t i = strat->current_point_id;
 
 	// Position of the next point to reach
-	float x_point = path[i][0];
-	float y_point = path[i][1];
+	double x_point = path[i][0];
+	double y_point = path[i][1];
 
 	// printf("Going for the point x: %.3f \t y: %.3f\n", x_point, y_point);
 
@@ -45,8 +45,8 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	last_t = cvs->inputs->t;
 
 	// Vector from robot to target
-	float vector_x = x_point-kalman_pos->x;
-	float vector_y = y_point-kalman_pos->y;
+	double vector_x = x_point-kalman_pos->x;
+	double vector_y = y_point-kalman_pos->y;
 		
 	if (i < path.size() - 1)
 	{
@@ -66,35 +66,41 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 
 		if (pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL_TAR)
 		{
-			printf("i is:%lu and size is: %lu\n",i, path.size());
-			strat->current_point_id = 0;
-			if (cvs->strat->current_target_id <= 7)
+			if (strat->status == STRAT_TARGET)
 			{
-
-				if (cvs->inputs->color_seen == MAP_BLUE)
-				{
-					cvs->outputs->flag_release = 1;
-					printf("Target Released!\n");
-				}
-				else
-				{
-					strat->current_target_id = (strat->current_target_id + 1)%8;
-					printf("Target Reached! Robots is at x: %.3f \t y: %.3f\n", kalman_pos->x, kalman_pos->y);
-					printf("Deltax: %.3f \t Deltay: %.3f\n", vector_x, vector_y);
-					printf("XPoint: %.3f \t YPoint: %.3f\n", x_point, y_point);
-					printf("Distance2: %.3f\n", pow(vector_x,2)+pow(vector_y,2));
-				}
+				printf("Target Reached! Robots is at x: %.3f \t y: %.3f\n", kalman_pos->x, kalman_pos->y);
+				printf("Deltax: %.3f \t Deltay: %.3f\n", vector_x, vector_y);
+				printf("XPoint: %.3f \t YPoint: %.3f\n", x_point, y_point);
+				printf("Distance2: %.3f\n", pow(vector_x,2)+pow(vector_y,2));
 				strat->main_state = GAME_STATE_WAIT;
+			}
+			else if (strat->status == STRAT_SCORING)
+			{
+				strat->current_point_id = 0;
+				printf("Target Released!\n");
+				cvs->outputs->flag_release = 1;
+
+				strat->target[strat->carrying_target_id[0]].status = TARGET_WON;
+				strat->target[strat->carrying_target_id[1]].status = TARGET_WON;
+				printf("WON TARGET: %d and %d\n", strat->carrying_target_id[0], strat->carrying_target_id[1]);
+				strat->carrying_target_id[0] = -1;
+				strat->carrying_target_id[1] = -1;
+				strat->prev_nb_target_carrying = 0;
+				strat->main_state = GAME_STATE_COMPUTE_PATH;
+			}
+			else if (strat->status == STRAT_RECOVERING)
+			{
+				//
 			}
 			return;
 		}
 	}
 
-	float beta  = atan2(vector_y,vector_x); // absolute angle of target
-	float gamma = limit_angle(beta-kalman_pos->theta); // relative angle of target with robot
+	double beta  = atan2(vector_y,vector_x); // absolute angle of target
+	double gamma = limit_angle(beta-kalman_pos->theta); // relative angle of target with robot
 
-	float l_speed = 0;
-	float r_speed = 0;
+	double l_speed = 0;
+	double r_speed = 0;
 
 	get_new_speed(gamma, &l_speed, &r_speed);
 
@@ -106,12 +112,13 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	speed_regulation(cvs, r_speed, l_speed);
 }
 
-void get_new_speed(float gamma, float *l_speed, float *r_speed)
+void get_new_speed(double gamma, double *l_speed, double *r_speed)
 {
 	int quadrant = 0;
 	int b = 0;
 
-	double speed[4] = {10.0,5.0,2.0,-10.0};
+	double speed_a[4] = {+10.0,+5.0,+2.0,-5.0};
+	double speed_b[4] = {+10.0,+10.0,+10.0,+5.0};
 
 	if (gamma > 0 && gamma <= M_PI/2)
 	{
@@ -162,13 +169,13 @@ void get_new_speed(float gamma, float *l_speed, float *r_speed)
 	if (quadrant >> 1)
 	{
 		// printf("In quandrant 2 or 3\n");
-		*l_speed = 10.0;
-		*r_speed = speed[b];
+		*l_speed = speed_b[b];
+		*r_speed = speed_a[b];
 	}
 	else
 	{
-		*l_speed = speed[b];
-		*r_speed = 10.0;
+		*l_speed = speed_a[b];
+		*r_speed = speed_b[b];
 	}
 
 	if (quadrant & 1)
