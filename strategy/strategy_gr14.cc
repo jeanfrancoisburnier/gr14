@@ -119,7 +119,7 @@ void main_strategy(CtrlStruct *cvs)
 			{
 				strat->status = STRAT_TARGET;
 				int k = 0;
-				while (strat->target[target_id].status == TARGET_WON)
+				while (strat->target[target_id].status == TARGET_WON || strat->target[target_id].status == TARGET_STOLEN)
 				{
 					if (++k > 8)
 					{
@@ -160,7 +160,7 @@ void main_strategy(CtrlStruct *cvs)
 			break;
 
 		case GAME_STATE_GO_TO_GOAL:
-			if (inputs->t - strat->last_t_path >= 0.3)
+			if (inputs->t - strat->last_t_path >= 0.1)
 			{
 			 	strat->main_state = GAME_STATE_COMPUTE_PATH;
 				break;
@@ -195,7 +195,7 @@ void main_strategy(CtrlStruct *cvs)
 					{
 						strat->carrying_target_id[1] = strat->current_target_id;
 					}
-					strat->current_target_id = (strat->current_target_id + 1)%8;
+					update_current_target_id(strat);
 					strat->current_point_id = 0;
  				}
  				strat->main_state = GAME_STATE_COMPUTE_PATH;
