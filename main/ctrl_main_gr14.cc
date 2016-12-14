@@ -96,9 +96,9 @@ void controller_loop(CtrlStruct *cvs)
 	// opponents position
 	opponents_tower(cvs);
 
-	set_plot(cvs->kalman_pos->x,"x");
-	set_plot(cvs->kalman_pos->y,"y");
-	set_plot(cvs->kalman_pos->theta,"t");
+	//set_plot(cvs->kalman_pos->x,"x");
+	//set_plot(cvs->kalman_pos->y,"y");
+	//set_plot(cvs->kalman_pos->theta,"t");
 
 	// set_plot(inputs->r_wheel_speed,"r_wheel_speed");
 	// set_plot(inputs->l_wheel_speed,"l_wheel_speed");
@@ -114,6 +114,9 @@ void controller_loop(CtrlStruct *cvs)
 	// printf("x: %f\t", cvs->kalman_pos->x);
 	// printf("y: %f\t", cvs->kalman_pos->y);
 	// printf("t: %f\n", cvs->kalman_pos->theta*180/M_PI);
+
+	set_plot(cvs->inputs->l_wheel_speed,"l_speed");
+	set_plot(cvs->inputs->l_wheel_speed,"r_speed");
 
 
 	// tower control

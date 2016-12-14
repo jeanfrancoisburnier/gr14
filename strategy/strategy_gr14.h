@@ -11,10 +11,17 @@
 
 #include "CtrlStruct_gr14.h"
 
+#include <array>
+#include <vector>
+using namespace std; //to be able to use array
+
+#define FORWARD true;
+#define BACKWARD false;
+
 NAMESPACE_INIT(ctrlGr14);
 
 /// 'main_state' states (adapt with your own states)
-enum {GAME_STATE_INITIAL, GAME_STATE_COMPUTE_PATH, GAME_STATE_GO_TO_GOAL, GAME_STATE_D, GAME_STATE_E, GAME_STATE_WAIT};
+enum {GAME_STATE_INITIAL, GAME_STATE_COMPUTE_PATH, GAME_STATE_GO_TO_GOAL, GAME_STATE_D, GAME_STATE_E, GAME_STATE_WAIT, GAME_STATE_BLOCKED};
 
 typedef enum Strategy_status
 {
@@ -84,6 +91,7 @@ void free_strategy(Strategy *strat);
 void main_strategy(CtrlStruct *cvs);
 
 void update_target_status(CtrlStruct *cvs);
+void deblock_robot(CtrlStruct *cvs, vector<array<float,2> > path, bool orient);
 
 
 NAMESPACE_CLOSE();
