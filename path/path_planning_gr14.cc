@@ -9,7 +9,7 @@
 
 #include "node_gr14.h"
 
-
+#define OBSTACLE_MARGIN 0.20;
 
 const int NB_NODES = NB_X * NB_Y;
 
@@ -18,7 +18,7 @@ using namespace std; //to be able to use array
 NAMESPACE_INIT(ctrlGr14);
 
 /*! \brief initialize the path-planning algorithm (memory allocated)
- * 
+ *
  * \param[in,out] path path-planning main structure
  */
 
@@ -49,14 +49,14 @@ void init_grid()
 	{
 		y_node = peak_y - (id_n/NB_X) * square_length - square_length/2;
 		//warning to understand this formula be cautious that id_n/NB_X is an operation between (int)
-		
+
 		x_node = -peak_x + square_length/2 + (id_n%NB_X) * square_length;
 		//warning to understand this formula be cautious that id_n%NB_X is an operation between (int)
 
 		bool state_pos = FREE;
 		for(int j=0; j<NB_FIXED_OBSTACLES; j++)
 		{
-			if( (x_node > list_obst[j].first_corner[X]) && (x_node < list_obst[j].second_corner[X]) 
+			if( (x_node > list_obst[j].first_corner[X]) && (x_node < list_obst[j].second_corner[X])
 				&& (y_node < list_obst[j].first_corner[Y]) && (y_node > list_obst[j].second_corner[Y]) ) //if the Node is on an obstacle --> occupied
 			{
 				state_pos = OCCUPIED;
@@ -100,7 +100,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 
     //printf("Before correction : source_id = %d \t goal_id = %d\n", source_id, goal_id);
 
-    static vector<array<float,2> > path; 
+    static vector<array<float,2> > path;
 
 // 	   if(goal_id >= nodes_grid.size() || goal_id < 0 )
  //    {
@@ -109,7 +109,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
  //        //Set the flag "path generated" to 0 and return Null
  //    }
 
-    
+
  //    if( source_id >= nodes_grid.size() || source_id < 0)
  //    {
  //        printf("invalid start, outside the map\n");
@@ -128,10 +128,10 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     		path.clear();
     		return path;//path returned is empty
     	}
-    		
+
 
     }
-    
+
     if( !nodes_grid[goal_id].node_get_free_position() )
     {
     	printf("invalid goal, on an occupied node\n");
@@ -144,8 +144,8 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     		return path;//path returned is empty
     	}
     }
-  	
-  	static int last_goal_id  = goal_id;//will be useful later to test if we changed the goal 
+
+  	static int last_goal_id  = goal_id;//will be useful later to test if we changed the goal
   	//printf("After correction : source_id = %d \t goal_id = %d\n\n", source_id, goal_id);
     update_grid(cvs);
 
@@ -175,7 +175,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     	path.clear();//remove the old path
     	bool path_not_found;
     	path_not_found = a_star(cvs, source_id, goal_id);
-    	
+
     	if(path_not_found)
     	{
     		printf("path not found", path_not_found);
@@ -187,12 +187,12 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     	path.push_back(goal_pos);
     	cvs->strat->current_point_id = 0;
     }
-    
+
 
     last_goal_id = goal_id;
 
     //Set the flag "path generated" to 1 and return path
-    return path; 
+    return path;
 }
 
 
@@ -209,50 +209,50 @@ bool a_star(CtrlStruct *cvs, int source_id, int goal_id)
     nodes_grid[source_id].node_set_distance_to_start(0);
     nodes_grid[source_id].node_set_heuristic_value(nodes_grid[source_id].node_get_distance_to_goal());
     nodes_grid[source_id].node_set_visited(true);
-    
+
     //priority queue to sort nodes depending on the value of the heuristic function
     priority_queue<Node,vector<Node>,compare_heuristic > open_paths;
-    
+
     // list of noe id that are reached by the current node and have not been visited yet
     // intermediate node
     vector<int> modified_ids;
     Node next = nodes_grid[source_id];
-    
+
     //check if source and goal node are different
     if (nodes_grid[source_id].node_get_id() == nodes_grid[goal_id].node_get_id())
     {
     	printf("Already on goal\n");
         return false;
     }
-    
+
     // do algorithm until goal node has been reached
     while (next.node_get_id() != nodes_grid[goal_id].node_get_id())
     {
         //find the ids of the nodes that have not been visited yet
         modified_ids = next.scan_edges(nodes_grid,nodes_grid[goal_id]);
-        
+
         //add to the queue the new nodes
         for(auto id:modified_ids)
         {
             open_paths.push(nodes_grid[id]);
         }
-        
+
         //check if there are new nodes available in the queue and if not return an error
         if(open_paths.size() == 0)
         {
             printf("No nodes available in the queue\n");
         	return true;
         }
-        
+
         //take the next node with the lowest heuristic function and remove that element for the list
         next = open_paths.top();
         //printf("%d\n",next.node_get_id());
         open_paths.pop();
-        
+
         //printf("node id: %d\t heuristic %f\n",next.node_get_id(),next.node_get_heuristic_value());
     }
     return false;
-    
+
 }
 
 
@@ -263,13 +263,13 @@ bool a_star(CtrlStruct *cvs, int source_id, int goal_id)
 vector<array<float,2> > generate_path(int source_id, int goal_id)
 {
     vector<array<float,2> > path ;
-        
+
     int next_id = goal_id;
-    
+
     // insert the goal in the vector
     path.insert(path.begin(),nodes_grid[goal_id].node_get_coordinates());
-    
-    //add all the nodes coordinates of the path previously computed with a* using the previous_id each time 
+
+    //add all the nodes coordinates of the path previously computed with a* using the previous_id each time
     while (next_id != source_id)
     {
         next_id = nodes_grid[next_id].node_get_previous_node_id();
@@ -280,7 +280,7 @@ vector<array<float,2> > generate_path(int source_id, int goal_id)
 
 
 /*! \brief close the path-planning algorithm (memory released)
- * 
+ *
  * \param[in,out] path path-planning main structure
  */
 void free_path_planning(PathPlanning *path)
@@ -295,9 +295,9 @@ void free_path_planning(PathPlanning *path)
 
 
 
-//This function return the id of a free node close to the occupied one 
+//This function return the id of a free node close to the occupied one
 //We first search for direct neighbours but if they are also occupied we extend
-//serach each time for direct neighbours even if there is some redundancy ... 
+//serach each time for direct neighbours even if there is some redundancy ...
 //(we can do an expension of 3 squares)
 int search_free_neighbours(int id_occ)
 {
@@ -338,7 +338,7 @@ int search_free_neighbours(int id_occ)
 				if( edges_node_occ[k].edge_get_weight() != 0 )//if we do not search for neighbours outside the map
 				{
 					id_test = edges_node_occ[k].edge_get_id_connected_node();
-					path_non_blocked.push_back(id_test); 
+					path_non_blocked.push_back(id_test);
 
 					if( nodes_grid[id_test].node_get_free_position() == FREE )//if the neighbor is free
 					{
@@ -353,7 +353,7 @@ int search_free_neighbours(int id_occ)
 	}
 
 	return id_occ;//if it didn't find a free id, we return the actual occupied node (it will be considered as an error after)
-	
+
 }
 
 
@@ -403,10 +403,10 @@ void reset_value_grid(vector<Obstacles> moving_obstacles)
 					array<float, 2> pos_node = nodes_grid[i].node_get_coordinates();
 					x_node = pos_node[X];
 					y_node = pos_node[Y];
-					
+
 					for(int j=0; j<nb_mov_obst; j++)
 					{
-						if( (x_node > moving_obstacles[j].first_corner[X]) && (x_node < moving_obstacles[j].second_corner[X]) 
+						if( (x_node > moving_obstacles[j].first_corner[X]) && (x_node < moving_obstacles[j].second_corner[X])
 							&& (y_node < moving_obstacles[j].first_corner[Y]) && (y_node > moving_obstacles[j].second_corner[Y]) )
 							//if the Node is on an opponent --> occupied
 						{
@@ -415,7 +415,7 @@ void reset_value_grid(vector<Obstacles> moving_obstacles)
 						}
 						else//if the Node is not on an obstacle --> Free
 						{
-							state_pos = FREE; 
+							state_pos = FREE;
 						}
 					}
 
@@ -426,11 +426,11 @@ void reset_value_grid(vector<Obstacles> moving_obstacles)
 					nodes_grid[i].node_set_free_position(OCCUPIED);
 					break;
 				}
-				
+
 			}
 		}
 	}
-	
+
 }
 
 
@@ -447,11 +447,11 @@ vector<Obstacles> update_moving_obstacles(CtrlStruct *cvs)
  		oppon.first_corner[X] = cvs->opp_pos->x[i] - ROBOT_SIZE/2 - 2*SECURITY_RANGE;
 		oppon.first_corner[Y] =  cvs->opp_pos->y[i] + ROBOT_SIZE/2 + 2*SECURITY_RANGE;
 		oppon.second_corner[X] =  cvs->opp_pos->x[i] + ROBOT_SIZE/2 + 2*SECURITY_RANGE;
-		oppon.second_corner[Y] =  cvs->opp_pos->y[i] - ROBOT_SIZE/2 - 2*SECURITY_RANGE; 
+		oppon.second_corner[Y] =  cvs->opp_pos->y[i] - ROBOT_SIZE/2 - 2*SECURITY_RANGE;
 
 		moving_obstacles.push_back(oppon);
  	}
-	
+
 	return moving_obstacles;
 }
 
@@ -470,12 +470,12 @@ bool test_if_goal_is_set_on_opponent(CtrlStruct *cvs, array<float, 2> goal_pos)
 
 	for(int j=0; j<nb_mov_obst; j++)
 	{
-		if( (x_node > moving_obstacles[j].first_corner[X]) && (x_node < moving_obstacles[j].second_corner[X]) 
+		if( (x_node > moving_obstacles[j].first_corner[X]) && (x_node < moving_obstacles[j].second_corner[X])
 			&& (y_node < moving_obstacles[j].first_corner[Y]) && (y_node > moving_obstacles[j].second_corner[Y]) )
 		{
 			return true;
 		}
-		else 
+		else
 		{
 			return false;
 		}
@@ -490,44 +490,44 @@ array<Obstacles, NB_FIXED_OBSTACLES> initialization_fixed_obstacles()
 {
 	array<Obstacles, NB_FIXED_OBSTACLES> list_obstacles;
 	list_obstacles[0].first_corner[X] = -0.850;
-	list_obstacles[0].first_corner[Y] = 1.0;
-	list_obstacles[0].second_corner[X] = -0.350;
-	list_obstacles[0].second_corner[Y] = 0.680;
+	list_obstacles[0].first_corner[Y] = 0.850 + OBSTACLE_MARGIN;
+	list_obstacles[0].second_corner[X] = -0.500 + OBSTACLE_MARGIN;
+	list_obstacles[0].second_corner[Y] = 0.830 - OBSTACLE_MARGIN;
 
-	list_obstacles[1].first_corner[X] = 0.330;
+	list_obstacles[1].first_corner[X] = 0.480 - OBSTACLE_MARGIN;
 	list_obstacles[1].first_corner[Y] = 1.350;
-	list_obstacles[1].second_corner[X] = 0.650;
-	list_obstacles[1].second_corner[Y] = 0.850;
+	list_obstacles[1].second_corner[X] = 0.500 + OBSTACLE_MARGIN;
+	list_obstacles[1].second_corner[Y] = 1.0 - OBSTACLE_MARGIN;
 
-	list_obstacles[2].first_corner[X] = 0.330;
-	list_obstacles[2].first_corner[Y] = -0.850;
-	list_obstacles[2].second_corner[X] = 0.650;
+	list_obstacles[2].first_corner[X] = 0.480 - OBSTACLE_MARGIN;
+	list_obstacles[2].first_corner[Y] = -1.0 + OBSTACLE_MARGIN;
+	list_obstacles[2].second_corner[X] = 0.500 + OBSTACLE_MARGIN;
 	list_obstacles[2].second_corner[Y] = -1.350;
 
 	list_obstacles[3].first_corner[X] = -0.850;
-	list_obstacles[3].first_corner[Y] = -0.680;
-	list_obstacles[3].second_corner[X] = -0.350;
-	list_obstacles[3].second_corner[Y] = -1.0;
+	list_obstacles[3].first_corner[Y] = -0.830 + OBSTACLE_MARGIN;
+	list_obstacles[3].second_corner[X] = -0.500 + OBSTACLE_MARGIN;
+	list_obstacles[3].second_corner[Y] = -0.850 - OBSTACLE_MARGIN;
 
-	list_obstacles[4].first_corner[X] = -0.350;
-	list_obstacles[4].first_corner[Y] = 0.550;
-	list_obstacles[4].second_corner[X] = 0.350;
-	list_obstacles[4].second_corner[Y] = 0.150;
+	list_obstacles[4].first_corner[X] = -0.200 - OBSTACLE_MARGIN;
+	list_obstacles[4].first_corner[Y] = 0.400 + OBSTACLE_MARGIN;
+	list_obstacles[4].second_corner[X] = 0.200 + OBSTACLE_MARGIN;
+	list_obstacles[4].second_corner[Y] = 0.300 - OBSTACLE_MARGIN;
 
-	list_obstacles[5].first_corner[X] = -0.350;
-	list_obstacles[5].first_corner[Y] = 0.150;
-	list_obstacles[5].second_corner[X] = 0.050;
-	list_obstacles[5].second_corner[Y] = -0.150;
+	list_obstacles[5].first_corner[X] = -0.200 - OBSTACLE_MARGIN;
+	list_obstacles[5].first_corner[Y] = 0.300 + OBSTACLE_MARGIN;
+	list_obstacles[5].second_corner[X] = -0.100 + OBSTACLE_MARGIN;
+	list_obstacles[5].second_corner[Y] = -0.300 - OBSTACLE_MARGIN;
 
-	list_obstacles[6].first_corner[X] = -0.650;
-	list_obstacles[6].first_corner[Y] = 0.250;
-	list_obstacles[6].second_corner[X] = -0.350;
-	list_obstacles[6].second_corner[Y] = -0.250;
+	list_obstacles[6].first_corner[X] = -0.500 - OBSTACLE_MARGIN;
+	list_obstacles[6].first_corner[Y] = 0.100 + OBSTACLE_MARGIN;
+	list_obstacles[6].second_corner[X] = -0.200 + OBSTACLE_MARGIN;
+	list_obstacles[6].second_corner[Y] = -0.100 - OBSTACLE_MARGIN;
 
-	list_obstacles[7].first_corner[X] = -0.350;
-	list_obstacles[7].first_corner[Y] = -0.150;
-	list_obstacles[7].second_corner[X] = 0.350;
-	list_obstacles[7].second_corner[Y] = -0.550;
+	list_obstacles[7].first_corner[X] = -0.200 - OBSTACLE_MARGIN;
+	list_obstacles[7].first_corner[Y] = -0.300 + OBSTACLE_MARGIN;
+	list_obstacles[7].second_corner[X] = 0.200 + OBSTACLE_MARGIN;
+	list_obstacles[7].second_corner[Y] = -0.400 - OBSTACLE_MARGIN;
 
 	return list_obstacles;
 }
