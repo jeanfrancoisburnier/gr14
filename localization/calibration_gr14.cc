@@ -13,9 +13,9 @@ NAMESPACE_INIT(ctrlGr14);
 enum {CALIB_START, CALIB_STATE_A, CALIB_STATE_B, CALIB_STATE_C, CALIB_STATE_D, CALIB_STATE_E, CALIB_STATE_F, CALIB_STATE_G, CALIB_STATE_H, CALIB_FINISH};
 
 /*! \brief calibration of the robot to calibrate its position
- * 
+ *
  * \param[in,out] cvs controller main structure
- * 
+ *
  * This FSM can be adapted, depending on the map and on the robots initial position.
  */
 void calibration(CtrlStruct *cvs)
@@ -39,7 +39,7 @@ void calibration(CtrlStruct *cvs)
 	calib  = cvs->calib;
 
 	kalman_pos = cvs->kalman_pos;
-	
+
 	t = inputs->t;
 	team_id = cvs->team_id;
 
@@ -81,7 +81,7 @@ void calibration(CtrlStruct *cvs)
 				}
 				else
 				{
-					kalman_pos->y = -1.5;
+					kalman_pos->y = -1.44;
 					kalman_pos->theta = +M_PI/2;
 				}
 
@@ -140,7 +140,7 @@ void calibration(CtrlStruct *cvs)
 				}
 				else
 				{
-					kalman_pos->x = +1.0;
+					kalman_pos->x = +0.94;
 					kalman_pos->theta = -M_PI;
 				}
 			}
@@ -174,7 +174,7 @@ void calibration(CtrlStruct *cvs)
 			speed_regulation(cvs, r_speed[cvs->team_id][7], l_speed[cvs->team_id][7]);
 			cvs->main_state = WAIT_INIT_STATE;
 			break;
-	
+
 		default:
 			printf("Error: unknown state : %d !\n", calib->flag);
 			exit(EXIT_FAILURE);
