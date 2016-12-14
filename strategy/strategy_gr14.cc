@@ -235,7 +235,7 @@ void update_target_status(CtrlStruct *cvs)
 	{
 		for(int i=0; i<NB_TARGET; i++)
 		{
-			if( (strat->target[i].status == TARGET_STOLEN) || (strat->target[i].status == TARGET_CARRYING) )
+			if( (strat->target[i].status != TARGET_STOLEN) || (strat->target[i].status != TARGET_WON) )
 			{
 				if( (strat->target[i].x > moving_obstacles[j].first_corner[X]) && 
 						(strat->target[i].x < moving_obstacles[j].second_corner[X]) && 
