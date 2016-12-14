@@ -80,6 +80,7 @@ typedef struct Strategy
 Strategy* init_strategy();
 void free_strategy(Strategy *strat);
 void main_strategy(CtrlStruct *cvs);
+void update_current_target_id(Strategy* strat);
 
 NAMESPACE_CLOSE();
 

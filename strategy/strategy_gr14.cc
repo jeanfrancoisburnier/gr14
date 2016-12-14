@@ -114,6 +114,7 @@ void main_strategy(CtrlStruct *cvs)
 			cvs->outputs->flag_release = 0;
 			source_pos[0] = cvs->kalman_pos->x;
 			source_pos[1] = cvs->kalman_pos->y;
+
 			if (inputs->nb_targets < 2)
 			{
 				strat->status = STRAT_TARGET;
@@ -126,13 +127,13 @@ void main_strategy(CtrlStruct *cvs)
 						strat->main_state = GAME_STATE_E;
 						return;
 					}
-					strat->current_target_id = (strat->current_target_id + 1) % 8;
+					update_current_target_id(strat);
 					target_id = strat->current_target_id;
 				}
 				goal_pos[0] = strat->target[target_id % 8].x;
 				goal_pos[1] = strat->target[target_id % 8].y;
-				printf("Going from x: %.3f y: %.3f\n", source_pos[0], source_pos[1]);
-				printf("Going for target %d at x: %.3f y: %.3f\n", target_id+1, goal_pos[0], goal_pos[1]);
+				// printf("Going from x: %.3f y: %.3f\n", source_pos[0], source_pos[1]);
+				// printf("Going for target %d at x: %.3f y: %.3f\n", target_id+1, goal_pos[0], goal_pos[1]);
 
 			}
 			else
@@ -141,17 +142,6 @@ void main_strategy(CtrlStruct *cvs)
 				goal_pos[0] = strat->target_base.x;
 				goal_pos[1] = strat->target_base.y;
 			}
-
-			// while(test_if_goal_is_set_on_opponent(cvs, goal_pos))//if goal on an opponent, go to the next target
-			// {
-			// 	target_id++;
-			// 	if(target_id == 8)
-			// 	{
-			// 		target_id = 0;
-			// 	}
-			// 	goal_pos[0] = strat->target[target_id].x;
-			// 	goal_pos[1] = strat->target[target_id].y;
-			// }
 			path = path_planning_compute(cvs, source_pos, goal_pos);
 			if (!path.empty())//if we're not able to compute a path, we do it again until we got one
 			{
@@ -172,7 +162,6 @@ void main_strategy(CtrlStruct *cvs)
 		case GAME_STATE_GO_TO_GOAL:
 			if (inputs->t - strat->last_t_path >= 0.3)
 			{
-				// printf("=========>We need to compute a path!!!\n");
 			 	strat->main_state = GAME_STATE_COMPUTE_PATH;
 				break;
 			}
@@ -217,6 +206,12 @@ void main_strategy(CtrlStruct *cvs)
 			printf("Error: unknown strategy main state: %d !\n", strat->main_state);
 			exit(EXIT_FAILURE);
 	}
+}
+
+void update_current_target_id(Strategy* strat)
+{
+	strat->current_target_id = (strat->current_target_id + 1) % 8;
+	return;
 }
 
 NAMESPACE_CLOSE();

@@ -11,7 +11,7 @@
 NAMESPACE_INIT(ctrlGr14);
 
 #define TAU 0.01
-#define RADIUS_TOL 0.0144
+#define RADIUS_TOL 0.02//0.0144
 #define RADIUS_TOL_TAR 0.003
 #define RADIUS_TOL_NEW 0.05
 
@@ -68,29 +68,25 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 		{
 			if (strat->status == STRAT_TARGET)
 			{
-				printf("Target Reached! Robots is at x: %.3f \t y: %.3f\n", kalman_pos->x, kalman_pos->y);
-				printf("Deltax: %.3f \t Deltay: %.3f\n", vector_x, vector_y);
-				printf("XPoint: %.3f \t YPoint: %.3f\n", x_point, y_point);
-				printf("Distance2: %.3f\n", pow(vector_x,2)+pow(vector_y,2));
+				// printf("Target Reached! Robots is at x: %.3f \t y: %.3f\n", kalman_pos->x, kalman_pos->y);
+				// printf("Deltax: %.3f \t Deltay: %.3f\n", vector_x, vector_y);
+				// printf("XPoint: %.3f \t YPoint: %.3f\n", x_point, y_point);
+				// printf("Distance2: %.3f\n", pow(vector_x,2)+pow(vector_y,2));
 				strat->main_state = GAME_STATE_WAIT;
 			}
 			else if (strat->status == STRAT_SCORING)
 			{
 				strat->current_point_id = 0;
-				printf("Target Released!\n");
+				// printf("Target Released!\n");
 				cvs->outputs->flag_release = 1;
 
 				strat->target[strat->carrying_target_id[0]].status = TARGET_WON;
 				strat->target[strat->carrying_target_id[1]].status = TARGET_WON;
-				printf("WON TARGET: %d and %d\n", strat->carrying_target_id[0], strat->carrying_target_id[1]);
+				// printf("WON TARGET: %d and %d\n", strat->carrying_target_id[0], strat->carrying_target_id[1]);
 				strat->carrying_target_id[0] = -1;
 				strat->carrying_target_id[1] = -1;
 				strat->prev_nb_target_carrying = 0;
 				strat->main_state = GAME_STATE_COMPUTE_PATH;
-			}
-			else if (strat->status == STRAT_RECOVERING)
-			{
-				//
 			}
 			return;
 		}
