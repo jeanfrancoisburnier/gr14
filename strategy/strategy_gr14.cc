@@ -82,6 +82,10 @@ Strategy* init_strategy()
 
 	strat->prev_nb_target_carrying = 0;
 
+	strat->attempts = 0;
+
+	strat->remaining_targets = 8;
+
 	return strat;
 }
 
@@ -119,6 +123,8 @@ void main_strategy(CtrlStruct *cvs)
 	target_id = strat->current_target_id;
 	// printf("Target id: %d\n", target_id);
 
+	update_target_status(cvs);
+
 	array<float, 2> source_pos;
 	array<float, 2> goal_pos;
 
@@ -128,25 +134,27 @@ void main_strategy(CtrlStruct *cvs)
 			cvs->outputs->flag_release = 0;
 			source_pos[0] = cvs->kalman_pos->x;
 			source_pos[1] = cvs->kalman_pos->y;
+
 			if (inputs->nb_targets < 2)
 			{
 				strat->status = STRAT_TARGET;
 				int k = 0;
-				while (strat->target[target_id].status == TARGET_WON)
+				while (strat->target[target_id].status == TARGET_WON || strat->target[target_id].status == TARGET_STOLEN)
 				{
 					if (++k > 8)
 					{
+						
 						printf("END GAME at t = %.2f!\n", cvs->inputs->t);
 						strat->main_state = GAME_STATE_E;
 						return;
 					}
-					strat->current_target_id = (strat->current_target_id + 1) % 8;
+					update_current_target_id(strat);
 					target_id = strat->current_target_id;
 				}
 				goal_pos[0] = strat->target[target_id % 8].x;
 				goal_pos[1] = strat->target[target_id % 8].y;
-				printf("Going from x: %.3f y: %.3f\n", source_pos[0], source_pos[1]);
-				printf("Going for target %d at x: %.3f y: %.3f\n", target_id+1, goal_pos[0], goal_pos[1]);
+				// printf("Going from x: %.3f y: %.3f\n", source_pos[0], source_pos[1]);
+				// printf("Going for target %d at x: %.3f y: %.3f\n", target_id+1, goal_pos[0], goal_pos[1]);
 
 			}
 			else
@@ -155,17 +163,6 @@ void main_strategy(CtrlStruct *cvs)
 				goal_pos[0] = strat->target_base.x;
 				goal_pos[1] = strat->target_base.y;
 			}
-
-			// while(test_if_goal_is_set_on_opponent(cvs, goal_pos))//if goal on an opponent, go to the next target
-			// {
-			// 	target_id++;
-			// 	if(target_id == 8)
-			// 	{
-			// 		target_id = 0;
-			// 	}
-			// 	goal_pos[0] = strat->target[target_id].x;
-			// 	goal_pos[1] = strat->target[target_id].y;
-			// }
 			path = path_planning_compute(cvs, source_pos, goal_pos);
 			if (!path.empty())//if we're not able to compute a path, we do it again until we got one
 			{
@@ -184,9 +181,8 @@ void main_strategy(CtrlStruct *cvs)
 			break;
 
 		case GAME_STATE_GO_TO_GOAL:
-			if (inputs->t - strat->last_t_path >= 0.3)
+			if (inputs->t - strat->last_t_path >= 0.1)
 			{
-
 				//if at the same position as the last call
 				if(abs(cvs->kalman_pos->x - last_pos_robot[X]) < MARGIN_POS
 					&& abs(cvs->kalman_pos->y - last_pos_robot[Y]) < MARGIN_POS)//if at the same position as the last call
@@ -208,6 +204,7 @@ void main_strategy(CtrlStruct *cvs)
 				}
 					
 				// printf("=========>We need to compute a path!!!\n");
+
 			 	strat->main_state = GAME_STATE_COMPUTE_PATH;
 				break;
 			}
@@ -241,8 +238,19 @@ void main_strategy(CtrlStruct *cvs)
 					{
 						strat->carrying_target_id[1] = strat->current_target_id;
 					}
-					strat->current_target_id = (strat->current_target_id + 1)%8;
+					update_current_target_id(strat);
 					strat->current_point_id = 0;
+					strat->attempts = 0;
+ 				}
+ 				else if (strat->attempts > 1)
+ 				{
+ 					strat->target[strat->current_target_id].status = TARGET_STOLEN;
+ 					strat->remaining_targets--;
+ 					strat->attempts = 0;
+ 				}
+ 				else
+ 				{
+ 					strat->attempts++;
  				}
  				strat->main_state = GAME_STATE_COMPUTE_PATH;
  			}
@@ -287,39 +295,63 @@ void main_strategy(CtrlStruct *cvs)
 }
 
 
+void update_current_target_id(Strategy* strat)
+{
+	strat->current_target_id = (strat->current_target_id + 1) % 8;
+	return;
+}
+
+
 //to call each 1.5 sec to see if the opponent just pass above the target or stopped to take it
 void update_target_status(CtrlStruct *cvs)
 {
 	Strategy *strat;
 	strat  = cvs->strat;
-	
-	static bool was_on_it[8] = {false};
+
+	// printf("Updating target status\n");
+	static int target_occupied[2] = {-1};
+	static double last_t_update[2];
 
 	int n = cvs->inputs->nb_opponents;
 	vector<Obstacles> moving_obstacles = update_moving_obstacles(cvs);//update the posîtion of the opponent robot
-
 	for(int j=0; j<n; j++)
 	{
-		for(int i=0; i<NB_TARGET; i++)
+		int i;
+		for(i = 0; i<8; i++)
 		{
-			if( (strat->target[i].status != TARGET_STOLEN) || (strat->target[i].status != TARGET_WON) )
+			if( (strat->target[i].status != TARGET_STOLEN) && (strat->target[i].status != TARGET_WON) )
 			{
 				if( (strat->target[i].x > moving_obstacles[j].first_corner[X]) && 
 						(strat->target[i].x < moving_obstacles[j].second_corner[X]) && 
 						(strat->target[i].y < moving_obstacles[j].first_corner[Y]) && 
 						(strat->target[i].y > moving_obstacles[j].second_corner[Y]) )
 				{
-					if(was_on_it[i] == false)
+					if (target_occupied[j] != i)
 					{
-						was_on_it[i] = true;
+						target_occupied[j] = i;
+						last_t_update[j] = cvs->inputs->t;
+						printf("reseting TIME\n");
 					}
 					else
 					{
-						strat->target[i].status = TARGET_STOLEN;
-						was_on_it[i] = false;
+						// printf("Time[%d]: %.3f\n",j, cvs->inputs->t-last_t_update[j]);
 					}
+					if (cvs->inputs->t - last_t_update[j] > 1.3)
+					{
+						printf("Target %d has been stolen\n", i);
+						strat->target[i].status = TARGET_STOLEN;
+						strat->remaining_targets--;
+						target_occupied[j] = -1;
+						last_t_update[j] = cvs->inputs->t;
+
+					}
+					break;
 				}	
 			}
+		}
+		if (i == 8)
+		{
+			target_occupied[j] = -1;
 		}	
 	}
 }
@@ -340,5 +372,6 @@ void deblock_robot(CtrlStruct *cvs, bool orient)
 		speed_regulation(cvs, 10, 10);
 	}
 }
+
 
 NAMESPACE_CLOSE();
