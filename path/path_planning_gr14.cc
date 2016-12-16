@@ -102,24 +102,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 
     static vector<array<float,2> > path;
 
-<<<<<<< HEAD
-=======
-// 	   if(goal_id >= nodes_grid.size() || goal_id < 0 )
- //    {
- //        printf("invalid goal, outside the map\n");
- //        exit(EXIT_FAILURE);
- //        //Set the flag "path generated" to 0 and return Null
- //    }
 
-
- //    if( source_id >= nodes_grid.size() || source_id < 0)
- //    {
- //        printf("invalid start, outside the map\n");
- //        exit(EXIT_FAILURE);
- //        //Set the flag "path generated" to 0 and return Null
- //    }
-
->>>>>>> 1230260f379540148e0f63cd3a066cb4fee1772a
     if( !nodes_grid[source_id].node_get_free_position() )
     {
     	printf("invalid start, on an occupied node\n");
@@ -131,11 +114,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     		path.clear();
     		return path;//path returned is empty
     	}
-<<<<<<< HEAD
-=======
 
-
->>>>>>> 1230260f379540148e0f63cd3a066cb4fee1772a
     }
 
     if( !nodes_grid[goal_id].node_get_free_position() )
@@ -150,15 +129,9 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     		return path;//path returned is empty
     	}
     }
-<<<<<<< HEAD
   	
   	static int last_goal_id = goal_id;
 
-=======
-
-  	static int last_goal_id  = goal_id;//will be useful later to test if we changed the goal
-  	//printf("After correction : source_id = %d \t goal_id = %d\n\n", source_id, goal_id);
->>>>>>> 1230260f379540148e0f63cd3a066cb4fee1772a
     update_grid(cvs);
 
     if(last_goal_id == goal_id) //if the goal is the same as last call
@@ -202,12 +175,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 
     last_goal_id = goal_id;
 
-<<<<<<< HEAD
     return path;//We return the computed path or an empty one if we weren't able to compute one
-=======
-    //Set the flag "path generated" to 1 and return path
-    return path;
->>>>>>> 1230260f379540148e0f63cd3a066cb4fee1772a
 }
 
 
@@ -368,10 +336,6 @@ int search_free_neighbours(int id_occ)
 	}
 
 	return id_occ;//if it didn't find a free id, we return the actual occupied node (it will be considered as an error after)
-<<<<<<< HEAD
-=======
-
->>>>>>> 1230260f379540148e0f63cd3a066cb4fee1772a
 }
 
 
@@ -448,10 +412,7 @@ void reset_value_grid(vector<Obstacles> moving_obstacles)
 			}
 		}
 	}
-<<<<<<< HEAD
-=======
 
->>>>>>> 1230260f379540148e0f63cd3a066cb4fee1772a
 }
 
 

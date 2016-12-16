@@ -266,7 +266,7 @@ void main_strategy(CtrlStruct *cvs)
 			else
 			{
 				deblock_robot(cvs, orientation);
-				if((inputs->t - time_first_call_block) > 2.0)//if it's been already 2 second we try to deblock ourself --> we might be free
+				if((inputs->t - time_first_call_block) > 1.0)//if it's been already 1 second we try to deblock ourself --> we might be free
 				{
 					//path = path_planning_compute(cvs, source_pos, goal_pos);
 					if(abs(cvs->kalman_pos->x - last_pos_robot[X]) < MARGIN_POS
