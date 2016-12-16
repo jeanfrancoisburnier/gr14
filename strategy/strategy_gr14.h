@@ -74,6 +74,8 @@ typedef struct Strategy
 	target_base_t target_base;
 	double last_t_wait;
 	double last_t_path;
+	int attempts;
+	int remaining_targets;
 	
 } Strategy;
 
@@ -81,6 +83,7 @@ Strategy* init_strategy();
 void free_strategy(Strategy *strat);
 void main_strategy(CtrlStruct *cvs);
 void update_current_target_id(Strategy* strat);
+void update_target_status(CtrlStruct *cvs);
 
 NAMESPACE_CLOSE();
 

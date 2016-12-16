@@ -81,7 +81,14 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 				cvs->outputs->flag_release = 1;
 
 				strat->target[strat->carrying_target_id[0]].status = TARGET_WON;
-				strat->target[strat->carrying_target_id[1]].status = TARGET_WON;
+				printf("WON TARGET: %d\n", strat->carrying_target_id[0]);
+
+				// if (cvs->inputs->prev_nb_target_carrying > 1)
+				// {
+					strat->target[strat->carrying_target_id[1]].status = TARGET_WON;
+					printf("WON TARGET: %d\n", strat->carrying_target_id[1]);
+
+				// }
 				// printf("WON TARGET: %d and %d\n", strat->carrying_target_id[0], strat->carrying_target_id[1]);
 				strat->carrying_target_id[0] = -1;
 				strat->carrying_target_id[1] = -1;
