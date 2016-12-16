@@ -356,16 +356,13 @@ void update_grid(CtrlStruct *cvs)
 void reset_value_grid(vector<Obstacles> moving_obstacles)
 {
 	int nb_mov_obst = moving_obstacles.size();
-
+	//printf("%s\n", );
 
 	if(nb_mov_obst == 0) // there is no opponent
 	{
 		for(int i=0; i<NB_NODES; i++)
 		{
-			for(int k=0; k<id_occupied.size(); k++)
-			{
-				nodes_grid[i].node_set_visited(false);
-			}
+			nodes_grid[i].node_set_visited(false);
 		}
 	}
 	else// there is at least one opponent
@@ -408,11 +405,9 @@ void reset_value_grid(vector<Obstacles> moving_obstacles)
 					nodes_grid[i].node_set_free_position(OCCUPIED);
 					break;
 				}
-
 			}
 		}
 	}
-
 }
 
 

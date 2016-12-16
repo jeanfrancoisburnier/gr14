@@ -269,8 +269,8 @@ void main_strategy(CtrlStruct *cvs)
 				if((inputs->t - time_first_call_block) > 1.0)//if it's been already 1 second we try to deblock ourself --> we might be free
 				{
 					//path = path_planning_compute(cvs, source_pos, goal_pos);
-					if(abs(cvs->kalman_pos->x - last_pos_robot[X]) < MARGIN_POS
-						&& abs(cvs->kalman_pos->y - last_pos_robot[Y]) < MARGIN_POS)//TJRS bloqué
+					if(fabs(cvs->kalman_pos->x - last_pos_robot[X]) < MARGIN_POS
+						&& fabs(cvs->kalman_pos->y - last_pos_robot[Y]) < MARGIN_POS)//TJRS bloqué
 					{
 						orientation = BACKWARD;
 						deblock_robot(cvs, orientation);
@@ -330,7 +330,6 @@ void update_target_status(CtrlStruct *cvs)
 					{
 						target_occupied[j] = i;
 						last_t_update[j] = cvs->inputs->t;
-						printf("reseting TIME\n");
 					}
 					else
 					{
@@ -365,11 +364,11 @@ void deblock_robot(CtrlStruct *cvs, bool orient)
 
 	if(orient)//we go in the opposit direction
 	{
-		speed_regulation(cvs, -10, -10);
+		speed_regulation(cvs, -8, -10);
 	}
 	else//BACKWARDS, we go in the opposit direction
 	{
-		speed_regulation(cvs, 10, 10);
+		speed_regulation(cvs, 10, 8);
 	}
 }
 
