@@ -426,10 +426,10 @@ vector<Obstacles> update_moving_obstacles(CtrlStruct *cvs)
  	for(int i=0; i<n; i++)
  	{
  		//printf("opp_x = %3f \t opp_y = %3f t = %3f\n", cvs->opp_pos->x[i], cvs->opp_pos->y[i], cvs->inputs->t);
- 		oppon.first_corner[X] = cvs->opp_pos->x[i] - ROBOT_SIZE/2 - 2*SECURITY_RANGE;
-		oppon.first_corner[Y] =  cvs->opp_pos->y[i] + ROBOT_SIZE/2 + 2*SECURITY_RANGE;
-		oppon.second_corner[X] =  cvs->opp_pos->x[i] + ROBOT_SIZE/2 + 2*SECURITY_RANGE;
-		oppon.second_corner[Y] =  cvs->opp_pos->y[i] - ROBOT_SIZE/2 - 2*SECURITY_RANGE;
+ 		oppon.first_corner[X] = cvs->opp_pos->x[i] - OBSTACLE_MARGIN;
+		oppon.first_corner[Y] =  cvs->opp_pos->y[i] + OBSTACLE_MARGIN;
+		oppon.second_corner[X] =  cvs->opp_pos->x[i] + OBSTACLE_MARGIN;
+		oppon.second_corner[Y] =  cvs->opp_pos->y[i] - OBSTACLE_MARGIN;
 
 		moving_obstacles.push_back(oppon);
  	}
