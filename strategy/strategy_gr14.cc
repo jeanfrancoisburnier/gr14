@@ -249,7 +249,7 @@ void main_strategy(CtrlStruct *cvs)
 			break;
 
 		case GAME_STATE_BLOCKED: //if the robot stay more than 2 second it means it's blocked
-			printf("In GAME_STATE_BLOCKED\n");
+			//printf("In GAME_STATE_BLOCKED\n");
 			if(first_call_block == true)
 			{
 				first_call_block = false;
@@ -257,7 +257,7 @@ void main_strategy(CtrlStruct *cvs)
 			}
 			else
 			{
-				deblock_robot(cvs, path, orientation);
+				deblock_robot(cvs, orientation);
 				if((inputs->t - time_first_call_block) > 2.0)//if it's been already 2 second we try to deblock ourself --> we might be free
 				{
 					//path = path_planning_compute(cvs, source_pos, goal_pos);
@@ -265,7 +265,7 @@ void main_strategy(CtrlStruct *cvs)
 						&& abs(cvs->kalman_pos->y - last_pos_robot[Y]) < MARGIN_POS)//TJRS bloqué
 					{
 						orientation = BACKWARD;
-						deblock_robot(cvs, path, orientation);
+						deblock_robot(cvs, orientation);
 					}
 					else
 					{
@@ -326,37 +326,10 @@ void update_target_status(CtrlStruct *cvs)
 
 
 //will indicate the robot to go at the opposite as the direction it was originally following
-void deblock_robot(CtrlStruct *cvs, vector<array<float,2> > path, bool orient)
+void deblock_robot(CtrlStruct *cvs, bool orient)
 {
-	printf("In deblock_robot\n");
-	/*ouble delta_t = cvs->inputs->t - last_call;
-	last_call = cvs->inputs->t;
-
-
-	int i = (int) path.size() - 1;
-
-	// Position of the next point to reach
-	double x_point = path[i][0];
-	double y_point = path[i][1];
-
-
-	// Vector from robot to target
-	double vector_x = x_point-cvs->kalman_pos->x;
-	double vector_y = y_point-cvs->kalman_pos->y;
-
-	double beta  = atan2(vector_y,vector_x); // absolute angle of target
-	double gamma = limit_angle(beta-cvs->kalman_pos->theta); // relative angle of target with robot
-
-	double l_speed = 0;
-	double r_speed = 0;
-
-	get_new_speed(gamma, &l_speed, &r_speed);
-	// Filter new speed command
-	r_speed = first_order_filter(cvs->inputs->r_wheel_speed, r_speed, TAU, delta_t);
-	l_speed = first_order_filter(cvs->inputs->l_wheel_speed, l_speed, TAU, delta_t);*/
-
-	// Set new speed in the opposite wanted direction 
-	//speed_regulation(cvs, -1000*r_speed, -1000*l_speed);
+	//printf("In deblock_robot\n");
+	
 
 	if(orient)//we go in the opposit direction
 	{

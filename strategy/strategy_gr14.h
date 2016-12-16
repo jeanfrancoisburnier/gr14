@@ -91,7 +91,7 @@ void free_strategy(Strategy *strat);
 void main_strategy(CtrlStruct *cvs);
 
 void update_target_status(CtrlStruct *cvs);
-void deblock_robot(CtrlStruct *cvs, vector<array<float,2> > path, bool orient);
+void deblock_robot(CtrlStruct *cvs, bool orient);
 
 
 NAMESPACE_CLOSE();
