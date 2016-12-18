@@ -144,7 +144,6 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     		id_actual_n = node_find_closest_node(path[i][X], path[i][Y]);
     		if(nodes_grid[id_actual_n].node_get_free_position() == OCCUPIED)//if a node of the path is now occupied
     		{
-    			printf("Ennemy on the path\n");
     			recompute_needed = true;//we need to recompute a new path
     			break;
     		}
@@ -205,7 +204,6 @@ bool a_star(CtrlStruct *cvs, int source_id, int goal_id)
     //check if source and goal node are different
     if (nodes_grid[source_id].node_get_id() == nodes_grid[goal_id].node_get_id())
     {
-    	printf("Already on goal\n");
         return false;
     }
 

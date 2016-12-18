@@ -77,7 +77,6 @@ void controller_loop(CtrlStruct *cvs)
 	CtrlIn *inputs;
 	CtrlOut *outputs;
 
-
 	// variables initialization
 	inputs  = cvs->inputs;
 	outputs = cvs->outputs;
@@ -96,7 +95,6 @@ void controller_loop(CtrlStruct *cvs)
 
 	// opponents position
 	opponents_tower(cvs);
-
 
 	// tower control
 	outputs->tower_command = 15.0;
