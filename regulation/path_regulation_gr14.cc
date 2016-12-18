@@ -104,6 +104,10 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 					strat->remaining_targets--;
 
 				}
+				if (strat->remaining_targets <= 0)
+				{
+					strat->remaining_targets--;
+				}
 				strat->carrying_target_id[0] = -1;
 				strat->carrying_target_id[1] = -1;
 				strat->prev_nb_target_carrying = 0;

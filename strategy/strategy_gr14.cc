@@ -103,27 +103,27 @@ void main_strategy(CtrlStruct *cvs)
 		strat->target[1].y = +1.25;
 		strat->target[1].status = TARGET_FREE;
 
-		strat->target[2].x = +0.7;
-		strat->target[2].y = +0.6;
+		strat->target[2].x = +0.1;
+		strat->target[2].y = +0.0;
 		strat->target[2].status = TARGET_FREE;
 
-		strat->target[3].x = -0.4;
-		strat->target[3].y = +0.6;
+		strat->target[3].x = +0.25;
+		strat->target[3].y = -1.25;
 		strat->target[3].status = TARGET_FREE;
 
-		strat->target[4].x = +0.1;
-		strat->target[4].y = +0.0;
+		strat->target[4].x = -0.4;
+		strat->target[4].y = +0.6;
 		strat->target[4].status = TARGET_FREE;
 
 		strat->target[5].x = +0.7;
-		strat->target[5].y = -0.6;
+		strat->target[5].y = +0.6;
 		strat->target[5].status = TARGET_FREE;
 
-		strat->target[6].x = +0.25;
-		strat->target[6].y = -1.25;
+		strat->target[6].x = -0.4;
+		strat->target[6].y = -0.6;
 		strat->target[6].status = TARGET_FREE;
 
-		strat->target[7].x = -0.4;
+		strat->target[7].x = +0.7;
 		strat->target[7].y = -0.6;
 		strat->target[7].status = TARGET_FREE;
 
@@ -145,29 +145,29 @@ void main_strategy(CtrlStruct *cvs)
 		strat->target[1].y = -1.25;
 		strat->target[1].status = TARGET_FREE;
 
-		strat->target[7].x = +0.7;
-		strat->target[7].y = -0.6;
-		strat->target[7].status = TARGET_FREE;
+		strat->target[2].x = +0.1;
+		strat->target[2].y = +0.0;
+		strat->target[2].status = TARGET_FREE;
+
+		strat->target[3].x = +0.25;
+		strat->target[3].y = +1.25;
+		strat->target[3].status = TARGET_FREE;
 
 		strat->target[4].x = -0.4;
 		strat->target[4].y = -0.6;
 		strat->target[4].status = TARGET_FREE;
 
-		strat->target[3].x = +0.1;
-		strat->target[3].y = +0.0;
-		strat->target[3].status = TARGET_FREE;
-
 		strat->target[5].x = +0.7;
-		strat->target[5].y = +0.6;
+		strat->target[5].y = -0.6;
 		strat->target[5].status = TARGET_FREE;
-
-		strat->target[2].x = +0.25;
-		strat->target[2].y = +1.25;
-		strat->target[2].status = TARGET_FREE;
 
 		strat->target[6].x = -0.4;
 		strat->target[6].y = +0.6;
 		strat->target[6].status = TARGET_FREE;
+
+		strat->target[7].x = +0.7;
+		strat->target[7].y = +0.6;
+		strat->target[7].status = TARGET_FREE;
 
 		strat->start_base.x = +0.7;
 		strat->start_base.y = -0.6;

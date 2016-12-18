@@ -366,23 +366,23 @@ int node_find_closest_node(float x_p, float y_p)//return the id of the closest N
 {
 	if( x_p>peak_x )
 	{
-		cout << "Warning your coordinates are outside the range of the robot\n" << endl;
+		// cout << "Warning your coordinates are outside the range of the robot\n" << endl;
 		x_p = peak_x;
 	}
 	else if( x_p<-peak_x )
 	{
-		cout << "Warning your coordinates are outside the range of the robot\n" << endl;
+		// cout << "Warning your coordinates are outside the range of the robot\n" << endl;
 		x_p = -peak_x;
 	}
 
 	if( y_p>peak_y )
 	{
-		cout << "Warning your coordinates are outside the range of the robot\n" << endl;
+		// cout << "Warning your coordinates are outside the range of the robot\n" << endl;
 		y_p = peak_y;
 	}
 	else if( x_p<-peak_x )
 	{
-		cout << "Warning your coordinates are outside the range of the robot\n" << endl;
+		// cout << "Warning your coordinates are outside the range of the robot\n" << endl;
 		y_p = -peak_y;
 	}
 
