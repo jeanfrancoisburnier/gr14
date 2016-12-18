@@ -33,7 +33,6 @@ NAMESPACE_INIT(ctrlGr14);
  */
 void kalman(CtrlStruct *cvs)
 {
-	//printf("in kalman\n");
 	// variable declaration
 	RobotPosition *triang_pos;
 	KalmanStruct *kalman_pos;
@@ -81,8 +80,6 @@ void kalman(CtrlStruct *cvs)
 
 	//condition if the triangulation pos and the previous pos are too different it will ignore
 	//particularly useful in the beggining before triagulation is working properly
-	//printf ( "%f %f %f;\n",x_hat[0],x_hat[1],x_hat[2]);
-	//printf ( "%f %f %f;\n",z_k[0],z_k[1],z_k[2]);
 	if (inputs->t < TIME_BEFORE_KALMAN || std::abs(z_k[2]-x_hat[2]) > NOISE)
 		{
 			update_odometry(cvs);
@@ -203,11 +200,6 @@ void kalman(CtrlStruct *cvs)
 	mult_matrices_3x3(result_matrix,P_hat,kalman_pos->P_k);
 
 	//--------end of the Kalman filter---------//
-
-	//printf ( "%f %f %f;\n",kalman_pos->x,kalman_pos->y,kalman_pos->theta);
-	//set_plot(cvs->kalman_pos->x,"x");
-	//set_plot(cvs->kalman_pos->y,"y");
-	//set_plot(cvs->kalman_pos->y,"theta");
 
 	// update time stamp for next loop
 	kalman_pos->last_t = inputs->t;
