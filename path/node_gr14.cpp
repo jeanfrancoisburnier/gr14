@@ -1,4 +1,4 @@
-/*! 
+/*!
  * \author Group 14
  * \file node.h
  * \Node class + one function
@@ -18,17 +18,17 @@ typedef enum
 	BOTTOM_BORDER = 5,
 	BOTTOM_LEFT_CORNER = 6,
 	LEFT_BORDER = 7,
-	INSIDE = 8 
+	INSIDE = 8
 } position_node_t;
 
 NAMESPACE_INIT(ctrlGr14);
 
 
 Node::Node(int id_node, bool free_init, float x_p, float y_p): id(id_node), free_position(free_init), heuristic_value(H_VALUE_INIT)
-{		
+{
 	coordinates[X]=x_p;
 	coordinates[Y]=y_p;
-	
+
 	int state;
 	state = node_identify_state(id);
 	node_creation_edges(state);
@@ -41,55 +41,46 @@ Node::~Node()
 
 
 
-//When a Node is created we have to be careful if it's in the border of the map 
-//Because it's Edges will be pointing in a forbidden zone, that's why this function 
+//When a Node is created we have to be careful if it's in the border of the map
+//Because it's Edges will be pointing in a forbidden zone, that's why this function
 //check attribute a state to the Node defined by id_n
 int Node::node_identify_state(int id_n)
 {
 	if( id_n == 0 )//Node in the top left corner
 	{
-		//printf("TOP_LEFT_CORNER\n");
 		return TOP_LEFT_CORNER;
 	}
 	else if( id_n == (NB_X - 1) )//Node at the top right corner
 	{
-		//printf("TOP_RIGHT_CORNER\n");
 		return TOP_RIGHT_CORNER;
 	}
 	else if( id_n == (NB_X*NB_Y - 1) )//Node at the bottom right corner
 	{
-		//printf("BOTTOM_RIGHT_CORNER\n");
 		return BOTTOM_RIGHT_CORNER;
 	}
 	else if( id_n == ((NB_Y-1) * NB_X))//Node at the bottom left corner
 	{
-		//printf("BOTTOM_LEFT_CORNER\n");
 		return BOTTOM_LEFT_CORNER;
 	}
-	else if( id_n < (NB_X - 1) )//Nodes at the top border (except corners) 
+	else if( id_n < (NB_X - 1) )//Nodes at the top border (except corners)
 	{
-		//printf("TOP_BORDER\n");
 		return TOP_BORDER;
 	}
 	else if( (id_n+1) % (NB_X) == 0)//Nodes at the right border (except corners)
 	{
-		//printf("RIGHT BORDER\n");
 		return RIGHT_BORDER;
 	}
-	
+
 	else if( id_n > ((NB_Y-1) * NB_X) )//Nodes at the bottom border (except corners)
 	{
-		//printf("BOTTOM_BORDER\n");
 		return BOTTOM_BORDER;
 	}
 	else if( (id_n % NB_X) == 0 )//Nodes at the left border (except corners)
 	{
-		//printf("LEFT_BORDER\n");
 		return LEFT_BORDER;
 	}
 	else//node not on the map border
 	{
-		//printf("IN\n");
 		return INSIDE;
 	}
 }
@@ -123,7 +114,7 @@ void Node::node_creation_edges(int state)
 			}
 			break;
 
-		case TOP_BORDER ://(except corners) 
+		case TOP_BORDER ://(except corners)
 			for(int i = 0; i < MAX_NB_EDGES; i++)
 			{
 				if( i<=1 || i==7 )//edges pointing outside the map
@@ -165,7 +156,7 @@ void Node::node_creation_edges(int state)
 			}
 			break;
 
-		case BOTTOM_RIGHT_CORNER : 
+		case BOTTOM_RIGHT_CORNER :
 			for(int i = 0; i < MAX_NB_EDGES; i++)
 			{
 				if( i>=1 && i<=5 )//edges pointing outside the map
@@ -179,7 +170,7 @@ void Node::node_creation_edges(int state)
 			}
 			break;
 
-		case BOTTOM_BORDER : //(except corners) 
+		case BOTTOM_BORDER : //(except corners)
 			for(int i = 0; i < MAX_NB_EDGES; i++)
 			{
 				if( i>=3 && i<=5 )//edges pointing outside the map
@@ -207,7 +198,7 @@ void Node::node_creation_edges(int state)
 			}
 			break;
 
-		case LEFT_BORDER : // (except corners) 
+		case LEFT_BORDER : // (except corners)
 			for(int i = 0; i < MAX_NB_EDGES; i++)
 			{
 				if( i>=5 )//edges pointing outside the map
@@ -293,8 +284,8 @@ vector<Edge> Node::node_get_edges()
 int Node::node_get_previous_node_id()
 {
 	return previous_node_id;
-}						
-	
+}
+
 bool Node::node_get_visited()
 {
 	return visited;
@@ -327,7 +318,7 @@ int Node::node_get_id()
 
 
 /*! \ Method to scan through the edges of a node
- * 
+ *
  * \param[in,out] List of all the nodes available so that we can modify the list with a*
  * \param[in] goal node so that we can compute the distance to goal for the new nodes
  * returns a list of node ids that have not been visited by the path finding algorithm yet
@@ -354,17 +345,17 @@ vector<int> Node::scan_edges(vector<Node>& node_list,Node goal)
 		}
 
 		/*
-		* Set the distance to start of the new node, the distance to goal, it's heuristic function value, the id of 
-		* the node we arrived here from and finally sets the visited boolean to true 
+		* Set the distance to start of the new node, the distance to goal, it's heuristic function value, the id of
+		* the node we arrived here from and finally sets the visited boolean to true
 		*/
 		node_list[next_node_id].node_set_distance_to_start(node_get_distance_to_start() + edge.edge_get_weight());
 		node_list[next_node_id].node_set_distance_to_goal(goal.node_get_coordinates());
-		node_list[next_node_id].node_set_heuristic_value(node_list[next_node_id].node_get_distance_to_start() 
+		node_list[next_node_id].node_set_heuristic_value(node_list[next_node_id].node_get_distance_to_start()
 														+ node_list[next_node_id].node_get_distance_to_goal());
 		node_list[next_node_id].node_set_previous_node_id(node_get_id());
 		node_list[next_node_id].node_set_visited(true);
 		ids.push_back(next_node_id);
-	} 
+	}
 	return ids;
 }
 
@@ -421,11 +412,10 @@ int node_find_closest_node(float x_p, float y_p)//return the id of the closest N
 //-------operator used in the priority queue-------//
 
 //
-bool compare_heuristic::operator()(Node& n1, Node& n2) 
+bool compare_heuristic::operator()(Node& n1, Node& n2)
 {
        return n1.node_get_heuristic_value() > n2.node_get_heuristic_value();
 }
 
 
 NAMESPACE_CLOSE();
-
