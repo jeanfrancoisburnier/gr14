@@ -12,7 +12,7 @@
 NAMESPACE_INIT(ctrlGr14);
 
 /*! \brief set the fixed beacons positions, depending on the team
- * 
+ *
  * \param[in] team_id ID of the team ('TEAM_A' or 'TEAM_B')
  * \param[out] x_beac_1 first beacon x position [m]
  * \param[out] y_beac_1 first beacon y position [m]
@@ -47,9 +47,9 @@ void fixed_beacon_positions(int team_id, double *x_beac_1, double *y_beac_1,
 			*y_beac_2 = -1.562;
 
 			*x_beac_3 = 0.0;
-			*y_beac_3 = -1.562;
+			*y_beac_3 = 1.562;
 			break;
-	
+
 		default:
 			printf("Error unknown team ID (%d) !\n", team_id);
 			exit(EXIT_FAILURE);
@@ -57,7 +57,7 @@ void fixed_beacon_positions(int team_id, double *x_beac_1, double *y_beac_1,
 }
 
 /*! \brief get the index of the best angle prediction
- * 
+ *
  * \param[in] alpha_predicted angle to reach [rad]
  * \param[in] alpha_a angle computed for A [rad]
  * \param[in] alpha_b angle computed for B [rad]
@@ -76,7 +76,7 @@ int index_predicted(double alpha_predicted, double alpha_a, double alpha_b, doub
 }
 
 /*! \brief triangulation main algorithm
- * 
+ *
  * \param[in] cvs controller main structure
  *
  * computation found here: http://www.telecom.ulg.ac.be/triangulation/
@@ -110,7 +110,7 @@ void triangulation(CtrlStruct *cvs)
 	}
 
 	// known positions of the beacons
-	fixed_beacon_positions(cvs->team_id, &x_beac_1, &y_beac_1, &x_beac_2, &y_beac_2, &x_beac_3, &y_beac_3);	
+	fixed_beacon_positions(cvs->team_id, &x_beac_1, &y_beac_1, &x_beac_2, &y_beac_2, &x_beac_3, &y_beac_3);
 
 	// indexes fot the angles detection
 	rise_index_1 = inputs->rising_index_fixed;
@@ -130,7 +130,7 @@ void triangulation(CtrlStruct *cvs)
 	fall_angle_2 = inputs->last_falling_fixed[fall_index_2];
 	fall_angle_3 = inputs->last_falling_fixed[fall_index_3];
 
-	//check if one beacons is on the -PI,PI intersection and adjust 
+	//check if one beacons is on the -PI,PI intersection and adjust
 	fall_angle_1 = (std::abs(rise_angle_1 - fall_angle_1) > PI) ? 2*PI+fall_angle_1 : fall_angle_1;
 	fall_angle_2 = (std::abs(rise_angle_2 - fall_angle_2) > PI) ? 2*PI+fall_angle_2 : fall_angle_2;
 	fall_angle_3 = (std::abs(rise_angle_3 - fall_angle_3) > PI) ? 2*PI+fall_angle_3 : fall_angle_3;
@@ -140,7 +140,7 @@ void triangulation(CtrlStruct *cvs)
 	alpha_b = limit_angle((fall_angle_2 + rise_angle_2)/2);
 	alpha_c = limit_angle((fall_angle_3 + rise_angle_3)/2);
 
-	// beacons angles predicted thanks to odometry measurements 
+	// beacons angles predicted thanks to odometry measurements
 	alpha_1_predicted = limit_angle(predicted_angle(kalman_pos->x,kalman_pos->y,x_beac_1,y_beac_1,kalman_pos->theta));
 	alpha_2_predicted = limit_angle(predicted_angle(kalman_pos->x,kalman_pos->y,x_beac_2,y_beac_2,kalman_pos->theta));
 	alpha_3_predicted = limit_angle(predicted_angle(kalman_pos->x,kalman_pos->y,x_beac_3,y_beac_3,kalman_pos->theta));
@@ -163,7 +163,7 @@ void triangulation(CtrlStruct *cvs)
 		case 0: alpha_1 = alpha_a; break;
 		case 1: alpha_1 = alpha_b; break;
 		case 2: alpha_1 = alpha_c; break;
-	
+
 		default:
 			printf("Error: unknown index %d !\n", alpha_1_index);
 			exit(EXIT_FAILURE);
@@ -175,7 +175,7 @@ void triangulation(CtrlStruct *cvs)
 		case 0: alpha_2 = alpha_a; break;
 		case 1: alpha_2 = alpha_b; break;
 		case 2: alpha_2 = alpha_c; break;
-	
+
 		default:
 			printf("Error: unknown index %d !\n", alpha_2_index);
 			exit(EXIT_FAILURE);
@@ -187,12 +187,12 @@ void triangulation(CtrlStruct *cvs)
 		case 0: alpha_3 = alpha_a; break;
 		case 1: alpha_3 = alpha_b; break;
 		case 2: alpha_3 = alpha_c; break;
-	
+
 		default:
 			printf("Error: unknown index %d !\n", alpha_3_index);
 			exit(EXIT_FAILURE);
 	}
-	
+
 	/* ----- triangulation computation start ----- //
 	* ToTal algorithm : http://www.telecom.ulg.ac.be/triangulation/
  	* Version with mathematical approximation of the limit for the pseudosingularities
@@ -203,7 +203,7 @@ void triangulation(CtrlStruct *cvs)
 	cot_23 = adjust_value_to_bounds( cot_23 , COT_MAX ) ;
 	double cot_31 = ( 1.0 - cot_12 * cot_23 ) / ( cot_12 + cot_23 ) ;
 	cot_31 = adjust_value_to_bounds( cot_31 , COT_MAX ) ;
-	
+
 	double x1_ = x_beac_1 - x_beac_2 , y1_ = y_beac_1 - y_beac_2 , x3_ = x_beac_3 - x_beac_2 , y3_ = y_beac_3 - y_beac_2 ;
 
 	double c12x = x1_ + cot_12 * y1_ ;
@@ -215,7 +215,7 @@ void triangulation(CtrlStruct *cvs)
 	double c31x = (x3_ + x1_) + cot_31 * (y3_ - y1_) ;
 	double c31y = (y3_ + y1_) - cot_31 * (x3_ - x1_) ;
 	double k31 = (x3_ * x1_) + (y3_ * y1_) + cot_31 * ( (y3_ * x1_) - (x3_ * y1_) ) ;
-  
+
   	double D = (c12x - c23x) * (c23y - c31y) - (c23x - c31x) * (c12y - c23y) ;
   	double invD = 1.0 / D ;
   	double K = k31 * invD ;
@@ -228,22 +228,20 @@ void triangulation(CtrlStruct *cvs)
 	pos_tri->theta = (limit_angle(atan2(y_beac_1 - pos_tri->y, x_beac_1 - pos_tri->x) - alpha_1)+
 		limit_angle(atan2(y_beac_2 - pos_tri->y, x_beac_2 - pos_tri->x) - alpha_2)+
 		limit_angle(atan2(y_beac_3 - pos_tri->y, x_beac_3 - pos_tri->x) - alpha_3))/3;
-	
+
 
 	//Reajust the position of the robot with the tower offset
 	pos_tri->x = K * (c12y - c23y) + x_beac_2 - TOWER_OFFSET*cos(pos_tri->theta);
 	pos_tri->y = K * (c23x - c12x) + y_beac_2 - TOWER_OFFSET*sin(pos_tri->theta);
-	
+
 	//printf ( "2: %f %f %f\n",pos_tri->x,pos_tri->y,pos_tri->theta);
-	//set_plot(pos_tri->x,"triang x");
-	//set_plot(pos_tri->y,"triang y");
-	//set_plot(pos_tri->theta,"triang theta");
+
 
 	// ----- triangulation computation end ----- //
 }
-	
-	/* 
-	* la fonction calcul l'angle en fonction de la position du robot. l'arctan prend la position du beacon(x_b,y_b) moins la 
+
+	/*
+	* la fonction calcul l'angle en fonction de la position du robot. l'arctan prend la position du beacon(x_b,y_b) moins la
 	* position du robot(x_r,y_r) . On déduit ensuite l'angle theta qui est l'orientation du robot
 	*/
 double predicted_angle(double x_r,double y_r,double x_b,double y_b,double alpha){
@@ -256,6 +254,3 @@ double predicted_angle(double x_r,double y_r,double x_b,double y_b,double alpha)
 
 
 NAMESPACE_CLOSE();
-
-
-

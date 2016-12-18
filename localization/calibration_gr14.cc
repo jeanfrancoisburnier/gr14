@@ -10,12 +10,12 @@ NAMESPACE_INIT(ctrlGr14);
 #define DEG_TO_RAD (M_PI/180.0) ///< convertion from degrees to radians
 
 // calibration states
-enum {CALIB_START, CALIB_STATE_A, CALIB_STATE_B, CALIB_STATE_C, CALIB_STATE_D, CALIB_STATE_E, CALIB_STATE_F, CALIB_STATE_G, CALIB_STATE_H, CALIB_FINISH};
+enum {CALIB_START, CALIB_STATE_A, CALIB_STATE_B, CALIB_STATE_C, CALIB_STATE_D, CALIB_STATE_E, CALIB_STATE_F, CALIB_STATE_G, CALIB_STATE_H, CALIB_STATE_I, CALIB_FINISH};
 
 /*! \brief calibration of the robot to calibrate its position
- * 
+ *
  * \param[in,out] cvs controller main structure
- * 
+ *
  * This FSM can be adapted, depending on the map and on the robots initial position.
  */
 void calibration(CtrlStruct *cvs)
@@ -33,7 +33,7 @@ void calibration(CtrlStruct *cvs)
 	calib  = cvs->calib;
 
 	kalman_pos = cvs->kalman_pos;
-	
+
 	t = inputs->t;
 	team_id = cvs->team_id;
 
@@ -69,9 +69,17 @@ void calibration(CtrlStruct *cvs)
 				calib->t_flag = t;
 
 				// Do not forget to take into that the robot could start on yellow side
-				kalman_pos->y = 1.44;
-				kalman_pos->theta = -M_PI/2;
-
+				if (team_id == TEAM_A)
+				{
+					kalman_pos->y = 1.44;
+					kalman_pos->theta = -M_PI/2;
+				}
+				else if (team_id == TEAM_B)
+				{
+					printf("done\n");
+					kalman_pos->y = -1.44;
+					kalman_pos->theta = M_PI/2;
+				}
 			}
 			break;
 
@@ -121,8 +129,15 @@ void calibration(CtrlStruct *cvs)
 				calib->t_flag = t;
 
 				// Do not forget to take into that the robot could start on yellow side
-				kalman_pos->x = 0.94;
-				kalman_pos->theta = M_PI;
+				if (team_id == TEAM_A) {
+					kalman_pos->x = 0.94;
+					kalman_pos->theta = M_PI;
+				}
+				else if (team_id == TEAM_B)
+				{
+					kalman_pos->x = 0.56;
+					kalman_pos->theta = 0;
+				}
 			}
 			break;
 
@@ -144,6 +159,18 @@ void calibration(CtrlStruct *cvs)
 			// go to final state after 2.5 seconds
 			if (t - calib->t_flag > 2.5)
 			{
+				calib->flag = CALIB_STATE_I;
+
+				calib->t_flag = t;
+			}
+			break;
+
+		case CALIB_STATE_I: // rotation of 90°
+			speed_regulation(cvs, +2.356, +2.356);
+
+			// go to final state after 2.5 seconds
+			if (t - calib->t_flag > 2)
+			{
 				calib->flag = CALIB_FINISH;
 
 				calib->t_flag = t;
@@ -154,7 +181,7 @@ void calibration(CtrlStruct *cvs)
 			speed_regulation(cvs, 0.0, 0.0);
 			cvs->main_state = WAIT_INIT_STATE;
 			break;
-	
+
 		default:
 			printf("Error: unknown state : %d !\n", calib->flag);
 			exit(EXIT_FAILURE);
