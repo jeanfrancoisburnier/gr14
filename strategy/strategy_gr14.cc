@@ -181,7 +181,7 @@ void main_strategy(CtrlStruct *cvs)
 			break;
 
 		case GAME_STATE_GO_TO_GOAL:
-			if (inputs->t - strat->last_t_path >= 0.1)
+			if (inputs->t - strat->last_t_path >= 0.1)//call 10 times per second
 			{
 				//if at the same position as the last call
 				if(abs(cvs->kalman_pos->x - last_pos_robot[X]) < MARGIN_POS
@@ -316,7 +316,7 @@ void update_target_status(CtrlStruct *cvs)
 	vector<Obstacles> moving_obstacles = update_moving_obstacles(cvs);//update the posîtion of the opponent robot
 	for(int j=0; j<n; j++)
 	{
-		int i;
+		int i;//important to declare outside the loop
 		for(i = 0; i<8; i++)
 		{
 			if( (strat->target[i].status != TARGET_STOLEN) && (strat->target[i].status != TARGET_WON) )
