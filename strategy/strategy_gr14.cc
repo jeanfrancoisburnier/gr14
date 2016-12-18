@@ -419,6 +419,7 @@ bool test_opponent_too_close(CtrlStruct *cvs, double level)
 			{
 				printf("Too close, security = %1f, last_distance = %3f\n", security_dist, last_distance);
 				if( (last_distance - new_distance)  > -MARGIN_POS)//If we go near the opponent
+
 				{
 					last_distance = new_distance;
 					return true;
@@ -465,6 +466,10 @@ bool test_opponent_too_close(CtrlStruct *cvs, double level)
 					last_distance_2 = new_distance;
 					return false;
 				}
+			}
+			else
+			{
+				return false;
 			}
 	}
 }

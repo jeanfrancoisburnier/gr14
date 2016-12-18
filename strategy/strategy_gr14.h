@@ -13,8 +13,10 @@
 
 #define NB_TARGET 8 //number of target
 
+
 #define FIRST_SECURITY_DISTANCE 0.30
 #define LAST_SECURITY_DISTANCE 0.09
+
 
 NAMESPACE_INIT(ctrlGr14);
 
