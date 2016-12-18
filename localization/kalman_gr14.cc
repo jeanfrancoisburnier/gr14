@@ -1,10 +1,10 @@
 /*
  *We use the kalman algorithm found on wikipedia https://en.wikipedia.org/wiki/Kalman_filter
  * However in this case we taqke the measurment to be the values of x y and theta being the values
- * computed with the triangulation algorithm which allows us to use a H matrix which is identity simplifying 
+ * computed with the triangulation algorithm which allows us to use a H matrix which is identity simplifying
  * greatly the algebra.
  * The matrix A and B are the same as the one used in the paper "Three-state Extended Kalman Filter for Mobile
- * Robot Localization" from Evgeni Kiriy Martin Buehler in CMU. The different computation for the Kalman process are 
+ * Robot Localization" from Evgeni Kiriy Martin Buehler in CMU. The different computation for the Kalman process are
  * detailed afterwards.
 */
 
@@ -28,11 +28,12 @@
 NAMESPACE_INIT(ctrlGr14);
 
 /*! \brief Kalman
- * 
+ *
  * \param[in,out] cvs controller main structure
  */
 void kalman(CtrlStruct *cvs)
 {
+	//printf("in kalman\n");
 	// variable declaration
 	RobotPosition *triang_pos;
 	KalmanStruct *kalman_pos;
@@ -49,17 +50,17 @@ void kalman(CtrlStruct *cvs)
 	 * P_hat The covariance matrix initialized with the previous matrix, will be updated during the algorithm
 	 * A_k, A_k_trans, B_k matrix used in the kalman algorithm see wikipedia page for details
 	 * S_k intermiditate matrix used in the Kalman algorithm see wikipedia
-	 * K_k kalman gain 
+	 * K_k kalman gain
 	 * u_k inputs for the a priori update here it is dSl,dSr see below
 	 * I 3 by 3 identity matrix
-	 * err_k difference between the calculated position and the measured position 
+	 * err_k difference between the calculated position and the measured position
 	 * dSl,dSr,dS,d_theta respectively the computed displacement of the left wheel, right wheel center of robot
 	 * and change in the robot's orientation since the last call of the function
 	 * dt change in time since the last computation of Kalman
 	 * r_sp, l_sp r wheel and left wheel speed
 	 * result_matrix, result_vect result vector and matrix used as temporary in the algorithm
 	 *
-	*/	
+	*/
 	double z_k[3] = {(*triang_pos).x,(*triang_pos).y,(*triang_pos).theta};
 	double x_hat[3] = {(*kalman_pos).x,(*kalman_pos).y,(*kalman_pos).theta};
 	double P_hat[3][3];
@@ -78,8 +79,10 @@ void kalman(CtrlStruct *cvs)
 	double result_matrix[3][3];
 	double result_vect[3];
 
-	//condition if the triangulation pos and the previous pos are too different it will ignore 
+	//condition if the triangulation pos and the previous pos are too different it will ignore
 	//particularly useful in the beggining before triagulation is working properly
+	//printf ( "%f %f %f;\n",x_hat[0],x_hat[1],x_hat[2]);
+	//printf ( "%f %f %f;\n",z_k[0],z_k[1],z_k[2]);
 	if (inputs->t < TIME_BEFORE_KALMAN || std::abs(z_k[2]-x_hat[2]) > NOISE)
 		{
 			update_odometry(cvs);
@@ -88,7 +91,7 @@ void kalman(CtrlStruct *cvs)
 
 	//------compute dSl, dSr, d_theta and dS for the matrices A and B--------//
 	//-----the method used is the same as the one used in odometry-----------//
-	r_sp = wheel_speed_meter(inputs->r_wheel_speed,WHEEL_RAD); 
+	r_sp = wheel_speed_meter(inputs->r_wheel_speed,WHEEL_RAD);
 	l_sp = wheel_speed_meter(inputs->l_wheel_speed,WHEEL_RAD);
 
 	// time
@@ -102,7 +105,7 @@ void kalman(CtrlStruct *cvs)
 
     dSl = dt * l_sp ;
     dSr = dt * r_sp ;
-    
+
     dS = (dSr + dSl) / 2;
     d_theta = (dSr - dSl) / WHEEL_SEP;
 
@@ -125,19 +128,19 @@ void kalman(CtrlStruct *cvs)
 	A_k[1][2] = dS*cos(x_hat[2]+d_theta/2);
 	A_k[2][0] = 0;
 	A_k[2][1] = 0;
-	A_k[2][2] = 1;    
+	A_k[2][2] = 1;
 
-	mat_trans(A_k,A_k_trans); 
+	mat_trans(A_k,A_k_trans);
 
     /*
      *
      * The computation are done all in 3 by 3 matrix (less sub function and easier algebra)
      * since u_k and B_k are supposed to be a R_2 vector and a 3 by 2 matrix I have simply added zeros
      * to make the R_3 and 3 by 3
-    */ 
+    */
     u_k[0] = dSl ;
     u_k[1] = dSr ;
-    u_k[2] = 0; 
+    u_k[2] = 0;
 
 	B_k[0][0] = 1/2 * cos(x_hat[2] + d_theta/2) + dS / (2 * WHEEL_SEP) * sin(x_hat[2] + d_theta/2);
 	B_k[0][1] = 1/2 * cos(x_hat[2] + d_theta/2) - dS / (2 * WHEEL_SEP) * sin(x_hat[2] + d_theta/2);
@@ -193,7 +196,7 @@ void kalman(CtrlStruct *cvs)
 	kalman_pos->x = result_vect[0];
 	kalman_pos->y = result_vect[1];
 	kalman_pos->theta = result_vect[2];
- 
+
  	//------kalman_pos->P_k = (I-K_k)P_hat-----//
 
 	mat_add(I,K_k,result_matrix,0);
@@ -202,10 +205,10 @@ void kalman(CtrlStruct *cvs)
 	//--------end of the Kalman filter---------//
 
 	//printf ( "%f %f %f;\n",kalman_pos->x,kalman_pos->y,kalman_pos->theta);
-	// set_output(cvs->kalman_pos->x,"x");
-	// set_output(cvs->kalman_pos->y,"y");
-	// set_output(cvs->kalman_pos->y,"theta");
-	
+	//set_plot(cvs->kalman_pos->x,"x");
+	//set_plot(cvs->kalman_pos->y,"y");
+	//set_plot(cvs->kalman_pos->y,"theta");
+
 	// update time stamp for next loop
 	kalman_pos->last_t = inputs->t;
 }
