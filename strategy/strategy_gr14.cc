@@ -20,63 +20,53 @@ NAMESPACE_INIT(ctrlGr14);
 #define TAU 0.01
 #define MARGIN_POS 0.050 //if its last_position minus its actual is inferior to this margin during too much time its considered blocked
 #define RECOMPUTE_PATH_T 0.1
+
 static double last_call = 0;//used in deblock_robot to construct or delta_t for the wheel command
-
-
-#define TAU 0.01
-#define MARGIN_POS 0.050 //if its last_position minus its actual is inferior to this margin during too much time its considered blocked
-static double last_call = 0;//used in deblock_robot to construct or delta_t for the wheel command
-
 
 vector<array<float,2> > path;
 
 /*! \brief intitialize the strategy structure
- * 
+ *
  * \return strategy structure initialized
  */
-Strategy* init_strategy()
+Strategy* init_strategy(CtrlStruct *cvs)
 {
 	Strategy *strat;
 
 	strat = (Strategy*) malloc(sizeof(Strategy));
 
-	strat->target[0].x = -0.8;
-	strat->target[0].y = +0.0;
-	strat->target[0].status = TARGET_FREE;
+	// printf("TEAM: %s\n", cvs->team_id == TEAM_A ? "A":"B");
+	// strat->target[0].x = -0.8;
+	// strat->target[0].y = +0.0;
+	// strat->target[0].status = TARGET_FREE;
 
-	strat->target[3].x = -0.4;
-	strat->target[3].y = +0.6;
-	strat->target[3].status = TARGET_FREE;
+	// strat->target[3].x = -0.4;
+	// strat->target[3].y = +0.6;
+	// strat->target[3].status = TARGET_FREE;
 
-	strat->target[2].x = +0.7;
-	strat->target[2].y = +0.6;
-	strat->target[2].status = TARGET_FREE;
+	// strat->target[2].x = +0.7;
+	// strat->target[2].y = +0.6;
+	// strat->target[2].status = TARGET_FREE;
 
-	strat->target[1].x = +0.25;
-	strat->target[1].y = +1.25;
-	strat->target[1].status = TARGET_FREE;
+	// strat->target[1].x = +0.25;
+	// strat->target[1].y = +1.25;
+	// strat->target[1].status = TARGET_FREE;
 
-	strat->target[4].x = +0.1;
-	strat->target[4].y = +0.0;
-	strat->target[4].status = TARGET_FREE;
+	// strat->target[4].x = +0.1;
+	// strat->target[4].y = +0.0;
+	// strat->target[4].status = TARGET_FREE;
 
-	strat->target[5].x = +0.7;
-	strat->target[5].y = -0.6;
-	strat->target[5].status = TARGET_FREE;
+	// strat->target[5].x = +0.7;
+	// strat->target[5].y = -0.6;
+	// strat->target[5].status = TARGET_FREE;
 
-	strat->target[6].x = +0.25;
-	strat->target[6].y = -1.25;
-	strat->target[6].status = TARGET_FREE;
+	// strat->target[6].x = +0.25;
+	// strat->target[6].y = -1.25;
+	// strat->target[6].status = TARGET_FREE;
 
-	strat->target[7].x = -0.4;
-	strat->target[7].y = -0.6;
-	strat->target[7].status = TARGET_FREE;
-
-	strat->start_base.x = +0.7;
-	strat->start_base.y = +0.6;
-
-	strat->target_base.x = -0.8;
-	strat->target_base.y = -1.2;
+	// strat->target[7].x = -0.4;
+	// strat->target[7].y = -0.6;
+	// strat->target[7].status = TARGET_FREE;
 
 	strat->current_target_id = 0;
 	strat->current_point_id = 0;
@@ -97,7 +87,7 @@ Strategy* init_strategy()
 }
 
 /*! \brief release the strategy structure (memory released)
- * 
+ *
  * \param[out] strat strategy structure to release
  */
 void free_strategy(Strategy *strat)
@@ -106,7 +96,7 @@ void free_strategy(Strategy *strat)
 }
 
 /*! \brief startegy during the game
- * 
+ *
  * \param[in,out] cvs controller main structure
  */
 void main_strategy(CtrlStruct *cvs)
@@ -128,12 +118,93 @@ void main_strategy(CtrlStruct *cvs)
 	strat  = cvs->strat;
 	inputs = cvs->inputs;
 	target_id = strat->current_target_id;
-	// printf("Target id: %d\n", target_id);
+	// printf("Remaining: %d\n", strat->remaining_targets);
 
 	update_target_status(cvs);
 
 	array<float, 2> source_pos;
 	array<float, 2> goal_pos;
+
+	if (cvs->team_id == TEAM_A)
+	{
+		strat->target[0].x = -0.8;
+		strat->target[0].y = +0.0;
+		strat->target[0].status = TARGET_FREE;
+
+		strat->target[1].x = +0.25;
+		strat->target[1].y = +1.25;
+		strat->target[1].status = TARGET_FREE;
+
+		strat->target[2].x = +0.7;
+		strat->target[2].y = +0.6;
+		strat->target[2].status = TARGET_FREE;
+
+		strat->target[3].x = -0.4;
+		strat->target[3].y = +0.6;
+		strat->target[3].status = TARGET_FREE;
+
+		strat->target[4].x = +0.1;
+		strat->target[4].y = +0.0;
+		strat->target[4].status = TARGET_FREE;
+
+		strat->target[5].x = +0.7;
+		strat->target[5].y = -0.6;
+		strat->target[5].status = TARGET_FREE;
+
+		strat->target[6].x = +0.25;
+		strat->target[6].y = -1.25;
+		strat->target[6].status = TARGET_FREE;
+
+		strat->target[7].x = -0.4;
+		strat->target[7].y = -0.6;
+		strat->target[7].status = TARGET_FREE;
+
+		strat->start_base.x = +0.7;
+		strat->start_base.y = +0.6;
+
+		strat->target_base.x = -0.8;
+		strat->target_base.y = -1.2;
+	}
+	else
+	{
+		strat->target[0].x = -0.8;
+		strat->target[0].y = +0.0;
+		strat->target[0].status = TARGET_FREE;
+
+		strat->target[1].x = +0.25;
+		strat->target[1].y = -1.25;
+		strat->target[1].status = TARGET_FREE;
+
+		strat->target[7].x = +0.7;
+		strat->target[7].y = -0.6;
+		strat->target[7].status = TARGET_FREE;
+
+		strat->target[4].x = -0.4;
+		strat->target[4].y = -0.6;
+		strat->target[4].status = TARGET_FREE;
+
+		strat->target[3].x = +0.1;
+		strat->target[3].y = +0.0;
+		strat->target[3].status = TARGET_FREE;
+
+		strat->target[5].x = +0.7;
+		strat->target[5].y = +0.6;
+		strat->target[5].status = TARGET_FREE;
+
+		strat->target[2].x = +0.25;
+		strat->target[2].y = +1.25;
+		strat->target[2].status = TARGET_FREE;
+
+		strat->target[6].x = -0.4;
+		strat->target[6].y = +0.6;
+		strat->target[6].status = TARGET_FREE;
+
+		strat->start_base.x = +0.7;
+		strat->start_base.y = -0.6;
+
+		strat->target_base.x = -0.8;
+		strat->target_base.y = +1.2;
+	}
 
 	switch (strat->main_state)
 	{
@@ -142,19 +213,20 @@ void main_strategy(CtrlStruct *cvs)
 			source_pos[0] = cvs->kalman_pos->x;
 			source_pos[1] = cvs->kalman_pos->y;
 
-			if (inputs->nb_targets < 2)
+			if (inputs->nb_targets < 2 && strat->remaining_targets >= 1)
 			{
 				strat->status = STRAT_TARGET;
 				int k = 0;
 				while (strat->target[target_id].status == TARGET_WON || strat->target[target_id].status == TARGET_STOLEN)
 				{
-					if (++k > 8)
-					{
+					// printf("k:%d\n", k);
+					// if (++k > 8)
+					// {
 						
-						printf("END GAME at t = %.2f!\n", cvs->inputs->t);
-						strat->main_state = GAME_STATE_E;
-						return;
-					}
+					// 	printf("END GAME at t = %.2f!\n", cvs->inputs->t);
+					// 	strat->main_state = GAME_STATE_E;
+					// 	return;
+					// }
 					update_current_target_id(strat);
 					target_id = strat->current_target_id;
 				}
@@ -170,6 +242,13 @@ void main_strategy(CtrlStruct *cvs)
 				goal_pos[0] = strat->target_base.x;
 				goal_pos[1] = strat->target_base.y;
 			}
+
+			if (strat->remaining_targets < 1)
+			{
+				printf("END GAME at t = %.2f!\n", cvs->inputs->t);
+				strat->main_state = GAME_STATE_E;
+				return;
+			}
 			path = path_planning_compute(cvs, source_pos, goal_pos);
 			if (!path.empty())//if we're not able to compute a path, we do it again until we got one
 			{
@@ -182,7 +261,7 @@ void main_strategy(CtrlStruct *cvs)
 			}
 			else
 			{
-				printf("Path is empty\n");
+				//printf("Path is empty\n");
 			}
 			strat->last_t_path = inputs->t;
 			break;
@@ -200,7 +279,7 @@ void main_strategy(CtrlStruct *cvs)
 						counter_times_fix = 0;
 						strat->main_state = GAME_STATE_BLOCKED;
 						break;
-					}	
+					}
 				}
 				else//will be necessarily called at least one time --> no need to initialize last_pos_robot
 					//update last_pos_robot if it's not blocked
@@ -209,7 +288,7 @@ void main_strategy(CtrlStruct *cvs)
 					last_pos_robot[X] = cvs->kalman_pos->x;
 					last_pos_robot[Y] = cvs->kalman_pos->y;
 				}
-					
+
 				// printf("=========>We need to compute a path!!!\n");
 
 			 	strat->main_state = GAME_STATE_COMPUTE_PATH;
@@ -273,7 +352,7 @@ void main_strategy(CtrlStruct *cvs)
 			else
 			{
 				deblock_robot(cvs, orientation);
-				if((inputs->t - time_first_call_block) > 1.5)//if it's been already 1 second we try to deblock ourself --> we might be free
+				if((inputs->t - time_first_call_block) > 2.0)//if it's been already 1 second we try to deblock ourself --> we might be free
 				{
 					//path = path_planning_compute(cvs, source_pos, goal_pos);
 					if(fabs(cvs->kalman_pos->x - last_pos_robot[X]) < MARGIN_POS
@@ -325,9 +404,9 @@ void update_target_status(CtrlStruct *cvs)
 		{
 			if( (strat->target[i].status != TARGET_STOLEN) && (strat->target[i].status != TARGET_WON) )
 			{
-				if( (strat->target[i].x > moving_obstacles[j].first_corner[X]) && 
-						(strat->target[i].x < moving_obstacles[j].second_corner[X]) && 
-						(strat->target[i].y < moving_obstacles[j].first_corner[Y]) && 
+				if( (strat->target[i].x > moving_obstacles[j].first_corner[X]) &&
+						(strat->target[i].x < moving_obstacles[j].second_corner[X]) &&
+						(strat->target[i].y < moving_obstacles[j].first_corner[Y]) &&
 						(strat->target[i].y > moving_obstacles[j].second_corner[Y]) )
 				{
 					if (target_occupied[j] != i)
@@ -350,20 +429,23 @@ void update_target_status(CtrlStruct *cvs)
 
 					}
 					break;
-				}	
+				}
 			}
 		}
 		if (i == 8)
 		{
 			target_occupied[j] = -1;
-		}	
+		}
 	}
 }
+
+
+
 //will indicate the robot to go at the opposite as the direction it was originally following
 void deblock_robot(CtrlStruct *cvs, bool orient)
 {
 	//printf("In deblock_robot\n");
-	
+
 
 	if(orient)//we go in the opposit direction
 	{
@@ -374,4 +456,104 @@ void deblock_robot(CtrlStruct *cvs, bool orient)
 		speed_regulation(cvs, 10, 10);
 	}
 }
+
+
+
+
+
+/*return false if the opponent isn't too close or if we go away from it and true in the other case
+level correspond to the level of magnitude of the distance to the opponent
+*/
+bool test_opponent_too_close(CtrlStruct *cvs, double level)
+{
+	double security_dist;
+	//test_level_OF_CIRCLE in argument
+
+	static int n = cvs->inputs->nb_opponents;
+
+	CtrlIn *inputs;
+	KalmanStruct *kalman_pos;
+	OpponentsPosition *opp_pos;
+
+	inputs  = cvs->inputs;
+	kalman_pos = cvs->kalman_pos;
+	opp_pos = cvs->opp_pos;
+
+
+	security_dist = level;
+	double new_distance = 0.;
+
+
+	switch(n)
+	{
+		case 0 : //if no opponent
+			return false;
+
+
+
+		case 1 : //If only one opponent
+			static double last_distance = sqrt( pow(opp_pos->x[0]-kalman_pos->x, 2) + pow(opp_pos->y[0]-kalman_pos->y, 2));
+
+			new_distance = pow(opp_pos->x[0] - kalman_pos->x, 2) + pow(opp_pos->y[0] - kalman_pos->y, 2);
+
+			if(new_distance < security_dist)//if we're too close to the enemy
+			{
+				printf("Too close, security = %1f, last_distance = %3f\n", security_dist, last_distance);
+				if( (last_distance - new_distance)  > -MARGIN_POS)//If we go near the opponent
+
+				{
+					last_distance = new_distance;
+					return true;
+				}
+				else//we go away from the opponent
+				{
+					last_distance = new_distance;
+					return false;
+				}
+			}
+			else
+			{
+				last_distance = new_distance;
+				return false;
+			}
+
+
+
+		case 2 ://if two opponents
+			static double last_distance_1 = sqrt( pow(opp_pos->x[0]-kalman_pos->x, 2) + pow(opp_pos->y[0]-kalman_pos->y, 2));
+			static double last_distance_2 = sqrt( pow(opp_pos->x[1]-kalman_pos->x, 2) + pow(opp_pos->y[1]-kalman_pos->y, 2));
+
+			new_distance = pow(opp_pos->x[0] - kalman_pos->x, 2) + pow(opp_pos->y[0] - kalman_pos->y, 2);//distance from the first opponent
+			if(new_distance < security_dist)//if we're too close to the enemy n°1
+			{
+				if( (last_distance_1 - new_distance)  > -MARGIN_POS)//If we go near the opponent n°1
+				{
+					printf("We go near the opponent\n");
+					last_distance_1 = new_distance;
+					return true;
+				}
+			}
+
+			new_distance = pow(opp_pos->x[1] - kalman_pos->x, 2) + pow(opp_pos->y[1] - kalman_pos->y, 2);//distance from the second opponent
+			if(new_distance < security_dist)//if we're too close to the enemy n°2
+			{
+				if( (last_distance_2 - new_distance)  > -MARGIN_POS)//If we draw near the opponent n°2
+				{
+					last_distance_2 = new_distance;
+					return true;
+				}
+				else//we go away from the opponent n°2
+				{
+					last_distance_2 = new_distance;
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+	}
+}
+
+
 NAMESPACE_CLOSE();

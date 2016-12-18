@@ -1,4 +1,4 @@
-/*! 
+/*!
  * \author Group 14
  * \file strategy_gr14.h
  * \brief strategy during the game
@@ -12,6 +12,11 @@
 #include "CtrlStruct_gr14.h"
 
 #define NB_TARGET 8 //number of target
+
+
+#define FIRST_SECURITY_DISTANCE 0.30
+#define LAST_SECURITY_DISTANCE 0.11
+
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -80,15 +85,18 @@ typedef struct Strategy
 	double last_t_path;
 	int attempts;
 	int remaining_targets;
-	
+
 } Strategy;
 
-Strategy* init_strategy();
+Strategy* init_strategy(CtrlStruct *cvs);
 void free_strategy(Strategy *strat);
 void main_strategy(CtrlStruct *cvs);
 void update_current_target_id(Strategy* strat);
 void update_target_status(CtrlStruct *cvs);
 void deblock_robot(CtrlStruct *cvs, bool orient);
+
+bool test_opponent_too_close(CtrlStruct *cvs, double level);
+
 NAMESPACE_CLOSE();
 
 #endif

@@ -76,7 +76,6 @@ void calibration(CtrlStruct *cvs)
 				}
 				else if (team_id == TEAM_B)
 				{
-					printf("done\n");
 					kalman_pos->y = -1.44;
 					kalman_pos->theta = M_PI/2;
 				}

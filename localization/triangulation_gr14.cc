@@ -234,9 +234,6 @@ void triangulation(CtrlStruct *cvs)
 	pos_tri->x = K * (c12y - c23y) + x_beac_2 - TOWER_OFFSET*cos(pos_tri->theta);
 	pos_tri->y = K * (c23x - c12x) + y_beac_2 - TOWER_OFFSET*sin(pos_tri->theta);
 
-	//printf ( "2: %f %f %f\n",pos_tri->x,pos_tri->y,pos_tri->theta);
-
-
 	// ----- triangulation computation end ----- //
 }
 
