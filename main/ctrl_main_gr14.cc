@@ -1,4 +1,4 @@
-/*! 
+/*!
  * \author Group 14
  * \file controller_main_gr14.cc
  * \brief Initialization, loop and finilization of the controller written in C (but compiled as C++)
@@ -20,7 +20,7 @@
 NAMESPACE_INIT(ctrlGr14);
 
 /*! \brief initialize controller operations (called once)
- * 
+ *
  * \param[in] cvs controller main structure
  */
 void controller_init(CtrlStruct *cvs)
@@ -42,7 +42,7 @@ void controller_init(CtrlStruct *cvs)
 		case ROBOT_R: cvs->team_id = TEAM_A; break;
 		case ROBOT_Y: cvs->team_id = TEAM_B; break;
 		case ROBOT_W: cvs->team_id = TEAM_B; break;
-	
+
 		default:
 			printf("Error: unknown robot ID: %d !\n", inputs->robot_id);
 			exit(EXIT_FAILURE);
@@ -52,7 +52,7 @@ void controller_init(CtrlStruct *cvs)
 	cvs->nb_opp = inputs->nb_opponents;
 
 	// robot initial position
-	set_init_position(cvs->robot_id, cvs->rob_pos);
+	//set_init_position(cvs->robot_id, cvs->rob_pos);
 	set_init_position_kalman(cvs->robot_id, cvs->kalman_pos);
 	cvs->kalman_pos->last_t = t;
 	cvs->rob_pos->last_t = t;
@@ -67,7 +67,7 @@ void controller_init(CtrlStruct *cvs)
 }
 
 /*! \brief controller loop (called every time-step)
- * 
+ *
  * \param[in] cvs controller main structure
  */
 void controller_loop(CtrlStruct *cvs)
@@ -100,12 +100,17 @@ void controller_loop(CtrlStruct *cvs)
 	// set_plot(cvs->kalman_pos->y,"y");
 	// set_plot(cvs->kalman_pos->theta,"t");
 
+	//set_plot(cvs->opp_pos->x[0],"x");
+	//set_plot(cvs->opp_pos->y[0],"y");
+
 	// set_plot(inputs->r_wheel_speed,"r_wheel_speed");
 	// set_plot(inputs->l_wheel_speed,"l_wheel_speed");
 
-	set_output(cvs->kalman_pos->x,"x_r");
-	set_output(cvs->kalman_pos->y,"y_r");
-	set_output(cvs->kalman_pos->theta,"theta_r");
+	set_plot(cvs->kalman_pos->x,"x_r");
+	set_plot(cvs->kalman_pos->y,"y_r");
+	set_plot(cvs->kalman_pos->theta,"theta_r");
+
+	// printf("BLUE: %s\n", cvs->inputs->color_seen == 4 ? "TRUE":"FALSE");
 
 	// printf("x: %f\t", cvs->kalman_pos->x);
 	// printf("y: %f\t", cvs->kalman_pos->y);
@@ -114,6 +119,9 @@ void controller_loop(CtrlStruct *cvs)
 	// printf("x: %f\t", cvs->kalman_pos->x);
 	// printf("y: %f\t", cvs->kalman_pos->y);
 	// printf("t: %f\n", cvs->kalman_pos->theta*180/M_PI);
+
+	//set_plot(cvs->inputs->l_wheel_speed,"l_speed");
+	//set_plot(cvs->inputs->l_wheel_speed,"r_speed");
 
 
 	// tower control
@@ -133,7 +141,7 @@ void controller_loop(CtrlStruct *cvs)
 			if (t > 0.0)
 			{
 				cvs->main_state = RUN_STATE;
-				cvs->strat->main_state = GAME_STATE_INITIAL;
+				cvs->strat->main_state = GAME_STATE_COMPUTE_PATH;
 			}
 			break;
 
@@ -157,7 +165,7 @@ void controller_loop(CtrlStruct *cvs)
 			printf("Error: state NB_MAIN_STATES should not be reached !\n");
 			exit(EXIT_FAILURE);
 			break;
-	
+
 		default:
 			printf("Error:unknown state : %d !\n", cvs->main_state);
 			exit(EXIT_FAILURE);
@@ -165,7 +173,7 @@ void controller_loop(CtrlStruct *cvs)
 }
 
 /*! \brief last controller operations (called once)
- * 
+ *
  * \param[in] cvs controller main structure
  */
 void controller_finish(CtrlStruct *cvs)

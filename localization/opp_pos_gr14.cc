@@ -7,7 +7,7 @@ NAMESPACE_INIT(ctrlGr14);
 
 #define TOWER_RADIUS 40e-3
 #define TOWER2CENTER 83e-3
-#define TAU 0.4
+#define TAU 0.7
  
 /*! \brief compute the opponents position using the tower
  * 
