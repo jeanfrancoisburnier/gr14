@@ -1,4 +1,4 @@
-/*! 
+/*!
  * \author Group 14
  * \file strategy_gr14.h
  * \brief strategy during the game
@@ -13,8 +13,8 @@
 
 #define NB_TARGET 8 //number of target
 
-#define FIRST_SECURITY_DISTANCE 0.250
-#define LAST_SECURITY_DISTANCE 0.180
+#define FIRST_SECURITY_DISTANCE 0.30
+#define LAST_SECURITY_DISTANCE 0.09
 
 NAMESPACE_INIT(ctrlGr14);
 
@@ -83,7 +83,7 @@ typedef struct Strategy
 	double last_t_path;
 	int attempts;
 	int remaining_targets;
-	
+
 } Strategy;
 
 Strategy* init_strategy();
