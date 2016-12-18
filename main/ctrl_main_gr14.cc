@@ -120,9 +120,6 @@ void controller_loop(CtrlStruct *cvs)
 	// printf("y: %f\t", cvs->kalman_pos->y);
 	// printf("t: %f\n", cvs->kalman_pos->theta*180/M_PI);
 
-	set_plot(cvs->inputs->l_wheel_speed,"l_speed");
-	set_plot(cvs->inputs->l_wheel_speed,"r_speed");
-
 
 	// tower control
 	outputs->tower_command = 15.0;

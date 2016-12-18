@@ -22,12 +22,6 @@ NAMESPACE_INIT(ctrlGr14);
 #define RECOMPUTE_PATH_T 0.1
 static double last_call = 0;//used in deblock_robot to construct or delta_t for the wheel command
 
-
-#define TAU 0.01
-#define MARGIN_POS 0.050 //if its last_position minus its actual is inferior to this margin during too much time its considered blocked
-static double last_call = 0;//used in deblock_robot to construct or delta_t for the wheel command
-
-
 vector<array<float,2> > path;
 
 /*! \brief intitialize the strategy structure
@@ -128,7 +122,7 @@ void main_strategy(CtrlStruct *cvs)
 	strat  = cvs->strat;
 	inputs = cvs->inputs;
 	target_id = strat->current_target_id;
-	// printf("Target id: %d\n", target_id);
+	// printf("Remaining: %d\n", strat->remaining_targets);
 
 	update_target_status(cvs);
 
@@ -142,19 +136,20 @@ void main_strategy(CtrlStruct *cvs)
 			source_pos[0] = cvs->kalman_pos->x;
 			source_pos[1] = cvs->kalman_pos->y;
 
-			if (inputs->nb_targets < 2)
+			if (inputs->nb_targets < 2 && strat->remaining_targets >= 1)
 			{
 				strat->status = STRAT_TARGET;
 				int k = 0;
 				while (strat->target[target_id].status == TARGET_WON || strat->target[target_id].status == TARGET_STOLEN)
 				{
-					if (++k > 8)
-					{
+					// printf("k:%d\n", k);
+					// if (++k > 8)
+					// {
 						
-						printf("END GAME at t = %.2f!\n", cvs->inputs->t);
-						strat->main_state = GAME_STATE_E;
-						return;
-					}
+					// 	printf("END GAME at t = %.2f!\n", cvs->inputs->t);
+					// 	strat->main_state = GAME_STATE_E;
+					// 	return;
+					// }
 					update_current_target_id(strat);
 					target_id = strat->current_target_id;
 				}
@@ -169,6 +164,13 @@ void main_strategy(CtrlStruct *cvs)
 				strat->status = STRAT_SCORING;
 				goal_pos[0] = strat->target_base.x;
 				goal_pos[1] = strat->target_base.y;
+			}
+
+			if (strat->remaining_targets < 1)
+			{
+				printf("END GAME at t = %.2f!\n", cvs->inputs->t);
+				strat->main_state = GAME_STATE_E;
+				return;
 			}
 			path = path_planning_compute(cvs, source_pos, goal_pos);
 			if (!path.empty())//if we're not able to compute a path, we do it again until we got one
@@ -273,7 +275,7 @@ void main_strategy(CtrlStruct *cvs)
 			else
 			{
 				deblock_robot(cvs, orientation);
-				if((inputs->t - time_first_call_block) > 1.5)//if it's been already 1 second we try to deblock ourself --> we might be free
+				if((inputs->t - time_first_call_block) > 2.0)//if it's been already 1 second we try to deblock ourself --> we might be free
 				{
 					//path = path_planning_compute(cvs, source_pos, goal_pos);
 					if(fabs(cvs->kalman_pos->x - last_pos_robot[X]) < MARGIN_POS

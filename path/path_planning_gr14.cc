@@ -489,7 +489,7 @@ array<Obstacles, NB_FIXED_OBSTACLES> initialization_fixed_obstacles()
 	list_obstacles[3].first_corner[X] = -0.850;
 	list_obstacles[3].first_corner[Y] = -0.830 + OBSTACLE_MARGIN;
 	list_obstacles[3].second_corner[X] = -0.500 + OBSTACLE_MARGIN;
-	list_obstacles[3].second_corner[Y] = -0.850 - OBSTACLE_MARGIN;
+	list_obstacles[3].second_corner[Y] = -0.9 - OBSTACLE_MARGIN;
 
 	list_obstacles[4].first_corner[X] = -0.200 - OBSTACLE_MARGIN;
 	list_obstacles[4].first_corner[Y] = 0.400 + OBSTACLE_MARGIN;
