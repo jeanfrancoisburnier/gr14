@@ -54,6 +54,21 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	if (i < path.size() - 1)
 	{
 		K = 5;
+		if(test_opponent_too_close(cvs, FIRST_SECURITY_DISTANCE))
+		{
+			if(test_opponent_too_close(cvs, LAST_SECURITY_DISTANCE))
+			{
+				K = 0;
+			}
+			else
+			{
+				K = 1;
+			}
+		}
+
+
+
+		//test_if_opponent_too_close
 		if (pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL) 
 		{
 			set_output(path[i][0],"x_path");
@@ -65,6 +80,18 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	else if (i == path.size() - 1 && pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL_NEW)
 	{
 		K = 1;
+
+		if(test_opponent_too_close(cvs, FIRST_SECURITY_DISTANCE))
+		{
+			if(test_opponent_too_close(cvs, LAST_SECURITY_DISTANCE))
+			{
+				K = 0;
+			}
+			else
+			{
+				K = 2;
+			}
+		}
 
 		if (pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL_TAR)
 		{

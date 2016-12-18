@@ -13,6 +13,9 @@
 
 #define NB_TARGET 8 //number of target
 
+#define FIRST_SECURITY_DISTANCE 0.250
+#define LAST_SECURITY_DISTANCE 0.180
+
 NAMESPACE_INIT(ctrlGr14);
 
 /// 'main_state' states (adapt with your own states)
@@ -89,6 +92,9 @@ void main_strategy(CtrlStruct *cvs);
 void update_current_target_id(Strategy* strat);
 void update_target_status(CtrlStruct *cvs);
 void deblock_robot(CtrlStruct *cvs, bool orient);
+
+bool test_opponent_too_close(CtrlStruct *cvs, double level);
+
 NAMESPACE_CLOSE();
 
 #endif

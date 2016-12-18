@@ -18,8 +18,8 @@
 
 //#define NB_OPPONENTS 2
 #define NB_FIXED_OBSTACLES 10 // 8 fixed obstacles + 2 oponents
-#define ROBOT_SIZE 0.260 //[m] diameter
-#define SECURITY_RANGE 0.020 //[m] security range add to the obstacles 
+//#define ROBOT_SIZE 0.260 //[m] diameter
+//#define SECURITY_RANGE 0.020 //[m] security range add to the obstacles 
  							//(and to robot's size / 2) to be able to consider the robot as a material point
 
 using namespace std; //to be able to use array
