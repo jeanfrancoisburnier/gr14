@@ -14,6 +14,13 @@
 using namespace std;
 
 NAMESPACE_INIT(ctrlGr14);
+#define FORWARD true;
+#define BACKWARD false;
+#define TAU 0.01
+#define MARGIN_POS 0.050 //if its last_position minus its actual is inferior to this margin during too much time its considered blocked
+#define RECOMPUTE_PATH_T 0.1
+static double last_call = 0;//used in deblock_robot to construct or delta_t for the wheel command
+
 
 vector<array<float,2> > path;
 
@@ -31,17 +38,17 @@ Strategy* init_strategy()
 	strat->target[0].y = +0.0;
 	strat->target[0].status = TARGET_FREE;
 
-	strat->target[1].x = -0.4;
-	strat->target[1].y = +0.6;
-	strat->target[1].status = TARGET_FREE;
+	strat->target[3].x = -0.4;
+	strat->target[3].y = +0.6;
+	strat->target[3].status = TARGET_FREE;
 
 	strat->target[2].x = +0.7;
 	strat->target[2].y = +0.6;
 	strat->target[2].status = TARGET_FREE;
 
-	strat->target[3].x = +0.25;
-	strat->target[3].y = +1.25;
-	strat->target[3].status = TARGET_FREE;
+	strat->target[1].x = +0.25;
+	strat->target[1].y = +1.25;
+	strat->target[1].status = TARGET_FREE;
 
 	strat->target[4].x = +0.1;
 	strat->target[4].y = +0.0;
@@ -62,7 +69,7 @@ Strategy* init_strategy()
 	strat->start_base.x = +0.7;
 	strat->start_base.y = +0.6;
 
-	strat->target_base.x = -0.7;
+	strat->target_base.x = -0.8;
 	strat->target_base.y = -1.2;
 
 	strat->current_target_id = 0;
@@ -98,6 +105,14 @@ void free_strategy(Strategy *strat)
  */
 void main_strategy(CtrlStruct *cvs)
 {
+	static int counter_times_fix = 0;
+	static bool orientation = FORWARD;
+	//Static variables used in GAME_STATE_BLOCKED
+	static bool first_call_block = true;
+	static double time_first_call_block = 0.0;
+	static float last_pos_robot[2];
+	static int nb_still_fix = 0;
+
 	// variables declaration
 	Strategy *strat;
 	CtrlIn *inputs;
@@ -167,8 +182,30 @@ void main_strategy(CtrlStruct *cvs)
 			break;
 
 		case GAME_STATE_GO_TO_GOAL:
-			if (inputs->t - strat->last_t_path >= 0.1)
+			if (inputs->t - strat->last_t_path >= RECOMPUTE_PATH_T)
 			{
+				//if at the same position as the last call
+				if(fabs(cvs->kalman_pos->x - last_pos_robot[X]) < MARGIN_POS
+					&& fabs(cvs->kalman_pos->y - last_pos_robot[Y]) < MARGIN_POS)//if at the same position as the last call
+				{
+					counter_times_fix++;
+					if(counter_times_fix >= 3.0/RECOMPUTE_PATH_T)//means it's been 3 seconds it was blocked
+					{
+						counter_times_fix = 0;
+						strat->main_state = GAME_STATE_BLOCKED;
+						break;
+					}	
+				}
+				else//will be necessarily called at least one time --> no need to initialize last_pos_robot
+					//update last_pos_robot if it's not blocked
+				{
+					counter_times_fix = 0;
+					last_pos_robot[X] = cvs->kalman_pos->x;
+					last_pos_robot[Y] = cvs->kalman_pos->y;
+				}
+					
+				// printf("=========>We need to compute a path!!!\n");
+
 			 	strat->main_state = GAME_STATE_COMPUTE_PATH;
 				break;
 			}
@@ -220,6 +257,36 @@ void main_strategy(CtrlStruct *cvs)
  			}
 			break;
 
+		case GAME_STATE_BLOCKED: //if the robot stay more than 2 second it means it's blocked
+			//printf("In GAME_STATE_BLOCKED\n");
+			if(first_call_block == true)
+			{
+				first_call_block = false;
+				time_first_call_block = inputs->t;
+			}
+			else
+			{
+				deblock_robot(cvs, orientation);
+				if((inputs->t - time_first_call_block) > 1.5)//if it's been already 1 second we try to deblock ourself --> we might be free
+				{
+					//path = path_planning_compute(cvs, source_pos, goal_pos);
+					if(fabs(cvs->kalman_pos->x - last_pos_robot[X]) < MARGIN_POS
+						&& fabs(cvs->kalman_pos->y - last_pos_robot[Y]) < MARGIN_POS)//TJRS bloqué
+					{
+						orientation = BACKWARD;
+						deblock_robot(cvs, orientation);
+					}
+					else
+					{
+						orientation = FORWARD;
+						strat->main_state = GAME_STATE_COMPUTE_PATH;//return do what it was supposed to do when deblocked
+					}
+					first_call_block = true;
+					time_first_call_block = 0;
+				}
+			}
+			break;
+
 		default:
 			printf("Error: unknown strategy main state: %d !\n", strat->main_state);
 			exit(EXIT_FAILURE);
@@ -259,7 +326,7 @@ void update_target_status(CtrlStruct *cvs)
 					{
 						target_occupied[j] = i;
 						last_t_update[j] = cvs->inputs->t;
-						printf("reseting TIME\n");
+						// printf("reseting TIME\n");
 					}
 					else
 					{
@@ -282,6 +349,22 @@ void update_target_status(CtrlStruct *cvs)
 		{
 			target_occupied[j] = -1;
 		}	
+	}
+}
+
+//will indicate the robot to go at the opposite as the direction it was originally following
+void deblock_robot(CtrlStruct *cvs, bool orient)
+{
+	//printf("In deblock_robot\n");
+	
+
+	if(orient)//we go in the opposit direction
+	{
+		speed_regulation(cvs, -10, -10);
+	}
+	else//BACKWARDS, we go in the opposit direction
+	{
+		speed_regulation(cvs, 10, 10);
 	}
 }
 

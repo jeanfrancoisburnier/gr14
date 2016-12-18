@@ -50,7 +50,7 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 		
 	if (i < path.size() - 1)
 	{
-		K = 3;
+		K = 5;
 
 		if (pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL) 
 		{

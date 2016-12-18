@@ -9,7 +9,7 @@
 
 #include "node_gr14.h"
 
-#define OBSTACLE_MARGIN 0.20;
+#define OBSTACLE_MARGIN 0.2//0.2;
 
 const int NB_NODES = NB_X * NB_Y;
 
