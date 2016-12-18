@@ -14,8 +14,8 @@
 #define NB_TARGET 8 //number of target
 
 
-#define FIRST_SECURITY_DISTANCE 0.30
-#define LAST_SECURITY_DISTANCE 0.11
+#define FIRST_SECURITY_DISTANCE 0.25
+#define LAST_SECURITY_DISTANCE 0.1
 
 
 NAMESPACE_INIT(ctrlGr14);
@@ -85,6 +85,7 @@ typedef struct Strategy
 	double last_t_path;
 	int attempts;
 	int remaining_targets;
+	bool init_flag;
 
 } Strategy;
 
