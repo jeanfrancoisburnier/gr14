@@ -20,12 +20,13 @@ NAMESPACE_INIT(ctrlGr14);
 #define TAU 0.01
 #define MARGIN_POS 0.050 //if its last_position minus its actual is inferior to this margin during too much time its considered blocked
 #define RECOMPUTE_PATH_T 0.1
+
 static double last_call = 0;//used in deblock_robot to construct or delta_t for the wheel command
 
 vector<array<float,2> > path;
 
 /*! \brief intitialize the strategy structure
- * 
+ *
  * \return strategy structure initialized
  */
 Strategy* init_strategy(CtrlStruct *cvs)
@@ -86,7 +87,7 @@ Strategy* init_strategy(CtrlStruct *cvs)
 }
 
 /*! \brief release the strategy structure (memory released)
- * 
+ *
  * \param[out] strat strategy structure to release
  */
 void free_strategy(Strategy *strat)
@@ -95,7 +96,7 @@ void free_strategy(Strategy *strat)
 }
 
 /*! \brief startegy during the game
- * 
+ *
  * \param[in,out] cvs controller main structure
  */
 void main_strategy(CtrlStruct *cvs)
@@ -260,7 +261,7 @@ void main_strategy(CtrlStruct *cvs)
 			}
 			else
 			{
-				printf("Path is empty\n");
+				//printf("Path is empty\n");
 			}
 			strat->last_t_path = inputs->t;
 			break;
@@ -278,7 +279,7 @@ void main_strategy(CtrlStruct *cvs)
 						counter_times_fix = 0;
 						strat->main_state = GAME_STATE_BLOCKED;
 						break;
-					}	
+					}
 				}
 				else//will be necessarily called at least one time --> no need to initialize last_pos_robot
 					//update last_pos_robot if it's not blocked
@@ -287,7 +288,7 @@ void main_strategy(CtrlStruct *cvs)
 					last_pos_robot[X] = cvs->kalman_pos->x;
 					last_pos_robot[Y] = cvs->kalman_pos->y;
 				}
-					
+
 				// printf("=========>We need to compute a path!!!\n");
 
 			 	strat->main_state = GAME_STATE_COMPUTE_PATH;
@@ -403,9 +404,9 @@ void update_target_status(CtrlStruct *cvs)
 		{
 			if( (strat->target[i].status != TARGET_STOLEN) && (strat->target[i].status != TARGET_WON) )
 			{
-				if( (strat->target[i].x > moving_obstacles[j].first_corner[X]) && 
-						(strat->target[i].x < moving_obstacles[j].second_corner[X]) && 
-						(strat->target[i].y < moving_obstacles[j].first_corner[Y]) && 
+				if( (strat->target[i].x > moving_obstacles[j].first_corner[X]) &&
+						(strat->target[i].x < moving_obstacles[j].second_corner[X]) &&
+						(strat->target[i].y < moving_obstacles[j].first_corner[Y]) &&
 						(strat->target[i].y > moving_obstacles[j].second_corner[Y]) )
 				{
 					if (target_occupied[j] != i)
@@ -428,20 +429,23 @@ void update_target_status(CtrlStruct *cvs)
 
 					}
 					break;
-				}	
+				}
 			}
 		}
 		if (i == 8)
 		{
 			target_occupied[j] = -1;
-		}	
+		}
 	}
 }
+
+
+
 //will indicate the robot to go at the opposite as the direction it was originally following
 void deblock_robot(CtrlStruct *cvs, bool orient)
 {
 	//printf("In deblock_robot\n");
-	
+
 
 	if(orient)//we go in the opposit direction
 	{
@@ -452,4 +456,104 @@ void deblock_robot(CtrlStruct *cvs, bool orient)
 		speed_regulation(cvs, 10, 10);
 	}
 }
+
+
+
+
+
+/*return false if the opponent isn't too close or if we go away from it and true in the other case
+level correspond to the level of magnitude of the distance to the opponent
+*/
+bool test_opponent_too_close(CtrlStruct *cvs, double level)
+{
+	double security_dist;
+	//test_level_OF_CIRCLE in argument
+
+	static int n = cvs->inputs->nb_opponents;
+
+	CtrlIn *inputs;
+	KalmanStruct *kalman_pos;
+	OpponentsPosition *opp_pos;
+
+	inputs  = cvs->inputs;
+	kalman_pos = cvs->kalman_pos;
+	opp_pos = cvs->opp_pos;
+
+
+	security_dist = level;
+	double new_distance = 0.;
+
+
+	switch(n)
+	{
+		case 0 : //if no opponent
+			return false;
+
+
+
+		case 1 : //If only one opponent
+			static double last_distance = sqrt( pow(opp_pos->x[0]-kalman_pos->x, 2) + pow(opp_pos->y[0]-kalman_pos->y, 2));
+
+			new_distance = pow(opp_pos->x[0] - kalman_pos->x, 2) + pow(opp_pos->y[0] - kalman_pos->y, 2);
+
+			if(new_distance < security_dist)//if we're too close to the enemy
+			{
+				printf("Too close, security = %1f, last_distance = %3f\n", security_dist, last_distance);
+				if( (last_distance - new_distance)  > -MARGIN_POS)//If we go near the opponent
+
+				{
+					last_distance = new_distance;
+					return true;
+				}
+				else//we go away from the opponent
+				{
+					last_distance = new_distance;
+					return false;
+				}
+			}
+			else
+			{
+				last_distance = new_distance;
+				return false;
+			}
+
+
+
+		case 2 ://if two opponents
+			static double last_distance_1 = sqrt( pow(opp_pos->x[0]-kalman_pos->x, 2) + pow(opp_pos->y[0]-kalman_pos->y, 2));
+			static double last_distance_2 = sqrt( pow(opp_pos->x[1]-kalman_pos->x, 2) + pow(opp_pos->y[1]-kalman_pos->y, 2));
+
+			new_distance = pow(opp_pos->x[0] - kalman_pos->x, 2) + pow(opp_pos->y[0] - kalman_pos->y, 2);//distance from the first opponent
+			if(new_distance < security_dist)//if we're too close to the enemy n°1
+			{
+				if( (last_distance_1 - new_distance)  > -MARGIN_POS)//If we go near the opponent n°1
+				{
+					printf("We go near the opponent\n");
+					last_distance_1 = new_distance;
+					return true;
+				}
+			}
+
+			new_distance = pow(opp_pos->x[1] - kalman_pos->x, 2) + pow(opp_pos->y[1] - kalman_pos->y, 2);//distance from the second opponent
+			if(new_distance < security_dist)//if we're too close to the enemy n°2
+			{
+				if( (last_distance_2 - new_distance)  > -MARGIN_POS)//If we draw near the opponent n°2
+				{
+					last_distance_2 = new_distance;
+					return true;
+				}
+				else//we go away from the opponent n°2
+				{
+					last_distance_2 = new_distance;
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+	}
+}
+
+
 NAMESPACE_CLOSE();

@@ -105,12 +105,12 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 
     if( !nodes_grid[source_id].node_get_free_position() )
     {
-    	printf("invalid start, on an occupied node\n");
+    	//printf("invalid start, on an occupied node\n");
     	last_id = source_id;
     	source_id = search_free_neighbours(source_id);
     	if(source_id == last_id)//search free neighbours failed (will not happened normally)
     	{
-    		printf("Still invalid, path is now empty\n");
+    		//printf("Still invalid, path is now empty\n");
     		path.clear();
     		return path;//path returned is empty
     	}
@@ -119,17 +119,17 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 
     if( !nodes_grid[goal_id].node_get_free_position() )
     {
-    	printf("invalid goal, on an occupied node\n");
+    	//printf("invalid goal, on an occupied node\n");
     	last_id = goal_id;
     	goal_id = search_free_neighbours(goal_id);
     	if(goal_id == last_id)//search free neighbours failed (will not happened normally)
     	{
-    		printf("Still invalid, path is now empty\n");
+    		//printf("Still invalid, path is now empty\n");
     		path.clear();
     		return path;//path returned is empty
     	}
     }
-  	
+
   	static int last_goal_id = goal_id;
 
     update_grid(cvs);
@@ -144,6 +144,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     		id_actual_n = node_find_closest_node(path[i][X], path[i][Y]);
     		if(nodes_grid[id_actual_n].node_get_free_position() == OCCUPIED)//if a node of the path is now occupied
     		{
+    			printf("Ennemy on the path\n");
     			recompute_needed = true;//we need to recompute a new path
     			break;
     		}
@@ -162,7 +163,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 
     	if(path_not_found)
     	{
-    		printf("path not found", path_not_found);
+    		//printf("path not found", path_not_found);
     		path.clear();
     		return path;
     	}
@@ -223,7 +224,7 @@ bool a_star(CtrlStruct *cvs, int source_id, int goal_id)
         //check if there are new nodes available in the queue and if not return an error
         if(open_paths.size() == 0)
         {
-            printf("No nodes available in the queue\n");
+            //printf("No nodes available in the queue\n");
         	return true;
         }
 
@@ -426,10 +427,10 @@ vector<Obstacles> update_moving_obstacles(CtrlStruct *cvs)
  	for(int i=0; i<n; i++)
  	{
  		//printf("opp_x = %3f \t opp_y = %3f t = %3f\n", cvs->opp_pos->x[i], cvs->opp_pos->y[i], cvs->inputs->t);
- 		oppon.first_corner[X] = cvs->opp_pos->x[i] - ROBOT_SIZE/2 - 2*SECURITY_RANGE;
-		oppon.first_corner[Y] =  cvs->opp_pos->y[i] + ROBOT_SIZE/2 + 2*SECURITY_RANGE;
-		oppon.second_corner[X] =  cvs->opp_pos->x[i] + ROBOT_SIZE/2 + 2*SECURITY_RANGE;
-		oppon.second_corner[Y] =  cvs->opp_pos->y[i] - ROBOT_SIZE/2 - 2*SECURITY_RANGE;
+ 		oppon.first_corner[X] = cvs->opp_pos->x[i] - OBSTACLE_MARGIN;
+		oppon.first_corner[Y] =  cvs->opp_pos->y[i] + OBSTACLE_MARGIN;
+		oppon.second_corner[X] =  cvs->opp_pos->x[i] + OBSTACLE_MARGIN;
+		oppon.second_corner[Y] =  cvs->opp_pos->y[i] - OBSTACLE_MARGIN;
 
 		moving_obstacles.push_back(oppon);
  	}
@@ -457,11 +458,9 @@ bool test_if_goal_is_set_on_opponent(CtrlStruct *cvs, array<float, 2> goal_pos)
 		{
 			return true;
 		}
-		else
-		{
-			return false;
-		}
 	}
+
+	return false;
 }
 
 

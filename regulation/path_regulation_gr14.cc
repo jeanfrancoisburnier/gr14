@@ -24,7 +24,7 @@ static int K = 3;
 static double last_t = 0;
 
 /*! \brief follow a given path
- * 
+ *
  * \param[in,out] cvs controller main structure
  */
 void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
@@ -47,14 +47,31 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	// Vector from robot to target
 	double vector_x = x_point-kalman_pos->x;
 	double vector_y = y_point-kalman_pos->y;
-		
+
 	// static int count = 0;
 	// count++;
 
 	if (i < path.size() - 1)
 	{
 		K = 5;
-		if (pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL) 
+		if(test_opponent_too_close(cvs, FIRST_SECURITY_DISTANCE))
+		{
+			if(test_opponent_too_close(cvs, LAST_SECURITY_DISTANCE))
+			{
+				printf("ROBOT stop ");
+				K = 0;
+			}
+			else
+			{
+				printf("ROBOT slow down ");
+				K = 2;
+			}
+		}
+
+
+
+		//test_if_opponent_too_close
+		if (pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL)
 		{
 			set_output(path[i][0],"x_path");
 			set_output(path[i][1],"y_path");
@@ -65,6 +82,20 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	else if (i == path.size() - 1 && pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL_NEW)
 	{
 		K = 1;
+
+		if(test_opponent_too_close(cvs, FIRST_SECURITY_DISTANCE))
+		{
+			if(test_opponent_too_close(cvs, LAST_SECURITY_DISTANCE))
+			{
+				printf("ROBOT stop ");
+				K = 0;
+			}
+			else
+			{
+				printf("ROBOT slow down ");
+				K = 1;
+			}
+		}
 
 		if (pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL_TAR)
 		{
@@ -128,7 +159,7 @@ void get_new_speed(double gamma, double *l_speed, double *r_speed)
 
 	if (gamma > 0 && gamma <= M_PI/2)
 	{
-		quadrant = 0;	
+		quadrant = 0;
 	}
 	else if (gamma > M_PI/2 && gamma <= M_PI)
 	{
@@ -194,6 +225,7 @@ void get_new_speed(double gamma, double *l_speed, double *r_speed)
 	*l_speed *= K;
 	*r_speed *= K;
 
+	printf("K = %d\n", K);
 	// printf("Quadrant: %d, b = %d \t l: %.3f, r: %.3f\n", quadrant, b, *l_speed, *r_speed);
 
 	// // Zone 1
