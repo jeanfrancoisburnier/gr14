@@ -416,7 +416,7 @@ bool test_opponent_too_close(CtrlStruct *cvs, double level)
 
 			if(new_distance < security_dist)//if we're too close to the enemy
 			{
-				printf("Too close\n");
+				printf("Too close, security_dist = %3f\n", security_dist);
 				if( (last_distance - new_distance)  > 0)//If we go near the opponent
 				{
 					last_distance = new_distance;
@@ -463,6 +463,10 @@ bool test_opponent_too_close(CtrlStruct *cvs, double level)
 					last_distance_2 = new_distance;
 					return false;
 				}
+			}
+			else
+			{
+				return false;
 			}
 	}
 }
