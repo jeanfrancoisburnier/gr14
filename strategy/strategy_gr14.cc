@@ -7,6 +7,7 @@
 #include "opp_pos_gr14.h"
 #include "odometry_gr14.h"
 #include "node_gr14.h"
+#include "useful_gr14.h"
 #include <vector>
 #include <array>
 #include <math.h>
@@ -19,6 +20,11 @@ NAMESPACE_INIT(ctrlGr14);
 #define TAU 0.01
 #define MARGIN_POS 0.050 //if its last_position minus its actual is inferior to this margin during too much time its considered blocked
 #define RECOMPUTE_PATH_T 0.1
+static double last_call = 0;//used in deblock_robot to construct or delta_t for the wheel command
+
+
+#define TAU 0.01
+#define MARGIN_POS 0.050 //if its last_position minus its actual is inferior to this margin during too much time its considered blocked
 static double last_call = 0;//used in deblock_robot to construct or delta_t for the wheel command
 
 
@@ -286,12 +292,12 @@ void main_strategy(CtrlStruct *cvs)
 				}
 			}
 			break;
-
 		default:
 			printf("Error: unknown strategy main state: %d !\n", strat->main_state);
 			exit(EXIT_FAILURE);
 	}
 }
+
 
 void update_current_target_id(Strategy* strat)
 {
@@ -299,11 +305,13 @@ void update_current_target_id(Strategy* strat)
 	return;
 }
 
+
 //to call each 1.5 sec to see if the opponent just pass above the target or stopped to take it
 void update_target_status(CtrlStruct *cvs)
 {
 	Strategy *strat;
 	strat  = cvs->strat;
+
 	// printf("Updating target status\n");
 	static int target_occupied[2] = {-1};
 	static double last_t_update[2];
@@ -351,7 +359,6 @@ void update_target_status(CtrlStruct *cvs)
 		}	
 	}
 }
-
 //will indicate the robot to go at the opposite as the direction it was originally following
 void deblock_robot(CtrlStruct *cvs, bool orient)
 {
@@ -367,5 +374,4 @@ void deblock_robot(CtrlStruct *cvs, bool orient)
 		speed_regulation(cvs, 10, 10);
 	}
 }
-
 NAMESPACE_CLOSE();

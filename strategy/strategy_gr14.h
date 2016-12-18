@@ -7,6 +7,8 @@
 #ifndef _STRATEGY_GR14_H_
 #define _STRATEGY_GR14_H_
 
+#define NB_TARGET 8 //number of target
+
 #include "CtrlStruct_gr14.h"
 
 #define NB_TARGET 8 //number of target
@@ -71,7 +73,7 @@ typedef struct Strategy
 	int prev_nb_target_carrying;
 	uint8_t current_target_id;
 	uint8_t current_point_id;
-	target_t target[8];
+	target_t target[NB_TARGET];
 	start_base_t  start_base;
 	target_base_t target_base;
 	double last_t_wait;

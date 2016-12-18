@@ -102,20 +102,6 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 
     static vector<array<float,2> > path;
 
-// 	   if(goal_id >= nodes_grid.size() || goal_id < 0 )
- //    {
- //        printf("invalid goal, outside the map\n");
- //        exit(EXIT_FAILURE);
- //        //Set the flag "path generated" to 0 and return Null
- //    }
-
-
- //    if( source_id >= nodes_grid.size() || source_id < 0)
- //    {
- //        printf("invalid start, outside the map\n");
- //        exit(EXIT_FAILURE);
- //        //Set the flag "path generated" to 0 and return Null
- //    }
 
     if( !nodes_grid[source_id].node_get_free_position() )
     {
@@ -128,7 +114,6 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     		path.clear();
     		return path;//path returned is empty
     	}
-
 
     }
 
@@ -144,9 +129,9 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     		return path;//path returned is empty
     	}
     }
+  	
+  	static int last_goal_id = goal_id;
 
-  	static int last_goal_id  = goal_id;//will be useful later to test if we changed the goal
-  	//printf("After correction : source_id = %d \t goal_id = %d\n\n", source_id, goal_id);
     update_grid(cvs);
 
     if(last_goal_id == goal_id) //if the goal is the same as last call
@@ -169,7 +154,6 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
     	}
     }
 
-    //printf("recompute_needed = %d\n", recompute_needed);
     if(recompute_needed == true)//compute a new path
     {
     	path.clear();//remove the old path
@@ -191,8 +175,7 @@ vector<array<float,2> > path_planning_compute(CtrlStruct *cvs, array<float, 2> s
 
     last_goal_id = goal_id;
 
-    //Set the flag "path generated" to 1 and return path
-    return path;
+    return path;//We return the computed path or an empty one if we weren't able to compute one
 }
 
 
@@ -353,7 +336,6 @@ int search_free_neighbours(int id_occ)
 	}
 
 	return id_occ;//if it didn't find a free id, we return the actual occupied node (it will be considered as an error after)
-
 }
 
 
@@ -370,7 +352,7 @@ void update_grid(CtrlStruct *cvs)
 
 
 
-//reset visited_value and update the free_positions of the nodes where there is now opponents
+//reset visited_value and update the free_positions of the nodes where there is now some opponents
 void reset_value_grid(vector<Obstacles> moving_obstacles)
 {
 	int nb_mov_obst = moving_obstacles.size();

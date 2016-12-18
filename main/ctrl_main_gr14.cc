@@ -110,6 +110,8 @@ void controller_loop(CtrlStruct *cvs)
 	set_output(cvs->kalman_pos->y,"y_r");
 	set_output(cvs->kalman_pos->theta,"theta_r");
 
+	// printf("BLUE: %s\n", cvs->inputs->color_seen == 4 ? "TRUE":"FALSE");
+
 	// printf("x: %f\t", cvs->kalman_pos->x);
 	// printf("y: %f\t", cvs->kalman_pos->y);
 	//printf("t: %f\n", cvs->kalman_pos->theta*180/M_PI);
@@ -117,6 +119,9 @@ void controller_loop(CtrlStruct *cvs)
 	// printf("x: %f\t", cvs->kalman_pos->x);
 	// printf("y: %f\t", cvs->kalman_pos->y);
 	// printf("t: %f\n", cvs->kalman_pos->theta*180/M_PI);
+
+	set_plot(cvs->inputs->l_wheel_speed,"l_speed");
+	set_plot(cvs->inputs->l_wheel_speed,"r_speed");
 
 
 	// tower control

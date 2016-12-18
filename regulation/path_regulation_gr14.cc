@@ -48,10 +48,12 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 	double vector_x = x_point-kalman_pos->x;
 	double vector_y = y_point-kalman_pos->y;
 		
+	// static int count = 0;
+	// count++;
+
 	if (i < path.size() - 1)
 	{
 		K = 5;
-
 		if (pow(vector_x,2)+pow(vector_y,2) < RADIUS_TOL) 
 		{
 			set_output(path[i][0],"x_path");
@@ -74,7 +76,7 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 				// printf("Distance2: %.3f\n", pow(vector_x,2)+pow(vector_y,2));
 				strat->main_state = GAME_STATE_WAIT;
 			}
-			else if (strat->status == STRAT_SCORING)
+			else if (strat->status == STRAT_SCORING && cvs->inputs->color_seen == MAP_BLUE)
 			{
 				strat->current_point_id = 0;
 				// printf("Target Released!\n");
