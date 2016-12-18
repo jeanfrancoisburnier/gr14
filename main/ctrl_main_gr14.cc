@@ -77,6 +77,8 @@ void controller_loop(CtrlStruct *cvs)
 	CtrlIn *inputs;
 	CtrlOut *outputs;
 
+	// printf("TEAM: %s\n", cvs->team_id == TEAM_A ? "A":"B");
+
 	// variables initialization
 	inputs  = cvs->inputs;
 	outputs = cvs->outputs;
@@ -120,12 +122,6 @@ void controller_loop(CtrlStruct *cvs)
 	// printf("y: %f\t", cvs->kalman_pos->y);
 	// printf("t: %f\n", cvs->kalman_pos->theta*180/M_PI);
 
-<<<<<<< HEAD
-=======
-	//set_plot(cvs->inputs->l_wheel_speed,"l_speed");
-	//set_plot(cvs->inputs->l_wheel_speed,"r_speed");
-
->>>>>>> master
 
 	// tower control
 	outputs->tower_command = 15.0;

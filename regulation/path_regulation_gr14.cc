@@ -76,7 +76,7 @@ void follow_path(CtrlStruct *cvs, vector<array<float,2> > path)
 				// printf("Distance2: %.3f\n", pow(vector_x,2)+pow(vector_y,2));
 				strat->main_state = GAME_STATE_WAIT;
 			}
-			else if (strat->status == STRAT_SCORING && cvs->inputs->color_seen == MAP_BLUE)
+			else if (strat->status == STRAT_SCORING)
 			{
 				strat->current_point_id = 0;
 				// printf("Target Released!\n");

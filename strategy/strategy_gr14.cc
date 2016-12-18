@@ -28,49 +28,44 @@ vector<array<float,2> > path;
  * 
  * \return strategy structure initialized
  */
-Strategy* init_strategy()
+Strategy* init_strategy(CtrlStruct *cvs)
 {
 	Strategy *strat;
 
 	strat = (Strategy*) malloc(sizeof(Strategy));
 
-	strat->target[0].x = -0.8;
-	strat->target[0].y = +0.0;
-	strat->target[0].status = TARGET_FREE;
+	// printf("TEAM: %s\n", cvs->team_id == TEAM_A ? "A":"B");
+	// strat->target[0].x = -0.8;
+	// strat->target[0].y = +0.0;
+	// strat->target[0].status = TARGET_FREE;
 
-	strat->target[3].x = -0.4;
-	strat->target[3].y = +0.6;
-	strat->target[3].status = TARGET_FREE;
+	// strat->target[3].x = -0.4;
+	// strat->target[3].y = +0.6;
+	// strat->target[3].status = TARGET_FREE;
 
-	strat->target[2].x = +0.7;
-	strat->target[2].y = +0.6;
-	strat->target[2].status = TARGET_FREE;
+	// strat->target[2].x = +0.7;
+	// strat->target[2].y = +0.6;
+	// strat->target[2].status = TARGET_FREE;
 
-	strat->target[1].x = +0.25;
-	strat->target[1].y = +1.25;
-	strat->target[1].status = TARGET_FREE;
+	// strat->target[1].x = +0.25;
+	// strat->target[1].y = +1.25;
+	// strat->target[1].status = TARGET_FREE;
 
-	strat->target[4].x = +0.1;
-	strat->target[4].y = +0.0;
-	strat->target[4].status = TARGET_FREE;
+	// strat->target[4].x = +0.1;
+	// strat->target[4].y = +0.0;
+	// strat->target[4].status = TARGET_FREE;
 
-	strat->target[5].x = +0.7;
-	strat->target[5].y = -0.6;
-	strat->target[5].status = TARGET_FREE;
+	// strat->target[5].x = +0.7;
+	// strat->target[5].y = -0.6;
+	// strat->target[5].status = TARGET_FREE;
 
-	strat->target[6].x = +0.25;
-	strat->target[6].y = -1.25;
-	strat->target[6].status = TARGET_FREE;
+	// strat->target[6].x = +0.25;
+	// strat->target[6].y = -1.25;
+	// strat->target[6].status = TARGET_FREE;
 
-	strat->target[7].x = -0.4;
-	strat->target[7].y = -0.6;
-	strat->target[7].status = TARGET_FREE;
-
-	strat->start_base.x = +0.7;
-	strat->start_base.y = +0.6;
-
-	strat->target_base.x = -0.8;
-	strat->target_base.y = -1.2;
+	// strat->target[7].x = -0.4;
+	// strat->target[7].y = -0.6;
+	// strat->target[7].status = TARGET_FREE;
 
 	strat->current_target_id = 0;
 	strat->current_point_id = 0;
@@ -128,6 +123,87 @@ void main_strategy(CtrlStruct *cvs)
 
 	array<float, 2> source_pos;
 	array<float, 2> goal_pos;
+
+	if (cvs->team_id == TEAM_A)
+	{
+		strat->target[0].x = -0.8;
+		strat->target[0].y = +0.0;
+		strat->target[0].status = TARGET_FREE;
+
+		strat->target[1].x = +0.25;
+		strat->target[1].y = +1.25;
+		strat->target[1].status = TARGET_FREE;
+
+		strat->target[2].x = +0.7;
+		strat->target[2].y = +0.6;
+		strat->target[2].status = TARGET_FREE;
+
+		strat->target[3].x = -0.4;
+		strat->target[3].y = +0.6;
+		strat->target[3].status = TARGET_FREE;
+
+		strat->target[4].x = +0.1;
+		strat->target[4].y = +0.0;
+		strat->target[4].status = TARGET_FREE;
+
+		strat->target[5].x = +0.7;
+		strat->target[5].y = -0.6;
+		strat->target[5].status = TARGET_FREE;
+
+		strat->target[6].x = +0.25;
+		strat->target[6].y = -1.25;
+		strat->target[6].status = TARGET_FREE;
+
+		strat->target[7].x = -0.4;
+		strat->target[7].y = -0.6;
+		strat->target[7].status = TARGET_FREE;
+
+		strat->start_base.x = +0.7;
+		strat->start_base.y = +0.6;
+
+		strat->target_base.x = -0.8;
+		strat->target_base.y = -1.2;
+	}
+	else
+	{
+		strat->target[0].x = -0.8;
+		strat->target[0].y = +0.0;
+		strat->target[0].status = TARGET_FREE;
+
+		strat->target[1].x = +0.25;
+		strat->target[1].y = -1.25;
+		strat->target[1].status = TARGET_FREE;
+
+		strat->target[7].x = +0.7;
+		strat->target[7].y = -0.6;
+		strat->target[7].status = TARGET_FREE;
+
+		strat->target[4].x = -0.4;
+		strat->target[4].y = -0.6;
+		strat->target[4].status = TARGET_FREE;
+
+		strat->target[3].x = +0.1;
+		strat->target[3].y = +0.0;
+		strat->target[3].status = TARGET_FREE;
+
+		strat->target[5].x = +0.7;
+		strat->target[5].y = +0.6;
+		strat->target[5].status = TARGET_FREE;
+
+		strat->target[2].x = +0.25;
+		strat->target[2].y = +1.25;
+		strat->target[2].status = TARGET_FREE;
+
+		strat->target[6].x = -0.4;
+		strat->target[6].y = +0.6;
+		strat->target[6].status = TARGET_FREE;
+
+		strat->start_base.x = +0.7;
+		strat->start_base.y = -0.6;
+
+		strat->target_base.x = -0.8;
+		strat->target_base.y = +1.2;
+	}
 
 	switch (strat->main_state)
 	{
